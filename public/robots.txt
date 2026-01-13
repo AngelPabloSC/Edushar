@@ -1,0 +1,6 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location (update when you have a sitemap)
+# Sitemap: https://edushar.com/sitemap.xml

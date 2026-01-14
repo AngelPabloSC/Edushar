@@ -19,10 +19,10 @@ import DictionaryCard from '../../components/DictionaryCard';
 import { dictionaryEntries, dictionaryStats } from '../../data/dictionaryData';
 
 /**
- * Página del Diccionario Bilingüe Shuar-Español
+ * Página Pública del Diccionario Bilingüe Shuar-Español
  * Permite buscar palabras con ejemplos de uso
  */
-const StudentDictionary = () => {
+const Dictionary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -133,48 +133,48 @@ const StudentDictionary = () => {
 
       {/* Empty State / Suggestion */}
       {!loading && (
-             <Paper
-             elevation={0}
-             sx={{
-               p: 6,
-               mt: 4,
-               textAlign: 'center',
-               bgcolor: 'rgba(209, 154, 74, 0.08)',
-               borderRadius: 4,
-               border: '2px dashed',
-               borderColor: 'rgba(209, 154, 74, 0.3)',
-             }}
-           >
-             <SearchOffIcon sx={{ fontSize: 64, color: 'rgba(209, 154, 74, 0.5)', mb: 2 }} />
-             <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
-               ¿No encuentras lo que buscas?
-             </Typography>
-             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
-               Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
-             </Typography>
-             <Button
-               variant="contained"
-               startIcon={<AddCircleOutlineIcon />}
-               onClick={() => navigate('/estudiante/contribuciones')}
-               sx={{
-                 bgcolor: 'secondary.main',
-                 color: 'white',
-                 fontWeight: 'bold',
-                 px: 4,
-                 py: 1.5,
-                 fontSize: '1rem',
-                 '&:hover': {
-                   bgcolor: 'secondary.dark',
-                   transform: 'scale(1.05)',
-                 },
-                 transition: 'all 0.2s',
-               }}
-             >
-               Contribuir nueva palabra
-             </Button>
-           </Paper>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 6,
+            mt: 4,
+            textAlign: 'center',
+            bgcolor: 'rgba(209, 154, 74, 0.08)',
+            borderRadius: 4,
+            border: '2px dashed',
+            borderColor: 'rgba(209, 154, 74, 0.3)',
+          }}
+        >
+          <SearchOffIcon sx={{ fontSize: 64, color: 'rgba(209, 154, 74, 0.5)', mb: 2 }} />
+          <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
+            ¿No encuentras lo que buscas?
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
+            Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={() => navigate('/login')} // Redirigir a login si es público
+            sx={{
+              bgcolor: 'secondary.main',
+              color: 'white',
+              fontWeight: 'bold',
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              '&:hover': {
+                bgcolor: 'secondary.dark',
+                transform: 'scale(1.05)',
+              },
+              transition: 'all 0.2s',
+            }}
+          >
+            Inicia sesión para contribuir
+          </Button>
+        </Paper>
       )}
- 
+
       {/* Footer Stats */}
       <Box
         sx={{
@@ -229,4 +229,4 @@ const StudentDictionary = () => {
   );
 };
 
-export default StudentDictionary;
+export default Dictionary;

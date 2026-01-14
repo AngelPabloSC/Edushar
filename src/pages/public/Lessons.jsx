@@ -13,8 +13,7 @@ const Lessons = () => {
   const lessonsByLevel = getLessonsByLevel();
 
   const handleLessonClick = (lessonId) => {
-    console.log('Lesson clicked:', lessonId);
-    // TODO: Navigate to lesson detail page
+    navigate('/login');
   };
 
   const levelIcons = {

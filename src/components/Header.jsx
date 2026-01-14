@@ -3,9 +3,10 @@ import Nature from '@mui/icons-material/Nature';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const navMenu = [
+  { label: 'Inicio', path: '/' },
   { label: 'Lecciones', path: '/lecciones' },
   { label: 'Cuentos', path: '/cuentos' },
-  { label: 'Juegos', path: '/juegos' },
+  { label: 'Diccionario', path: '/diccionario' },
 ];
 
 const Header = () => {

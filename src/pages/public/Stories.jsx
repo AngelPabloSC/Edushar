@@ -8,8 +8,9 @@ import {
   InputAdornment,
   Paper,
   Pagination,
+  Skeleton,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -20,18 +21,22 @@ import StoryCard from '../../components/StoryCard';
 import { storiesData } from '../../data/storiesData';
 
 /**
- * Página de Biblioteca de Cuentos Shuar
+ * Página Pública de Biblioteca de Cuentos Shuar
  * Muestra cuentos y leyendas con filtros por categoría
  */
-const StudentStories = () => {
+const Stories = () => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // Usar datos reales de cuentos
-  const stories = storiesData;
-
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const categories = [
     { id: 'all', name: 'Todos los relatos', icon: <AutoAwesomeIcon /> },
@@ -41,7 +46,7 @@ const StudentStories = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -171,35 +176,50 @@ const StudentStories = () => {
 
           {/* Grid de Cards */}
           <Grid container spacing={3}>
-            {stories.map((story) => (
-              <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                <StoryCard 
-                  story={story} 
-                  onClick={() => navigate(`/estudiante/cuentos/${story.id}`)}
-                />
-              </Grid>
-            ))}
+            {loading 
+              ? [1, 2, 3, 4, 5, 6].map((n) => (
+                  <Grid key={n} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StoryCard loading={true} />
+                  </Grid>
+                ))
+              : storiesData
+                  .filter(story => selectedCategory === 'all' || story.category?.toLowerCase().includes(selectedCategory))
+                  .filter(story => 
+                    story.title?.shuar?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                    story.title?.es?.toLowerCase().includes(searchQuery.toLowerCase())
+                  )
+                  .map((story) => (
+                    <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                      <StoryCard 
+                        story={story} 
+                        onClick={() => navigate('/login')}
+                      />
+                    </Grid>
+                  ))
+            }
           </Grid>
 
           {/* Paginación */}
-          <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-            <Pagination
-              count={8}
-              page={page}
-              onChange={(e, value) => setPage(value)}
-              color="secondary"
-              size="large"
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  fontWeight: 'bold',
-                },
-              }}
-            />
-          </Box>
+          {!loading && (
+            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
+              <Pagination
+                count={8}
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="secondary"
+                size="large"
+                sx={{
+                  '& .MuiPaginationItem-root': {
+                    fontWeight: 'bold',
+                  },
+                }}
+              />
+            </Box>
+          )}
         </Grid>
       </Grid>
     </Container>
   );
 };
 
-export default StudentStories;
+export default Stories;

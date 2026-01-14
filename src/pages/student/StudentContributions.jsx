@@ -20,6 +20,10 @@ import {
   Grid,
   Card,
   CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material';
 import { useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
@@ -31,8 +35,20 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
  * Página de Contribuciones del Estudiante
  * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
  */
+import { useDialong } from '../../hooks/useDialog';
+import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
+import validationRules from '../../utils/validationRules';
+
+/**
+ * Página de Contribuciones del Estudiante
+ * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
+ */
 const StudentContributions = () => {
+  const {  isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
+  const { handleSetDataSnackbar } = useSnackBarContext();
   const [activeTab, setActiveTab] = useState('palabra');
+  const [actionCallback, setActionCallback] = useState(null);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     palabraShuar: '',
     traduccionEspanol: '',
@@ -42,11 +58,53 @@ const StudentContributions = () => {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error when user types
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.palabraShuar) newErrors.palabraShuar = validationRules.required;
+    if (!formData.traduccionEspanol) newErrors.traduccionEspanol = validationRules.required;
+    if (!formData.categoria) newErrors.categoria = validationRules.required;
+    
+    // Example usage of other rules if needed, e.g. length check
+    // if (formData.palabraShuar.length < 2) newErrors.palabraShuar = validationRules.minLength(2).message;
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleConfirmSubmit = () => {
+    // Aquí iría la lógica real para enviar la contribución a la API
+    console.log('Enviando contribución:', formData);
+    handleSetDataSnackbar({ message: '¡Gracias! Tu contribución ha sido enviada para revisión.', type: 'success' });
+    
+    // Resetear formulario
+    setFormData({
+        palabraShuar: '',
+        traduccionEspanol: '',
+        categoria: '',
+        ejemploUso: '',
+    });
+    handleCloseDialog();
   };
 
   const handleSubmit = () => {
-    console.log('Enviando contribución:', formData);
-    // Aquí iría la lógica para enviar la contribución
+    if (!validateForm()) {
+        handleSetDataSnackbar({ message: 'Por favor corrige los errores antes de enviar', type: 'error' });
+        return;
+    }
+
+    setDialongContent({
+        title: '¿Confirmar envío?',
+        message: 'Tu contribución será revisada por un administrador antes de ser publicada. ¿Deseas continuar?'
+    });
+    setActionCallback(() => handleConfirmSubmit);
+    handleOpenDialog();
   };
 
   // Datos de ejemplo para el historial
@@ -183,6 +241,8 @@ const StudentContributions = () => {
                     placeholder="Ej: Kúshush"
                     value={formData.palabraShuar}
                     onChange={(e) => handleInputChange('palabraShuar', e.target.value)}
+                    error={!!errors.palabraShuar}
+                    helperText={errors.palabraShuar}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
@@ -197,6 +257,8 @@ const StudentContributions = () => {
                     placeholder="Ej: Armadillo"
                     value={formData.traduccionEspanol}
                     onChange={(e) => handleInputChange('traduccionEspanol', e.target.value)}
+                    error={!!errors.traduccionEspanol}
+                    helperText={errors.traduccionEspanol}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 2,
@@ -205,7 +267,7 @@ const StudentContributions = () => {
                   />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <FormControl fullWidth>
+                  <FormControl fullWidth error={!!errors.categoria}>
                     <InputLabel>Categoría</InputLabel>
                     <Select
                       value={formData.categoria}
@@ -222,6 +284,11 @@ const StudentContributions = () => {
                       <MenuItem value="verbos">Verbos</MenuItem>
                       <MenuItem value="otros">Otros</MenuItem>
                     </Select>
+                    {errors.categoria && (
+                        <Typography variant="caption" color="error" sx={{ ml: 1.5, mt: 0.5 }}>
+                            {errors.categoria}
+                        </Typography>
+                    )}
                   </FormControl>
                 </Grid>
                 <Grid size={{ xs: 12 }}>
@@ -239,6 +306,38 @@ const StudentContributions = () => {
                       },
                     }}
                   />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Button
+                    variant="outlined"
+                    component="label"
+                    fullWidth
+                    sx={{
+                      height: 100,
+                      borderStyle: 'dashed',
+                      borderWidth: 2,
+                      borderRadius: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      textTransform: 'none',
+                      color: 'text.secondary',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
+                        <span className="material-symbols-outlined">add_photo_alternate</span>
+                    </Box>
+                    <Typography variant="body2" fontWeight="medium">
+                        Subir una imagen o foto (Opcional)
+                    </Typography>
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={(e) => console.log('File selected:', e.target.files[0])}
+                    />
+                  </Button>
                 </Grid>
               </Grid>
             )}
@@ -434,6 +533,35 @@ const StudentContributions = () => {
           </Table>
         </TableContainer>
       </Box>
+
+
+      {/* Confirmation Dialog */}
+      <Dialog 
+            open={isOpen} 
+            onClose={handleCloseDialog}
+            PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+        >
+            <DialogTitle sx={{ fontWeight: 'bold' }}>{dialongContent.title}</DialogTitle>
+            <DialogContent>
+                <Typography color="text.secondary">
+                    {dialongContent.message}
+                </Typography>
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 2 }}>
+                <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                    Cancelar
+                </Button>
+                <Button 
+                    onClick={actionCallback} 
+                    variant="contained" 
+                    color="primary"
+                    sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, color: 'white' }}
+                    autoFocus
+                >
+                    Confirmar Envío
+                </Button>
+            </DialogActions>
+        </Dialog>
     </Container>
   );
 };

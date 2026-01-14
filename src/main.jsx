@@ -5,6 +5,8 @@ import App from './App.jsx';
 import { ThemeeProvider } from './hooks/context/ThemeContext.jsx';
 import { AuthProvider } from './hooks/context/AuthContext.jsx';
 import { SidebarProvider } from './hooks/context/sidebardContext.jsx';
+import GlobalSnackbarProvider from './hooks/context/SnackbarContext.jsx';
+import { SnackbarProvider } from 'notistack';
 import CssBaseline from '@mui/material/CssBaseline';
 import './index.css';
 
@@ -12,11 +14,15 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ThemeeProvider>
       <CssBaseline />
-      <AuthProvider>
-        <SidebarProvider>
-          <App />
-        </SidebarProvider>
-      </AuthProvider>
+      <SnackbarProvider maxSnack={3}>
+        <GlobalSnackbarProvider>
+          <AuthProvider>
+            <SidebarProvider>
+              <App />
+            </SidebarProvider>
+          </AuthProvider>
+        </GlobalSnackbarProvider>
+      </SnackbarProvider>
     </ThemeeProvider>
   </BrowserRouter>
 );

@@ -1,87 +1,107 @@
 export const lessonsData = [
-    // Nivel 1: Fundamentos
     {
         id: 1,
-        level: 1,
-        levelName: 'Nivel 1: Fundamentos',
-        title: 'Saludos Básicos',
-        description: 'Aprende a decir hola, adiós y a presentarte respetuosamente en la cultura Shuar.',
-        image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400',
-        locked: false,
-        completed: true,
-        inProgress: false,
+        order: '01',
+        title: 'Saludos y Presentaciones',
+        level: 'A1 - Principiante',
+        status: 'Publicada',
+        icon: 'menu_book',
     },
     {
         id: 2,
-        level: 1,
-        levelName: 'Nivel 1: Fundamentos',
-        title: 'La Familia',
-        description: 'Vocabulario esencial para describir a los miembros de tu familia y las relaciones de parentesco.',
-        image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400',
-        locked: false,
-        completed: false,
-        inProgress: true,
-        progress: 60,
+        order: '02',
+        title: 'Números del 1 al 100',
+        level: 'A1 - Principiante',
+        status: 'Borrador',
+        icon: 'calculate',
     },
     {
         id: 3,
-        level: 1,
-        levelName: 'Nivel 1: Fundamentos',
-        title: 'Los Números',
-        description: 'Aprende a contar del 1 al 20 y los conceptos básicos de cantidad en Shuar.',
-        image: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?w=400',
-        locked: true,
-        completed: false,
-        inProgress: false,
+        order: '03',
+        title: 'Miembros de la Familia',
+        level: 'A2 - Elemental',
+        status: 'Publicada',
+        icon: 'family_history',
     },
-    // Nivel 2: Intermedio
     {
         id: 4,
-        level: 2,
-        levelName: 'Nivel 2: Intermedio',
-        title: 'Verbos Comunes',
-        description: 'Acciones cotidianas: comer, dormir, caminar y trabajar.',
-        image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400',
-        locked: true,
-        completed: false,
-        inProgress: false,
-    },
-    {
-        id: 5,
-        level: 2,
-        levelName: 'Nivel 2: Intermedio',
-        title: 'La Naturaleza',
-        description: 'Nombres de árboles, plantas y fenómenos naturales de la selva.',
-        image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400',
-        locked: true,
-        completed: false,
-        inProgress: false,
-    },
-    {
-        id: 6,
-        level: 2,
-        levelName: 'Nivel 2: Intermedio',
-        title: 'Cultura y Tradición',
-        description: 'Explora las costumbres, vestimenta y rituales del pueblo Shuar.',
-        image: 'https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?w=400',
-        locked: true,
-        completed: false,
-        inProgress: false,
+        order: '04',
+        title: 'Comida y Tradición',
+        level: 'B1 - Intermedio',
+        status: 'Publicada',
+        icon: 'restaurant',
     },
 ];
 
-// Agrupar lecciones por nivel
+export const lessonColumns = [
+    {
+        name: "order",
+        label: "Orden",
+        options: {
+            filter: true,
+            sort: true,
+        }
+    },
+    {
+        name: "title",
+        label: "Título de la Lección",
+        options: {
+            filter: true,
+            sort: true,
+        }
+    },
+    {
+        name: "level",
+        label: "Nivel",
+        options: {
+            filter: true,
+            sort: true,
+        }
+    },
+    {
+        name: "status",
+        label: "Estado",
+        options: {
+            filter: true,
+            sort: true,
+        }
+    },
+    {
+        name: "actions",
+        label: "Acciones",
+        options: {
+            filter: false,
+            sort: false,
+            empty: true,
+        }
+    }
+];
+
+// Helper function to group lessons by level - returns array
 export const getLessonsByLevel = () => {
     const grouped = {};
-    lessonsData.forEach((lesson) => {
-        if (!grouped[lesson.level]) {
-            grouped[lesson.level] = {
-                level: lesson.level,
-                levelName: lesson.levelName,
-                lessons: [],
+
+    lessonsData.forEach(lesson => {
+        const level = lesson.level;
+        if (!grouped[level]) {
+            grouped[level] = {
+                level: level,
+                lessons: []
             };
         }
-        grouped[lesson.level].lessons.push(lesson);
+        grouped[level].lessons.push(lesson);
     });
-    return Object.values(grouped);
+
+    // Convert object to array and sort by level
+    const levelOrder = {
+        'A1 - Principiante': 1,
+        'A2 - Elemental': 2,
+        'B1 - Intermedio': 3,
+        'B2 - Intermedio Alto': 4,
+        'C1 - Avanzado': 5
+    };
+
+    return Object.values(grouped).sort((a, b) => {
+        return (levelOrder[a.level] || 999) - (levelOrder[b.level] || 999);
+    });
 };

@@ -1,11 +1,11 @@
-import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Tooltip, TextField, InputAdornment, LinearProgress, Paper, Button } from '@mui/material';
+import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Tooltip, TextField, InputAdornment, LinearProgress, Paper, Button, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { lessonsData } from '../../data/lessonsData';
 import LockIcon from '@mui/icons-material/Lock';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /**
  * Dashboard del estudiante - Muestra todas las lecciones disponibles
@@ -14,6 +14,14 @@ import { useState } from 'react';
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleLessonClick = (lessonId, isLocked) => {
     if (!isLocked) {
@@ -55,7 +63,7 @@ const StudentDashboard = () => {
       {/* Header Section */}
       <Box sx={{ mb: 6 }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 3, mb: 4 }}>
-          <Box sx={{ maxWidth: 720 }}>
+          <Box sx={{ maxWidth: 720, width: '100%' }}>
             <Typography 
               variant="h2" 
               component="h1" 
@@ -118,48 +126,52 @@ const StudentDashboard = () => {
         </Box>
 
         {/* Widget de Progreso Global */}
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            borderRadius: 4,
-            bgcolor: 'background.paper',
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: 1,
-          }}
-        >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-            <Box>
-              <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Nivel 1: Principiante
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Has completado {completedLessons} de {totalLessons} lecciones
+        {loading ? (
+          <Skeleton variant="rectangular" height={100} sx={{ borderRadius: 4 }} animation="wave" />
+        ) : (
+          <Paper
+            elevation={0}
+            sx={{
+              p: 3,
+              borderRadius: 4,
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: 1,
+            }}
+          >
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
+              <Box>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  Nivel 1: Principiante
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Has completado {completedLessons} de {totalLessons} lecciones
+                </Typography>
+              </Box>
+              <Typography variant="h5" fontWeight="bold" color="secondary.main">
+                {globalProgress}%
               </Typography>
             </Box>
-            <Typography variant="h5" fontWeight="bold" color="secondary.main">
-              {globalProgress}%
-            </Typography>
-          </Box>
-          <LinearProgress
-            variant="determinate"
-            value={globalProgress}
-            sx={{
-              height: 12,
-              borderRadius: 10,
-              bgcolor: 'rgba(0, 0, 0, 0.05)',
-              '& .MuiLinearProgress-bar': {
+            <LinearProgress
+              variant="determinate"
+              value={globalProgress}
+              sx={{
+                height: 12,
                 borderRadius: 10,
-                bgcolor: 'secondary.main',
-              },
-            }}
-          />
-        </Paper>
+                bgcolor: 'rgba(0, 0, 0, 0.05)',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 10,
+                  bgcolor: 'secondary.main',
+                },
+              }}
+            />
+          </Paper>
+        )}
       </Box>
 
       {/* Mensaje si no hay resultados */}
-      {Object.keys(lessonsByLevel).length === 0 && (
+      {!loading && Object.keys(lessonsByLevel).length === 0 && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="h5" color="text.secondary" gutterBottom>
             No se encontraron lecciones
@@ -170,8 +182,40 @@ const StudentDashboard = () => {
         </Box>
       )}
 
-      {/* Lecciones por Nivel */}
-      {Object.entries(lessonsByLevel).map(([levelName, lessons]) => (
+      {/* Lecciones por Nivel Skeleton Loading */}
+      {loading && (
+        <Box sx={{ mb: 8 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+            <Skeleton variant="rounded" width={40} height={40} animation="wave" />
+            <Skeleton variant="text" width={300} height={40} animation="wave" />
+          </Box>
+          <Grid container spacing={{ xs: 3, md: 4 }}>
+            {[1, 2, 3].map((item) => (
+              <Grid key={item} size={{ xs: 12, sm: 6, md: 4 }}>
+                <Card 
+                  sx={{ 
+                    height: '100%', 
+                    borderRadius: 4, 
+                    border: '1px solid',
+                    borderColor: 'divider'
+                  }}
+                >
+                  <Skeleton variant="rectangular" height={192} animation="wave" />
+                  <CardContent sx={{ p: 3 }}>
+                    <Skeleton variant="text" height={32} width="80%" sx={{ mb: 2 }} animation="wave" />
+                    <Skeleton variant="text" height={20} width="100%" animation="wave" />
+                    <Skeleton variant="text" height={20} width="60%" sx={{ mb: 3 }} animation="wave" />
+                    <Skeleton variant="rectangular" height={40} sx={{ borderRadius: 1 }} animation="wave" />
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      )}
+
+      {/* Lecciones por Nivel Data */}
+      {!loading && Object.entries(lessonsByLevel).map(([levelName, lessons]) => (
         <Box key={levelName} sx={{ mb: 8 }}>
           {/* Título del Nivel */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>

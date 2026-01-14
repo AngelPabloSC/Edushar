@@ -7,9 +7,9 @@ import {
   Paper,
   Grid,
   Chip,
-  LinearProgress,
 } from '@mui/material';
 import { useState } from 'react';
+import { studentProfileData } from '../../data/profileData';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
@@ -28,34 +28,19 @@ import StarIcon from '@mui/icons-material/Star';
  * Muestra estadísticas, medallas y actividad reciente
  */
 const StudentProfile = () => {
-  const [user] = useState({
-    name: 'Juan Pérez',
-    level: 'Nivel 4',
-    streak: 5,
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400',
-  });
+  const [user] = useState(studentProfileData.user);
+  const { stats, medals, activities } = studentProfileData;
 
-  const stats = {
-    lessonsCompleted: 12,
-    totalLessons: 20,
-    wordsLearned: 150,
-    lessonsProgress: 60,
+  const getMedalIcon = (type) => {
+    switch (type) {
+      case 'military': return <MilitaryTechIcon />;
+      case 'story': return <AutoStoriesIcon />;
+      case 'trophy': return <EmojiEventsIcon />;
+      case 'brain': return <PsychologyIcon />;
+      case 'group': return <Diversity3Icon />;
+      default: return <EmojiEventsIcon />;
+    }
   };
-
-  const medals = [
-    { id: 1, name: 'Guardián Amazónico', icon: <MilitaryTechIcon />, color: 'warning', earned: true },
-    { id: 2, name: 'Primer Cuento', icon: <AutoStoriesIcon />, color: 'info', earned: true },
-    { id: 3, name: 'Maestro Vocabulario', icon: <EmojiEventsIcon />, color: 'success', earned: true },
-    { id: 4, name: 'Políglota Shuar', icon: <PsychologyIcon />, color: 'default', earned: false },
-    { id: 5, name: 'Líder Comunitario', icon: <Diversity3Icon />, color: 'default', earned: false },
-  ];
-
-  const activities = [
-    { id: 1, title: 'Lección Completada: Saludos', time: 'Hace 2 horas', type: 'lesson', exp: 50 },
-    { id: 2, title: 'Leíste: El Origen del Sol', time: 'Ayer', type: 'story' },
-    { id: 3, title: 'Nueva Medalla: Maestro Vocabulario', time: 'Hace 2 días', type: 'medal' },
-    { id: 4, title: 'Quiz: Animales de la Selva', time: 'Lunes', type: 'quiz', score: '100%' },
-  ];
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -418,10 +403,9 @@ const StudentProfile = () => {
                             ? 'info.main'
                             : 'success.main'
                           : 'text.disabled',
-                        boxShadow: medal.earned && medal.color === 'warning' ? 3 : 0,
                       }}
                     >
-                      {medal.icon}
+                      {getMedalIcon(medal.iconType)}
                     </Box>
                     <Typography variant="caption" fontWeight="bold" textAlign="center" sx={{ maxWidth: 80 }}>
                       {medal.name}

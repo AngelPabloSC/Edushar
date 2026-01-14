@@ -23,7 +23,9 @@ const Header2 = () => {
 
   const handleProfile = () => {
     handleMenuClose();
-    navigate('/estudiante/perfil');
+    // Navegar según el rol del usuario
+    const profileRoute = user?.rol === 'ADMIN' ? '/admin/perfil' : '/estudiante/perfil';
+    navigate(profileRoute);
   };
 
   const handleLogout = () => {

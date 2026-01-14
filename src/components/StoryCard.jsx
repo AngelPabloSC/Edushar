@@ -1,189 +1,166 @@
-import {
-  Card,
-  CardContent,
-  CardMedia,
-  CardActionArea,
-  Box,
-  Typography,
-  Chip,
-  Button,
-} from '@mui/material';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, IconButton, Chip, Paper, useTheme, alpha } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PersonIcon from '@mui/icons-material/Person';
 
-/**
- * Componente reutilizable para mostrar cards de cuentos
- */
-const StoryCard = ({ story }) => {
-  const navigate = useNavigate();
+const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
+    const theme = useTheme();
 
-  const getCategoryColor = (category) => {
-    const colors = {
-      'Mito': 'error',
-      'Leyenda': 'warning',
-      'Vida': 'info',
-    };
-    return colors[category] || 'default';
-  };
+    // Safety check
+    if (!story) {
+        return null;
+    }
 
-  return (
-    <Card
-      elevation={0}
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 3,
-        border: '1px solid',
-        borderColor: 'divider',
-        boxShadow: 1,
-        transition: 'all 0.3s',
-        '&:hover': {
-          boxShadow: 6,
-          transform: 'translateY(-4px)',
-        },
-      }}
-    >
-      <CardActionArea 
-          onClick={() => navigate(`/cuento/${story.id}`)}
-          sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+
+    return (
+        <Paper 
+            elevation={0}
+            onClick={onClick ? () => onClick(story) : undefined}
+            sx={{ 
+                borderRadius: 4, 
+                overflow: 'hidden', 
+                border: '1px solid', 
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: onClick ? 'pointer' : 'default',
+                '&:hover': { 
+                    transform: onClick ? 'translateY(-4px)' : 'none',
+                    boxShadow: onClick ? '0 12px 24px -4px rgba(0,0,0,0.08)' : 'none',
+                    borderColor: onClick ? 'primary.main' : 'divider'
+                }
+            }}
         >
-        {/* Imagen */}
-        <Box sx={{ position: 'relative' }}>
-          <CardMedia
-            component="img"
-            height="192"
-            image={story.image}
-            alt={story.titleSpanish}
-            sx={{
-              objectFit: 'cover',
-            }}
-          />
-          {/* Gradiente overlay */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              height: '50%',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)',
-            }}
-          />
-          {/* Badges */}
-          <Box
-            sx={{
-              position: 'absolute',
-              bottom: 12,
-              left: 12,
-              display: 'flex',
-              gap: 1,
-            }}
-          >
-            <Chip
-              label={story.category}
-              size="small"
-              color={getCategoryColor(story.category)}
-              sx={{
-                fontWeight: 'bold',
-                fontSize: '0.65rem',
-                height: 20,
-              }}
-            />
-          </Box>
-        </Box>
+            {/* Cover Image & Badges */}
+            <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+                <Box 
+                    component="img"
+                    src={story?.cover || 'https://via.placeholder.com/400x225'}
+                    alt={story?.title?.es || 'Story cover'}
+                    sx={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover' 
+                    }}
+                />
+                <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 1 }}>
+                     <Chip 
+                        label={story?.category || 'General'} 
+                        size="small"
+                        sx={{ 
+                            height: 20, 
+                            fontSize: '0.65rem', 
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            bgcolor: alpha(theme.palette.primary.main, 0.9),
+                            color: 'white',
+                            border: 'none',
+                            backdropFilter: 'blur(4px)'
+                        }} 
+                    />
+                    <Chip 
+                        label={story?.status || 'Borrador'} 
+                        size="small"
+                        sx={{ 
+                            height: 20, 
+                            fontSize: '0.65rem', 
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            bgcolor: story?.status === 'Publicado' ? alpha(theme.palette.info.main, 0.9) : alpha(theme.palette.grey[500], 0.9),
+                            color: 'white',
+                            border: 'none',
+                            backdropFilter: 'blur(4px)'
+                        }} 
+                    />
+                </Box>
+            </Box>
 
-        {/* Contenido */}
-        <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <Typography
-            variant="caption"
-            sx={{
-              color: 'error.main',
-              fontStyle: 'italic',
-              fontWeight: 500,
-              mb: 0.5,
-            }}
-          >
-            {story.titleShuar}
-          </Typography>
-          <Typography
-            variant="h6"
-            component="h3"
-            gutterBottom
-            sx={{
-              fontWeight: 'bold',
-              lineHeight: 1.3,
-            }}
-          >
-            {story.titleSpanish}
-          </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{
-              lineHeight: 1.6,
-              flexGrow: 1,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {story.description}
-          </Typography>
+            {/* Content */}
+            <Box sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                    <Box>
+                        <Typography 
+                            variant="h6" 
+                            fontWeight={800} 
+                            sx={{ 
+                                lineHeight: 1.2, 
+                                mb: 0.5,
+                                fontSize: '1.1rem',
+                                color: 'text.primary'
+                            }}
+                        >
+                            {story?.title?.es || 'Sin título'}
+                        </Typography>
+                        <Typography 
+                            variant="body2" 
+                            sx={{ 
+                                color: theme.palette.success.main, // Using green for Shuar context
+                                fontWeight: 500, 
+                                fontStyle: 'italic',
+                                fontSize: '0.85rem'
+                            }}
+                        >
+                            Shuar / Español
+                        </Typography>
+                    </Box>
+                    <IconButton size="small" sx={{ color: 'text.disabled' }}>
+                        <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                </Box>
 
-          {/* Footer */}
-          <Box
-            sx={{
-              mt: 2,
-              pt: 2,
-              borderTop: '1px solid',
-              borderColor: 'divider',
-            }}
-          >
-            <Button
-              variant="text"
-              endIcon={<ArrowForwardIcon />}
-              fullWidth
-              sx={{
-                color: 'secondary.main',
-                fontWeight: 'bold',
-                py: 1,
-                justifyContent: 'center',
-                textTransform: 'none',
-                fontSize: '0.875rem',
-                '& .MuiButton-endIcon': {
-                  transition: 'transform 0.2s',
-                },
-                '&:hover': {
-                  bgcolor: 'rgba(209, 154, 74, 0.08)',
-                },
-                '&:hover .MuiButton-endIcon': {
-                  transform: 'translateX(4px)',
-                },
-                transition: 'all 0.2s',
-              }}
-            >
-              Leer ahora →
-            </Button>
-          </Box>
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
+                {/* Author Info */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <PersonIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                    <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                        {story?.author || 'Anónimo'}
+                    </Typography>
+                </Box>
 
-StoryCard.propTypes = {
-  story: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    titleShuar: PropTypes.string.isRequired,
-    titleSpanish: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
-    duration: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-  }).isRequired,
+                {/* Actions */}
+                {(onEdit || onDelete) && (
+                    <Box sx={{ display: 'flex', gap: 1, pt: 2, borderTop: '1px solid', borderColor: alpha(theme.palette.divider, 0.5) }}>
+                        {onEdit && (
+                            <Button 
+                                fullWidth 
+                                variant="contained" 
+                                size="small"
+                                onClick={() => onEdit(story)}
+                                startIcon={<EditIcon sx={{ fontSize: 16 }} />}
+                                sx={{ 
+                                    bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                                    color: 'primary.dark',
+                                    boxShadow: 'none',
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15), boxShadow: 'none' }
+                                }}
+                            >
+                                Editar
+                            </Button>
+                        )}
+                        {onDelete && (
+                            <Button 
+                                fullWidth 
+                                variant="text" 
+                                size="small"
+                                onClick={() => onDelete(story.id)}
+                                startIcon={<DeleteIcon sx={{ fontSize: 16 }} />}
+                                sx={{ 
+                                    color: 'text.secondary',
+                                    fontWeight: 700,
+                                    borderRadius: 2,
+                                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.08), color: 'error.main' }
+                                }}
+                            >
+                                Borrar
+                            </Button>
+                        )}
+                    </Box>
+                )}
+            </Box>
+        </Paper>
+    );
 };
 
 export default StoryCard;

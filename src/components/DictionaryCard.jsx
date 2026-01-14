@@ -6,6 +6,7 @@ import {
   Typography,
   Chip,
   Button,
+  Skeleton,
 } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
@@ -14,7 +15,62 @@ import PropTypes from 'prop-types';
 /**
  * Componente reutilizable para mostrar entradas del diccionario
  */
-const DictionaryCard = ({ entry }) => {
+const DictionaryCard = ({ entry, loading = false }) => {
+  if (loading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: 'divider',
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+        }}
+      >
+        <Skeleton 
+          variant="rectangular" 
+          width={{ xs: '100%', md: 192 }} 
+          height={{ xs: 192, md: '100%' }}
+          sx={{ minHeight: { md: 240 } }}
+          animation="wave" 
+        />
+        <CardContent sx={{ flex: 1, p: 3 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Box sx={{ width: '60%' }}>
+              <Skeleton variant="text" height={48} width="80%" sx={{ mb: 1 }} animation="wave" />
+              <Skeleton variant="text" height={28} width="60%" animation="wave" />
+            </Box>
+            <Skeleton variant="rounded" width={80} height={24} animation="wave" />
+          </Box>
+
+          <Box
+            sx={{
+              mt: 3,
+              pl: 2,
+              borderLeft: '3px solid',
+              borderColor: 'rgba(0,0,0,0.1)',
+              bgcolor: 'rgba(0, 0, 0, 0.03)',
+              py: 2,
+              pr: 2,
+              borderRadius: 1,
+            }}
+          >
+            <Skeleton variant="text" height={24} width="100%" sx={{ mb: 1.5 }} animation="wave" />
+            <Skeleton variant="text" height={24} width="90%" animation="wave" />
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+            <Skeleton variant="rounded" width={100} height={32} animation="wave" />
+            <Skeleton variant="rounded" width={90} height={32} animation="wave" />
+          </Box>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card
       elevation={0}
@@ -135,22 +191,6 @@ const DictionaryCard = ({ entry }) => {
           >
             Pronunciar
           </Button>
-          <Button
-            size="small"
-            startIcon={<BookmarkBorderIcon />}
-            sx={{
-              color: 'secondary.main',
-              fontWeight: 'bold',
-              fontSize: '0.8rem',
-              textTransform: 'none',
-              px: 2,
-              '&:hover': {
-                bgcolor: 'rgba(209, 154, 74, 0.08)',
-              },
-            }}
-          >
-            Guardar
-          </Button>
         </Box>
       </CardContent>
     </Card>
@@ -159,14 +199,15 @@ const DictionaryCard = ({ entry }) => {
 
 DictionaryCard.propTypes = {
   entry: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    wordShuar: PropTypes.string.isRequired,
-    wordSpanish: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
-    exampleShuar: PropTypes.string.isRequired,
-    exampleSpanish: PropTypes.string.isRequired,
-    image: PropTypes.string.isRequired,
-  }).isRequired,
+    id: PropTypes.number,
+    wordShuar: PropTypes.string,
+    wordSpanish: PropTypes.string,
+    category: PropTypes.string,
+    exampleShuar: PropTypes.string,
+    exampleSpanish: PropTypes.string,
+    image: PropTypes.string,
+  }),
+  loading: PropTypes.bool,
 };
 
 export default DictionaryCard;

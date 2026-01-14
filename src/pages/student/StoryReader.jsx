@@ -17,6 +17,8 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
+import { storiesData } from '../../data/storiesData';
+
 /**
  * Página de lectura de cuentos bilingüe (Shuar-Español)
  * Incluye paginación y toggle de traducción
@@ -27,41 +29,8 @@ const StoryReader = () => {
   const [showTranslation, setShowTranslation] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Datos de ejemplo del cuento
-  const story = {
-    id: 1,
-    titleShuar: 'Etsa tura Yawá',
-    titleSpanish: 'Etsa y el Jaguar',
-    category: 'Mito Ancestral',
-    image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200',
-    introduction: 'Este relato narra cómo el joven Etsa restauró el equilibrio en la selva amazónica, enseñando al jaguar su lugar en la naturaleza.',
-    pages: [
-      {
-        paragraphs: [
-          {
-            shuar: 'Yaunchu, Etsa nayaimpinam pujuyayi. Ni kintia amik, Etsa nunkanam tarimiayi, aints ainau yainkatas.',
-            spanish: 'Hace mucho tiempo, Etsa vivía en el cielo. Al terminar su día, Etsa bajó a la tierra para ayudar a la gente.',
-          },
-          {
-            shuar: 'Nuik, Yawá ikiamnum yajuch arak. Etsa wainkak, Yawá chicharkamiayi: "¿Urukamtai aints ainau yajuch awajme?"',
-            spanish: 'Entonces, el Jaguar andaba haciendo daño en la selva. Al verlo, Etsa le habló al Jaguar: "¿Por qué tratas mal a la gente?"',
-          },
-        ],
-      },
-      {
-        paragraphs: [
-          {
-            shuar: 'Yawá, shamkama, Etsan aimkamiayi. Tura Etsa, kakaram chichamjai, Yawá ikiamnum akupkamiayi.',
-            spanish: 'El Jaguar, asustado, le respondió a Etsa. Y Etsa, con palabras fuertes, envió al Jaguar a lo profundo de la selva.',
-          },
-          {
-            shuar: 'Maquia, aints ainau shiir pujusarmiayi. Etsa nayaimpinam waketkimiayi, tura Yawá ikiamnum pujusmiayi.',
-            spanish: 'Desde entonces, la gente vivió feliz. Etsa regresó al cielo, y el Jaguar se quedó viviendo en la selva.',
-          },
-        ],
-      },
-    ],
-  };
+
+  const story = storiesData.find(s => s.id === Number(storyId)) || storiesData[0];
 
   const totalPages = story.pages.length;
   const currentPageData = story.pages[currentPage];

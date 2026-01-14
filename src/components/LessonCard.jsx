@@ -1,8 +1,34 @@
-import { Card, CardMedia, CardContent, CardActionArea, Typography, Button, Box } from '@mui/material';
+import { Card, CardMedia, CardContent, CardActionArea, Typography, Button, Skeleton } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PropTypes from 'prop-types';
 
-const LessonCard = ({ title, description, image, onClick }) => {
+const LessonCard = ({ title, description, image, onClick, loading = false }) => {
+  if (loading) {
+    return (
+      <Card
+        elevation={0}
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: 3,
+          overflow: 'hidden',
+          border: '1px solid',
+          borderColor: 'divider',
+        }}
+      >
+        <Skeleton variant="rectangular" height={224} animation="wave" />
+        <CardContent sx={{ p: 3, flexGrow: 1 }}>
+          <Skeleton variant="text" height={32} width="80%" sx={{ mb: 2 }} animation="wave" />
+          <Skeleton variant="text" height={20} width="100%" animation="wave" />
+          <Skeleton variant="text" height={20} width="100%" animation="wave" />
+          <Skeleton variant="text" height={20} width="60%" sx={{ mb: 3 }} animation="wave" />
+          <Skeleton variant="rectangular" height={40} width="100%" sx={{ borderRadius: 1 }} animation="wave" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card
       elevation={0}
@@ -104,10 +130,11 @@ const LessonCard = ({ title, description, image, onClick }) => {
 };
 
 LessonCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired,
+  title: PropTypes.string,
+  description: PropTypes.string,
+  image: PropTypes.string,
   onClick: PropTypes.func,
+  loading: PropTypes.bool,
 };
 
 export default LessonCard;

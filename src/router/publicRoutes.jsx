@@ -6,6 +6,8 @@ import LoadingFallback from '../components/LoadingFallback';
 const Landing = lazy(() => import('../pages/public/Landing'));
 const Auth = lazy(() => import('../pages/public/Auth'));
 const Lessons = lazy(() => import('../pages/public/Lessons'));
+const Stories = lazy(() => import('../pages/public/Stories'));
+const Dictionary = lazy(() => import('../pages/public/Dictionary'));
 const NotFound = lazy(() => import('../pages/NotFound'));
 
 const publicRoutes = [
@@ -42,6 +44,22 @@ const publicRoutes = [
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <Lessons />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'cuentos',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Stories />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'diccionario',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Dictionary />
           </Suspense>
         ),
       },

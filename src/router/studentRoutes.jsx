@@ -71,6 +71,14 @@ const studentRoutes = [
           </Suspense>
         ),
       },
+      {
+        path: 'cuentos/:id',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <StoryReader />
+          </Suspense>
+        ),
+      },
     ],
   },
   {

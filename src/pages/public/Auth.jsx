@@ -16,6 +16,8 @@ import {
   Stack,
   Fade,
   useTheme,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -31,6 +33,8 @@ const Auth = () => {
     registerData,
     loginErrors,
     registerErrors,
+    isLoading,
+    authError,
     setShowPassword,
     setShowConfirmPassword,
     handleTabChange,
@@ -183,6 +187,12 @@ const Auth = () => {
                     </Typography>
                   </Box>
 
+                  {authError && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                      {authError}
+                    </Alert>
+                  )}
+
                 <Box component="form" onSubmit={handleLoginSubmit}>
                   <TextField
                     fullWidth
@@ -241,9 +251,17 @@ const Auth = () => {
                     variant="contained"
                     color="secondary"
                     size="large"
+                    disabled={isLoading}
                     sx={{ mt: 3, py: 1.5 }}
                   >
-                    Entrar a mi cuenta
+                    {isLoading ? (
+                      <>
+                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                        Iniciando sesión...
+                      </>
+                    ) : (
+                      'Entrar a mi cuenta'
+                    )}
                   </Button>
 
                   <Box sx={{ position: 'relative', my: 3 }}>
@@ -310,6 +328,12 @@ const Auth = () => {
                       Aprende y preserva nuestra cultura milenaria
                     </Typography>
                   </Box>
+
+                  {authError && (
+                    <Alert severity="error" sx={{ mb: 3 }}>
+                      {authError}
+                    </Alert>
+                  )}
 
                 <Box component="form" onSubmit={handleRegisterSubmit}>
                   {/* Información Personal */}
@@ -458,9 +482,17 @@ const Auth = () => {
                     variant="contained"
                     color="secondary"
                     size="large"
+                    disabled={isLoading}
                     sx={{ mt: 3, py: 1.5 }}
                   >
-                    Crear mi cuenta
+                    {isLoading ? (
+                      <>
+                        <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                        Creando cuenta...
+                      </>
+                    ) : (
+                      'Crear mi cuenta'
+                    )}
                   </Button>
 
                   <Box sx={{ position: 'relative', my: 3 }}>

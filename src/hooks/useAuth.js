@@ -1,10 +1,15 @@
 import { useState } from 'react';
+import { useAuth as useAuthContext } from './context/AuthContext';
 import validationRules from '../utils/validationRules';
+import { authenticateUser, registerUser } from '../data/mockUsers';
 
 const useAuth = () => {
+    const { login } = useAuthContext();
     const [tabValue, setTabValue] = useState(0);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [authError, setAuthError] = useState('');
 
     const [loginData, setLoginData] = useState({
         email: '',
@@ -126,8 +131,9 @@ const useAuth = () => {
         });
     };
 
-    const handleLoginSubmit = (e) => {
+    const handleLoginSubmit = async (e) => {
         e.preventDefault();
+        setAuthError('');
 
         // Validar todos los campos
         const errors = {};
@@ -144,12 +150,28 @@ const useAuth = () => {
             return;
         }
 
-        // TODO: Implementar lógica de autenticación con Firebase
-        console.log('Login:', loginData);
+        // Autenticar usuario
+        setIsLoading(true);
+        try {
+            const result = await authenticateUser(loginData.email, loginData.password);
+
+            if (result.success) {
+                // Llamar a la función login del contexto
+                login(result.data);
+            } else {
+                setAuthError(result.error);
+            }
+        } catch (error) {
+            console.error('Error during login:', error);
+            setAuthError('Ocurrió un error al iniciar sesión. Por favor, intenta de nuevo.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleRegisterSubmit = (e) => {
+    const handleRegisterSubmit = async (e) => {
         e.preventDefault();
+        setAuthError('');
 
         // Validar todos los campos
         const errors = {};
@@ -197,8 +219,23 @@ const useAuth = () => {
             return;
         }
 
-        // TODO: Implementar lógica de registro con Firebase
-        console.log('Register:', registerData);
+        // Registrar usuario
+        setIsLoading(true);
+        try {
+            const result = await registerUser(registerData);
+
+            if (result.success) {
+                // Llamar a la función login del contexto para autenticar automáticamente
+                login(result.data);
+            } else {
+                setAuthError(result.error);
+            }
+        } catch (error) {
+            console.error('Error during registration:', error);
+            setAuthError('Ocurrió un error al registrarse. Por favor, intenta de nuevo.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return {
@@ -210,6 +247,8 @@ const useAuth = () => {
         registerData,
         loginErrors,
         registerErrors,
+        isLoading,
+        authError,
 
         // Setters
         setShowPassword,

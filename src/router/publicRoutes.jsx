@@ -1,8 +1,12 @@
+import { lazy, Suspense } from 'react';
 import PublicLayout from '../layouts/PublicLayout';
-import Landing from '../pages/public/Landing';
-import Auth from '../pages/public/Auth';
-import Lessons from '../pages/public/Lessons';
-import NotFound from '../pages/NotFound';
+import LoadingFallback from '../components/LoadingFallback';
+
+// Lazy load page components
+const Landing = lazy(() => import('../pages/public/Landing'));
+const Auth = lazy(() => import('../pages/public/Auth'));
+const Lessons = lazy(() => import('../pages/public/Lessons'));
+const NotFound = lazy(() => import('../pages/NotFound'));
 
 const publicRoutes = [
   {
@@ -11,27 +15,48 @@ const publicRoutes = [
     children: [
       {
         index: true,
-        element: <Landing />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Landing />
+          </Suspense>
+        ),
       },
       {
         path: 'login',
-        element: <Auth />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Auth />
+          </Suspense>
+        ),
       },
       {
         path: 'register',
-        element: <Auth />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Auth />
+          </Suspense>
+        ),
       },
       {
         path: 'lecciones',
-        element: <Lessons />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <Lessons />
+          </Suspense>
+        ),
       },
       // Catch-all route for 404
       {
         path: '*',
-        element: <NotFound />,
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <NotFound />
+          </Suspense>
+        ),
       },
     ],
   },
 ];
 
 export default publicRoutes;
+

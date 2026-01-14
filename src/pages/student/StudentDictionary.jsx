@@ -1,0 +1,246 @@
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  InputAdornment,
+  Button,
+  Paper,
+  Grid,
+} from '@mui/material';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import SearchIcon from '@mui/icons-material/Search';
+import SearchOffIcon from '@mui/icons-material/SearchOff';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DictionaryCard from '../../components/DictionaryCard';
+
+/**
+ * Página del Diccionario Bilingüe Shuar-Español
+ * Permite buscar palabras con ejemplos de uso
+ */
+const StudentDictionary = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
+
+  // Datos de ejemplo del diccionario
+  const dictionaryEntries = [
+    {
+      id: 1,
+      wordShuar: 'Nua',
+      wordSpanish: 'Mujer',
+      category: 'Sustantivo',
+      exampleShuar: 'Ii nuari jutai.',
+      exampleSpanish: 'Nuestra mujer es fuerte.',
+      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
+    },
+    {
+      id: 2,
+      wordShuar: 'Jia',
+      wordSpanish: 'Jaguar / Tigre',
+      category: 'Sustantivo',
+      exampleShuar: 'Jia ikiamnum pujawai.',
+      exampleSpanish: 'El jaguar vive en la selva.',
+      image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400',
+    },
+    {
+      id: 3,
+      wordShuar: 'Entsa',
+      wordSpanish: 'Agua / Río',
+      category: 'Sustantivo',
+      exampleShuar: 'Entsa pichiitui.',
+      exampleSpanish: 'El agua está limpia.',
+      image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=400',
+    },
+  ];
+
+  const stats = {
+    words: '12,402',
+    audioClips: '8,150',
+    contributors: '420',
+  };
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ mb: 6 }}>
+        <Typography
+          variant="h2"
+          component="h1"
+          gutterBottom
+          sx={{
+            fontWeight: 900,
+            fontSize: { xs: '2rem', md: '2.75rem' },
+            color: 'text.primary',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          Diccionario Shuar-Español
+        </Typography>
+        <Typography
+          variant="h6"
+          color="text.secondary"
+          sx={{
+            fontSize: { xs: '1rem', md: '1.125rem' },
+            fontWeight: 400,
+          }}
+        >
+          Preservando la cultura a través del lenguaje, una palabra a la vez.
+        </Typography>
+      </Box>
+
+      {/* Search Bar */}
+      <Box sx={{ mb: 4 }}>
+        <TextField
+          fullWidth
+          placeholder="Buscar una palabra (ej: Nua, Ii, Kichwa)..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: 'secondary.main',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  px: 4,
+                  '&:hover': {
+                    bgcolor: 'secondary.dark',
+                  },
+                }}
+              >
+                Buscar
+              </Button>
+            ),
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 3,
+              bgcolor: 'background.paper',
+              boxShadow: 2,
+              pr: 1,
+              '&:hover': {
+                boxShadow: 3,
+              },
+              '&.Mui-focused': {
+                boxShadow: 4,
+                '& fieldset': {
+                  borderColor: 'secondary.main',
+                  borderWidth: 2,
+                },
+              },
+            },
+          }}
+        />
+      </Box>
+
+      {/* Dictionary Results */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 6 }}>
+        {dictionaryEntries.map((entry) => (
+          <DictionaryCard key={entry.id} entry={entry} />
+        ))}
+      </Box>
+
+      {/* Empty State / Suggestion */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: 6,
+          mt: 4,
+          textAlign: 'center',
+          bgcolor: 'rgba(209, 154, 74, 0.08)',
+          borderRadius: 4,
+          border: '2px dashed',
+          borderColor: 'rgba(209, 154, 74, 0.3)',
+        }}
+      >
+        <SearchOffIcon sx={{ fontSize: 64, color: 'rgba(209, 154, 74, 0.5)', mb: 2 }} />
+        <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
+          ¿No encuentras lo que buscas?
+        </Typography>
+        <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
+          Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={<AddCircleOutlineIcon />}
+          onClick={() => navigate('/estudiante/contribuciones')}
+          sx={{
+            bgcolor: 'secondary.main',
+            color: 'white',
+            fontWeight: 'bold',
+            px: 4,
+            py: 1.5,
+            fontSize: '1rem',
+            '&:hover': {
+              bgcolor: 'secondary.dark',
+              transform: 'scale(1.05)',
+            },
+            transition: 'all 0.2s',
+          }}
+        >
+          Contribuir nueva palabra
+        </Button>
+      </Paper>
+
+      {/* Footer Stats */}
+      <Box
+        sx={{
+          mt: 6,
+          pt: 4,
+          borderTop: '1px solid',
+          borderColor: 'divider',
+          textAlign: 'center',
+        }}
+      >
+        <Typography
+          variant="overline"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 600,
+            letterSpacing: 2,
+            fontSize: '0.75rem',
+            mb: 2,
+            display: 'block',
+          }}
+        >
+          Base de Datos del Diccionario
+        </Typography>
+        <Grid container spacing={6} justifyContent="center">
+          <Grid size={{ xs: 4, md: 'auto' }}>
+            <Typography variant="h3" fontWeight="900" color="secondary.main">
+              {stats.words}
+            </Typography>
+            <Typography variant="caption" sx={{ textTransform: 'uppercase', opacity: 0.7, fontSize: '0.7rem', fontWeight: 600 }}>
+              Palabras
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 4, md: 'auto' }}>
+            <Typography variant="h3" fontWeight="900" color="secondary.main">
+              {stats.audioClips}
+            </Typography>
+            <Typography variant="caption" sx={{ textTransform: 'uppercase', opacity: 0.7, fontSize: '0.7rem', fontWeight: 600 }}>
+              Audios
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 4, md: 'auto' }}>
+            <Typography variant="h3" fontWeight="900" color="secondary.main">
+              {stats.contributors}
+            </Typography>
+            <Typography variant="caption" sx={{ textTransform: 'uppercase', opacity: 0.7, fontSize: '0.7rem', fontWeight: 600 }}>
+              Contribuidores
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
+  );
+};
+
+export default StudentDictionary;

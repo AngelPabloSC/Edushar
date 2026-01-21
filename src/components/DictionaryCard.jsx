@@ -23,19 +23,19 @@ const DictionaryCard = ({ entry, loading = false }) => {
         sx={{
           display: 'flex',
           flexDirection: { xs: 'column', md: 'row' },
-          borderRadius: 3,
+          borderRadius: 2,
           border: '1px solid',
           borderColor: 'divider',
           overflow: 'hidden',
           bgcolor: 'background.paper',
         }}
       >
-        <Skeleton 
-          variant="rectangular" 
-          width={{ xs: '100%', md: 192 }} 
+        <Skeleton
+          variant="rectangular"
+          width={{ xs: '100%', md: 192 }}
           height={{ xs: 192, md: '100%' }}
           sx={{ minHeight: { md: 240 } }}
-          animation="wave" 
+          animation="wave"
         />
         <CardContent sx={{ flex: 1, p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -77,7 +77,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
       sx={{
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
-        borderRadius: 3,
+        borderRadius: 2,
         border: '1px solid',
         borderColor: 'divider',
         overflow: 'hidden',
@@ -151,9 +151,9 @@ const DictionaryCard = ({ entry, loading = false }) => {
             borderRadius: 1,
           }}
         >
-          <Typography 
-            variant="body1" 
-            sx={{ 
+          <Typography
+            variant="body1"
+            sx={{
               mb: 1.5,
               color: 'text.primary',
               fontSize: '0.95rem',
@@ -162,8 +162,8 @@ const DictionaryCard = ({ entry, loading = false }) => {
           >
             <strong style={{ color: '#D19A4A', fontWeight: 700 }}>Shuar:</strong> {entry.exampleShuar}
           </Typography>
-          <Typography 
-            variant="body1" 
+          <Typography
+            variant="body1"
             sx={{
               color: 'text.secondary',
               fontSize: '0.95rem',

@@ -102,7 +102,7 @@ const Lessons = () => {
       </Box>
 
       {/* Main Content */}
-      <Container maxWidth="lg" sx={{ py: 6 }}>
+      <Container maxWidth="lg" sx={{ py: 6, px: { xs: 3, sm: 4, md: 6 } }}>
         {/* Search Bar */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 8 }}>
           <TextField
@@ -122,7 +122,7 @@ const Lessons = () => {
             sx={{
               maxWidth: 600,
               '& .MuiOutlinedInput-root': {
-                borderRadius: 3,
+                borderRadius: 2,
                 bgcolor: 'background.paper',
                 '&:hover': {
                   '& .MuiOutlinedInput-notchedOutline': {

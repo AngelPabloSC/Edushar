@@ -46,7 +46,7 @@ const Stories = () => {
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -82,7 +82,7 @@ const Stories = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 3,
+              borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',
               boxShadow: 1,
@@ -176,26 +176,26 @@ const Stories = () => {
 
           {/* Grid de Cards */}
           <Grid container spacing={3}>
-            {loading 
+            {loading
               ? [1, 2, 3, 4, 5, 6].map((n) => (
-                  <Grid key={n} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <StoryCard loading={true} />
+                <Grid key={n} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <StoryCard loading={true} />
+                </Grid>
+              ))
+              : storiesData
+                .filter(story => selectedCategory === 'all' || story.category?.toLowerCase().includes(selectedCategory))
+                .filter(story =>
+                  story.title?.shuar?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  story.title?.es?.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((story) => (
+                  <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StoryCard
+                      story={story}
+                      onClick={() => navigate('/login')}
+                    />
                   </Grid>
                 ))
-              : storiesData
-                  .filter(story => selectedCategory === 'all' || story.category?.toLowerCase().includes(selectedCategory))
-                  .filter(story => 
-                    story.title?.shuar?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    story.title?.es?.toLowerCase().includes(searchQuery.toLowerCase())
-                  )
-                  .map((story) => (
-                    <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                      <StoryCard 
-                        story={story} 
-                        onClick={() => navigate('/login')}
-                      />
-                    </Grid>
-                  ))
             }
           </Grid>
 

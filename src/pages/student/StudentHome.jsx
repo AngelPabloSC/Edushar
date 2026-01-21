@@ -1,7 +1,7 @@
-import { 
-  Box, 
-  Container, 
-  Typography, 
+import {
+  Box,
+  Container,
+  Typography,
   Grid,
   Divider,
 } from '@mui/material';
@@ -102,14 +102,14 @@ const StudentHome = () => {
   );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Saludo personalizado - Optimizado para LCP */}
       <Box sx={{ mb: 5 }}>
-        <Typography 
-          variant="h2" 
-          component="h1" 
-          gutterBottom 
-          sx={{ 
+        <Typography
+          variant="h2"
+          component="h1"
+          gutterBottom
+          sx={{
             fontWeight: 900,
             letterSpacing: '-0.03em',
             fontSize: { xs: '2rem', md: '2.75rem' },
@@ -118,15 +118,15 @@ const StudentHome = () => {
             // background: 'linear-gradient(135deg, #D19A4A 0%, #E0B76A 100%)',
             // backgroundClip: 'text',
             // WebkitBackgroundClip: 'text',
-           //WebkitTextFillColor: 'transparent',
+            //WebkitTextFillColor: 'transparent',
           }}
         >
           !Turasha, {user?.nombre || 'Estudiante'}!
         </Typography>
-        <Typography 
-          variant="h5" 
-          color="text.secondary" 
-          sx={{ 
+        <Typography
+          variant="h5"
+          color="text.secondary"
+          sx={{
             fontWeight: 500,
             fontSize: { xs: '1.125rem', md: '1.5rem' },
           }}
@@ -151,9 +151,9 @@ const StudentHome = () => {
 
       {/* Divider con texto */}
       <Divider sx={{ mb: 5 }}>
-        <Typography 
-          variant="overline" 
-          sx={{ 
+        <Typography
+          variant="overline"
+          sx={{
             color: 'text.secondary',
             fontWeight: 700,
             letterSpacing: 2,
@@ -165,14 +165,14 @@ const StudentHome = () => {
       </Divider>
 
       {/* Grid de Acciones Rápidas */}
-      <Grid 
-        container 
+      <Grid
+        container
         spacing={{ xs: 3, md: 4 }}
         justifyContent="center"
         alignItems="stretch"
       >
         {actionCards.map((card) => (
-          <Grid 
+          <Grid
             key={card.id}
             size={{ xs: 12, sm: 6, md: 4 }}
             sx={{ display: 'flex' }}
@@ -198,8 +198,8 @@ const StudentHome = () => {
 
       {/* Sección de ayuda/tips - Solo si hay racha */}
       {currentProgress.streak > 0 && (
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             mt: 6,
             p: 3,
             borderRadius: 3,

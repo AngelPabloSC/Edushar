@@ -37,7 +37,7 @@ const StudentDictionary = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -97,7 +97,7 @@ const StudentDictionary = () => {
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
-              borderRadius: 3,
+              borderRadius: 2,
               bgcolor: 'background.paper',
               boxShadow: 2,
               pr: 1,
@@ -118,63 +118,63 @@ const StudentDictionary = () => {
 
       {/* Dictionary Results */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 6 }}>
-        {loading 
+        {loading
           ? [1, 2, 3].map((n) => <DictionaryCard key={n} loading={true} />)
           : dictionaryEntries
-              .filter(entry => 
-                entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((entry) => (
-                <DictionaryCard key={entry.id} entry={entry} />
-              ))
+            .filter(entry =>
+              entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((entry) => (
+              <DictionaryCard key={entry.id} entry={entry} />
+            ))
         }
       </Box>
 
       {/* Empty State / Suggestion */}
       {!loading && (
-             <Paper
-             elevation={0}
-             sx={{
-               p: 6,
-               mt: 4,
-               textAlign: 'center',
-               bgcolor: 'rgba(209, 154, 74, 0.08)',
-               borderRadius: 4,
-               border: '2px dashed',
-               borderColor: 'rgba(209, 154, 74, 0.3)',
-             }}
-           >
-             <SearchOffIcon sx={{ fontSize: 64, color: 'rgba(209, 154, 74, 0.5)', mb: 2 }} />
-             <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
-               ¿No encuentras lo que buscas?
-             </Typography>
-             <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
-               Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
-             </Typography>
-             <Button
-               variant="contained"
-               startIcon={<AddCircleOutlineIcon />}
-               onClick={() => navigate('/estudiante/contribuciones')}
-               sx={{
-                 bgcolor: 'secondary.main',
-                 color: 'white',
-                 fontWeight: 'bold',
-                 px: 4,
-                 py: 1.5,
-                 fontSize: '1rem',
-                 '&:hover': {
-                   bgcolor: 'secondary.dark',
-                   transform: 'scale(1.05)',
-                 },
-                 transition: 'all 0.2s',
-               }}
-             >
-               Contribuir nueva palabra
-             </Button>
-           </Paper>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 6,
+            mt: 4,
+            textAlign: 'center',
+            bgcolor: 'rgba(209, 154, 74, 0.08)',
+            borderRadius: 4,
+            border: '2px dashed',
+            borderColor: 'rgba(209, 154, 74, 0.3)',
+          }}
+        >
+          <SearchOffIcon sx={{ fontSize: 64, color: 'rgba(209, 154, 74, 0.5)', mb: 2 }} />
+          <Typography variant="h5" fontWeight="bold" gutterBottom color="text.primary">
+            ¿No encuentras lo que buscas?
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
+            Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleOutlineIcon />}
+            onClick={() => navigate('/estudiante/contribuciones')}
+            sx={{
+              bgcolor: 'secondary.main',
+              color: 'white',
+              fontWeight: 'bold',
+              px: 4,
+              py: 1.5,
+              fontSize: '1rem',
+              '&:hover': {
+                bgcolor: 'secondary.dark',
+                transform: 'scale(1.05)',
+              },
+              transition: 'all 0.2s',
+            }}
+          >
+            Contribuir nueva palabra
+          </Button>
+        </Paper>
       )}
- 
+
       {/* Footer Stats */}
       <Box
         sx={{

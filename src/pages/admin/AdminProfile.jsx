@@ -66,7 +66,7 @@ const AdminProfile = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
             {/* Profile Header */}
             <Paper
                 elevation={0}

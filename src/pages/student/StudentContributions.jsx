@@ -1,12 +1,12 @@
-import { 
-  Box, 
-  Container, 
-  Typography, 
-  TextField, 
-  Button, 
-  Select, 
-  MenuItem, 
-  FormControl, 
+import {
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
   InputLabel,
   Paper,
   Chip,
@@ -44,7 +44,7 @@ import validationRules from '../../utils/validationRules';
  * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
  */
 const StudentContributions = () => {
-  const {  isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
+  const { isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
   const { handleSetDataSnackbar } = useSnackBarContext();
   const [activeTab, setActiveTab] = useState('palabra');
   const [actionCallback, setActionCallback] = useState(null);
@@ -66,11 +66,11 @@ const StudentContributions = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.palabraShuar) newErrors.palabraShuar = validationRules.required;
     if (!formData.traduccionEspanol) newErrors.traduccionEspanol = validationRules.required;
     if (!formData.categoria) newErrors.categoria = validationRules.required;
-    
+
     // Example usage of other rules if needed, e.g. length check
     // if (formData.palabraShuar.length < 2) newErrors.palabraShuar = validationRules.minLength(2).message;
 
@@ -82,26 +82,26 @@ const StudentContributions = () => {
     // Aquí iría la lógica real para enviar la contribución a la API
     console.log('Enviando contribución:', formData);
     handleSetDataSnackbar({ message: '¡Gracias! Tu contribución ha sido enviada para revisión.', type: 'success' });
-    
+
     // Resetear formulario
     setFormData({
-        palabraShuar: '',
-        traduccionEspanol: '',
-        categoria: '',
-        ejemploUso: '',
+      palabraShuar: '',
+      traduccionEspanol: '',
+      categoria: '',
+      ejemploUso: '',
     });
     handleCloseDialog();
   };
 
   const handleSubmit = () => {
     if (!validateForm()) {
-        handleSetDataSnackbar({ message: 'Por favor corrige los errores antes de enviar', type: 'error' });
-        return;
+      handleSetDataSnackbar({ message: 'Por favor corrige los errores antes de enviar', type: 'error' });
+      return;
     }
 
     setDialongContent({
-        title: '¿Confirmar envío?',
-        message: 'Tu contribución será revisada por un administrador antes de ser publicada. ¿Deseas continuar?'
+      title: '¿Confirmar envío?',
+      message: 'Tu contribución será revisada por un administrador antes de ser publicada. ¿Deseas continuar?'
     });
     setActionCallback(() => handleConfirmSubmit);
     handleOpenDialog();
@@ -133,14 +133,14 @@ const StudentContributions = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
-        <Typography 
-          variant="h2" 
-          component="h1" 
-          gutterBottom 
-          sx={{ 
+        <Typography
+          variant="h2"
+          component="h1"
+          gutterBottom
+          sx={{
             fontWeight: 900,
             fontSize: { xs: '2rem', md: '2.75rem' },
             color: 'text.primary',
@@ -149,8 +149,8 @@ const StudentContributions = () => {
         >
           Contribuir a EduShar
         </Typography>
-        <Typography 
-          variant="h6" 
+        <Typography
+          variant="h6"
           color="text.secondary"
           sx={{
             fontSize: { xs: '1rem', md: '1.125rem' },
@@ -226,7 +226,7 @@ const StudentContributions = () => {
             elevation={0}
             sx={{
               p: 4,
-              borderRadius: 3,
+              borderRadius: 2,
               border: '1px solid',
               borderColor: 'divider',
               boxShadow: 1,
@@ -285,9 +285,9 @@ const StudentContributions = () => {
                       <MenuItem value="otros">Otros</MenuItem>
                     </Select>
                     {errors.categoria && (
-                        <Typography variant="caption" color="error" sx={{ ml: 1.5, mt: 0.5 }}>
-                            {errors.categoria}
-                        </Typography>
+                      <Typography variant="caption" color="error" sx={{ ml: 1.5, mt: 0.5 }}>
+                        {errors.categoria}
+                      </Typography>
                     )}
                   </FormControl>
                 </Grid>
@@ -326,10 +326,10 @@ const StudentContributions = () => {
                     }}
                   >
                     <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
-                        <span className="material-symbols-outlined">add_photo_alternate</span>
+                      <span className="material-symbols-outlined">add_photo_alternate</span>
                     </Box>
                     <Typography variant="body2" fontWeight="medium">
-                        Subir una imagen o foto (Opcional)
+                      Subir una imagen o foto (Opcional)
                     </Typography>
                     <input
                       type="file"
@@ -378,9 +378,9 @@ const StudentContributions = () => {
               <Typography variant="h6" fontWeight="bold">
                 Mis Contribuciones
               </Typography>
-              <Typography 
-                variant="body2" 
-                color="secondary.main" 
+              <Typography
+                variant="body2"
+                color="secondary.main"
                 fontWeight="bold"
                 sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
               >
@@ -396,7 +396,7 @@ const StudentContributions = () => {
                 sx={{
                   border: '1px solid',
                   borderColor: 'divider',
-                  borderRadius: 3,
+                  borderRadius: 2,
                   boxShadow: 1,
                 }}
               >
@@ -436,7 +436,7 @@ const StudentContributions = () => {
               elevation={0}
               sx={{
                 p: 3,
-                borderRadius: 3,
+                borderRadius: 2,
                 background: 'linear-gradient(135deg, rgba(209, 154, 74, 0.1) 0%, rgba(209, 154, 74, 0.05) 100%)',
                 border: '1px solid',
                 borderColor: 'rgba(209, 154, 74, 0.2)',
@@ -493,7 +493,7 @@ const StudentContributions = () => {
           elevation={0}
           sx={{
             mt: 3,
-            borderRadius: 3,
+            borderRadius: 2,
             border: '1px solid',
             borderColor: 'divider',
             boxShadow: 1,
@@ -536,32 +536,32 @@ const StudentContributions = () => {
 
 
       {/* Confirmation Dialog */}
-      <Dialog 
-            open={isOpen} 
-            onClose={handleCloseDialog}
-            PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
-        >
-            <DialogTitle sx={{ fontWeight: 'bold' }}>{dialongContent.title}</DialogTitle>
-            <DialogContent>
-                <Typography color="text.secondary">
-                    {dialongContent.message}
-                </Typography>
-            </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
-                    Cancelar
-                </Button>
-                <Button 
-                    onClick={actionCallback} 
-                    variant="contained" 
-                    color="primary"
-                    sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, color: 'white' }}
-                    autoFocus
-                >
-                    Confirmar Envío
-                </Button>
-            </DialogActions>
-        </Dialog>
+      <Dialog
+        open={isOpen}
+        onClose={handleCloseDialog}
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 'bold' }}>{dialongContent.title}</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary">
+            {dialongContent.message}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={actionCallback}
+            variant="contained"
+            color="primary"
+            sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, color: 'white' }}
+            autoFocus
+          >
+            Confirmar Envío
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  IconButton,
-  TextField,
-  Select,
-  MenuItem,
-  useMediaQuery,
-  useTheme,
-  alpha,
-  Tooltip,
-  Container,
-  Grid,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  InputLabel,
-  FormControl,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions
+    Box,
+    Typography,
+    Paper,
+    Button,
+    IconButton,
+    TextField,
+    Select,
+    MenuItem,
+    useMediaQuery,
+    useTheme,
+    alpha,
+    Tooltip,
+    Container,
+    Grid,
+    Radio,
+    RadioGroup,
+    FormControlLabel,
+    InputLabel,
+    FormControl,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
@@ -99,7 +99,7 @@ const AdminLessonEditor = () => {
         setPendingAction('publish');
         setDialongContent({
             title: "Publicar Lección",
-             message: "¿Estás seguro de que deseas publicar esta lección? Será visible inmediatamente para los estudiantes.",
+            message: "¿Estás seguro de que deseas publicar esta lección? Será visible inmediatamente para los estudiantes.",
             confirmText: "Publicar Ahora",
             color: "success" // Green for publish
         });
@@ -112,8 +112,8 @@ const AdminLessonEditor = () => {
         prerequisite: 'Ninguno',
         content: '',
         exercises: [
-             { id: 1, type: 'multiple_choice', question: "¿Cómo se dice 'Pájaro' en Shuar?", options: ['Chikirpu', 'Ikiama', 'Yawa', 'Aujuju'], correct: 0 },
-             { id: 2, type: 'fill_in_blanks', content: "El animal más veloz es el [Yawá-pish].", question: "" }
+            { id: 1, type: 'multiple_choice', question: "¿Cómo se dice 'Pájaro' en Shuar?", options: ['Chikirpu', 'Ikiama', 'Yawa', 'Aujuju'], correct: 0 },
+            { id: 2, type: 'fill_in_blanks', content: "El animal más veloz es el [Yawá-pish].", question: "" }
         ]
     });
 
@@ -123,21 +123,21 @@ const AdminLessonEditor = () => {
 
     const actions = (
         <>
-            <Button 
-                variant="outlined" 
+            <Button
+                variant="outlined"
                 onClick={handleSaveDraftClick}
-                sx={{ 
-                    borderRadius: 3, px: 4, py: 1, fontWeight: 700, 
+                sx={{
+                    borderRadius: 3, px: 4, py: 1, fontWeight: 700,
                     borderColor: 'divider', color: 'text.primary',
                     '&:hover': { borderColor: 'text.primary', bgcolor: 'transparent' }
                 }}
             >
                 Guardar Borrador
             </Button>
-            <Button 
-                variant="contained" 
+            <Button
+                variant="contained"
                 onClick={handlePublishClick}
-                sx={{ 
+                sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'text.primary', color: 'white',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
@@ -156,34 +156,34 @@ const AdminLessonEditor = () => {
 
     return (
         <>
-            <EditorHeader 
+            <EditorHeader
                 breadcrumbs={breadcrumbs}
                 onBack={handleBack}
                 lastSaved="Guardado: Hace 2 min"
                 showLastSaved={true}
             />
 
-            <Container maxWidth="lg" sx={{ pt: 4, pb: 12 }}>
-                <PageHeader 
+            <Container maxWidth="lg" sx={{ pt: 4, pb: 12, px: { xs: 3, sm: 4, md: 6 } }}>
+                <PageHeader
                     title={isEditMode ? 'Editar Lección' : 'Crear Nueva Lección'}
                     subtitle="Configure el contenido educativo y los ejercicios para los estudiantes Shuar."
                 />
 
                 <Grid container spacing={4} direction="column">
-                    
+
                     {/* CONF: Basic Information Card */}
                     <Grid item xs={12}>
-                        <Paper elevation={0} sx={{ 
-                            borderRadius: 3, 
-                            border: '1px solid', 
-                            borderColor: 'divider', 
-                            overflow: 'hidden' 
+                        <Paper elevation={0} sx={{
+                            borderRadius: 3,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            overflow: 'hidden'
                         }}>
-                            <Box sx={{ 
-                                px: 3, py: 2, 
-                                borderBottom: '1px solid', 
-                                borderColor: 'divider', 
-                                bgcolor: alpha(theme.palette.background.paper, 0.5) 
+                            <Box sx={{
+                                px: 3, py: 2,
+                                borderBottom: '1px solid',
+                                borderColor: 'divider',
+                                bgcolor: alpha(theme.palette.background.paper, 0.5)
                             }}>
                                 <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <InfoIcon color="primary" /> Información Básica
@@ -193,11 +193,11 @@ const AdminLessonEditor = () => {
                                 <Grid container spacing={3}>
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" fontWeight={700} gutterBottom>Título de la Lección</Typography>
-                                        <TextField 
-                                            fullWidth 
+                                        <TextField
+                                            fullWidth
                                             placeholder="Ej. Saludos básicos y presentaciones"
                                             value={lessonData.title}
-                                            onChange={(e) => setLessonData({...lessonData, title: e.target.value})}
+                                            onChange={(e) => setLessonData({ ...lessonData, title: e.target.value })}
                                             sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                         />
                                     </Grid>
@@ -206,7 +206,7 @@ const AdminLessonEditor = () => {
                                         <Select
                                             fullWidth
                                             value={lessonData.level}
-                                            onChange={(e) => setLessonData({...lessonData, level: e.target.value})}
+                                            onChange={(e) => setLessonData({ ...lessonData, level: e.target.value })}
                                             sx={{ borderRadius: 2 }}
                                         >
                                             <MenuItem value="A1 - Principiante">Principiante</MenuItem>
@@ -219,7 +219,7 @@ const AdminLessonEditor = () => {
                                         <Select
                                             fullWidth
                                             value={lessonData.prerequisite}
-                                            onChange={(e) => setLessonData({...lessonData, prerequisite: e.target.value})}
+                                            onChange={(e) => setLessonData({ ...lessonData, prerequisite: e.target.value })}
                                             sx={{ borderRadius: 2 }}
                                         >
                                             <MenuItem value="Ninguno">Ninguno</MenuItem>
@@ -245,10 +245,10 @@ const AdminLessonEditor = () => {
                             </Box>
                             <Box sx={{ p: 3 }}>
                                 {/* Fake Toolbar matching HTML */}
-                                <Box sx={{ 
-                                    display: 'flex', flexWrap: 'wrap', gap: 0.5, 
-                                    p: 1, 
-                                    border: '1px solid', borderColor: 'divider', 
+                                <Box sx={{
+                                    display: 'flex', flexWrap: 'wrap', gap: 0.5,
+                                    p: 1,
+                                    border: '1px solid', borderColor: 'divider',
                                     borderBottom: 0,
                                     borderTopLeftRadius: 8, borderTopRightRadius: 8,
                                     bgcolor: 'action.hover'
@@ -269,14 +269,14 @@ const AdminLessonEditor = () => {
                                     minRows={12}
                                     placeholder="Escriba aquí el cuerpo de la lección, incluya vocabulario y contextos culturales..."
                                     value={lessonData.content}
-                                    onChange={(e) => setLessonData({...lessonData, content: e.target.value})}
-                                    sx={{ 
-                                        '& .MuiOutlinedInput-root': { 
-                                            borderTopLeftRadius: 0, borderTopRightRadius: 0, borderRadius: 2 
-                                        } 
+                                    onChange={(e) => setLessonData({ ...lessonData, content: e.target.value })}
+                                    sx={{
+                                        '& .MuiOutlinedInput-root': {
+                                            borderTopLeftRadius: 0, borderTopRightRadius: 0, borderRadius: 2
+                                        }
                                     }}
                                 />
-                                
+
                                 <Box sx={{ mt: 3, border: '2px dashed', borderColor: 'divider', borderRadius: 3, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(theme.palette.background.default, 0.5) }}>
                                     <Box sx={{ width: 64, height: 64, borderRadius: '50%', bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, color: 'primary.main' }}>
                                         <CloudUploadIcon fontSize="large" />
@@ -297,25 +297,25 @@ const AdminLessonEditor = () => {
                                 </Typography>
                             </Box>
                             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                
+
                                 {lessonData.exercises.map((ex, index) => (
-                                    <Paper key={ex.id} elevation={0} sx={{ 
-                                        p: 3, 
-                                        border: '1px solid', borderColor: 'divider', 
-                                        borderRadius: 3, 
-                                        bgcolor: alpha(theme.palette.background.default, 0.3), 
-                                        position: 'relative' 
+                                    <Paper key={ex.id} elevation={0} sx={{
+                                        p: 3,
+                                        border: '1px solid', borderColor: 'divider',
+                                        borderRadius: 3,
+                                        bgcolor: alpha(theme.palette.background.default, 0.3),
+                                        position: 'relative'
                                     }}>
                                         <IconButton size="small" sx={{ position: 'absolute', top: 12, right: 12, color: 'error.main', bgcolor: 'white', '&:hover': { bgcolor: '#ffebee' } }}>
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
-                                        
+
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                                            <Box sx={{ 
-                                                minWidth: 24, height: 24, borderRadius: 1, 
-                                                bgcolor: 'primary.main', color: 'background.paper', 
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', 
-                                                fontSize: '0.75rem', fontWeight: 800 
+                                            <Box sx={{
+                                                minWidth: 24, height: 24, borderRadius: 1,
+                                                bgcolor: 'primary.main', color: 'background.paper',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                fontSize: '0.75rem', fontWeight: 800
                                             }}>
                                                 {index + 1}
                                             </Box>
@@ -326,22 +326,22 @@ const AdminLessonEditor = () => {
 
                                         {ex.type === 'multiple_choice' ? (
                                             <>
-                                                <TextField 
-                                                    fullWidth 
-                                                    variant="standard" 
-                                                    placeholder="¿Cómo se dice 'Pájaro' en Shuar?" 
-                                                    value={ex.question} 
-                                                    sx={{ mb: 2, '& .MuiInput-input': { fontSize: '1.1rem', fontWeight: 600 } }} 
+                                                <TextField
+                                                    fullWidth
+                                                    variant="standard"
+                                                    placeholder="¿Cómo se dice 'Pájaro' en Shuar?"
+                                                    value={ex.question}
+                                                    sx={{ mb: 2, '& .MuiInput-input': { fontSize: '1.1rem', fontWeight: 600 } }}
                                                 />
                                                 <Grid container spacing={2}>
                                                     {ex.options.map((opt, optIndex) => (
                                                         <Grid item xs={12} key={optIndex}>
-                                                            <Paper elevation={0} sx={{ 
-                                                                p: 1.5, 
-                                                                border: '1px solid', borderColor: 'divider', 
-                                                                borderRadius: 2, 
+                                                            <Paper elevation={0} sx={{
+                                                                p: 1.5,
+                                                                border: '1px solid', borderColor: 'divider',
+                                                                borderRadius: 2,
                                                                 bgcolor: 'background.paper',
-                                                                display: 'flex', alignItems: 'center', gap: 1 
+                                                                display: 'flex', alignItems: 'center', gap: 1
                                                             }}>
                                                                 <Radio checked={ex.correct === optIndex} size="small" />
                                                                 <TextField fullWidth variant="standard" value={opt} InputProps={{ disableUnderline: true }} />
@@ -382,14 +382,14 @@ const AdminLessonEditor = () => {
                 </Grid>
             </Container>
 
-            <EditorFooter 
+            <EditorFooter
                 actions={actions}
                 savingStatus="Campos obligatorios completos"
             />
 
             {/* Confirmation Dialog */}
-            <Dialog 
-                open={isDialogOpen} 
+            <Dialog
+                open={isDialogOpen}
                 onClose={handleCloseDialog}
                 PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
             >
@@ -403,9 +403,9 @@ const AdminLessonEditor = () => {
                     <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
                         Cancelar
                     </Button>
-                    <Button 
-                        onClick={handleConfirmAction} 
-                        variant="contained" 
+                    <Button
+                        onClick={handleConfirmAction}
+                        variant="contained"
                         color={dialongContent.color || 'primary'}
                         sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
                         autoFocus

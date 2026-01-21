@@ -59,16 +59,16 @@ const StudentDashboard = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header Section */}
       <Box sx={{ mb: 6 }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 3, mb: 4 }}>
           <Box sx={{ maxWidth: 720, width: '100%' }}>
-            <Typography 
-              variant="h2" 
-              component="h1" 
-              gutterBottom 
-              sx={{ 
+            <Typography
+              variant="h2"
+              component="h1"
+              gutterBottom
+              sx={{
                 fontWeight: 900,
                 fontSize: { xs: '2rem', md: '2.75rem' },
                 color: 'text.primary',
@@ -77,8 +77,8 @@ const StudentDashboard = () => {
             >
               Mis Lecciones
             </Typography>
-            <Typography 
-              variant="h6" 
+            <Typography
+              variant="h6"
               color="text.secondary"
               sx={{
                 fontSize: { xs: '1rem', md: '1.125rem' },
@@ -105,7 +105,7 @@ const StudentDashboard = () => {
               }}
               sx={{
                 '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
+                  borderRadius: 2,
                   bgcolor: 'background.paper',
                   boxShadow: 1,
                   transition: 'all 0.3s',
@@ -133,7 +133,7 @@ const StudentDashboard = () => {
             elevation={0}
             sx={{
               p: 3,
-              borderRadius: 4,
+              borderRadius: 2,
               bgcolor: 'background.paper',
               border: '1px solid',
               borderColor: 'divider',
@@ -192,10 +192,10 @@ const StudentDashboard = () => {
           <Grid container spacing={{ xs: 3, md: 4 }}>
             {[1, 2, 3].map((item) => (
               <Grid key={item} size={{ xs: 12, sm: 6, md: 4 }}>
-                <Card 
-                  sx={{ 
-                    height: '100%', 
-                    borderRadius: 4, 
+                <Card
+                  sx={{
+                    height: '100%',
+                    borderRadius: 2,
                     border: '1px solid',
                     borderColor: 'divider'
                   }}
@@ -232,10 +232,10 @@ const StudentDashboard = () => {
                 {levelName.includes('1') ? '1' : '2'}
               </Typography>
             </Box>
-            <Typography 
-              variant="h4" 
-              component="h2" 
-              sx={{ 
+            <Typography
+              variant="h4"
+              component="h2"
+              sx={{
                 fontWeight: 800,
                 color: 'text.primary',
               }}
@@ -243,10 +243,10 @@ const StudentDashboard = () => {
               {levelName}
             </Typography>
           </Box>
-          
+
           {/* Grid de Lecciones */}
-          <Grid 
-            container 
+          <Grid
+            container
             spacing={{ xs: 3, md: 4 }}
             justifyContent="flex-start"
             alignItems="stretch"
@@ -258,17 +258,17 @@ const StudentDashboard = () => {
               const isInProgress = status === 'in-progress';
 
               return (
-                <Grid 
+                <Grid
                   key={lesson.id}
                   size={{ xs: 12, sm: 6, md: 4 }}
                   sx={{ display: 'flex' }}
                 >
-                  <Card 
-                    sx={{ 
+                  <Card
+                    sx={{
                       width: '100%',
                       height: '100%',
                       position: 'relative',
-                      borderRadius: 4,
+                      borderRadius: 2,
                       overflow: 'hidden',
                       border: '2px solid',
                       borderColor: isInProgress ? 'secondary.main' : isLocked ? 'divider' : 'rgba(209, 154, 74, 0.2)',
@@ -281,10 +281,10 @@ const StudentDashboard = () => {
                       },
                     }}
                   >
-                    <CardActionArea 
+                    <CardActionArea
                       onClick={() => handleLessonClick(lesson.id, isLocked)}
                       disabled={isLocked}
-                      sx={{ 
+                      sx={{
                         height: '100%',
                         display: 'flex',
                         flexDirection: 'column',
@@ -299,7 +299,7 @@ const StudentDashboard = () => {
                           height="192"
                           image={lesson.image}
                           alt={lesson.title}
-                          sx={{ 
+                          sx={{
                             objectFit: 'cover',
                             filter: isLocked ? 'grayscale(100%)' : 'none',
                             opacity: isLocked ? 0.6 : 1,
@@ -405,10 +405,10 @@ const StudentDashboard = () => {
 
                       {/* Contenido de la Card */}
                       <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Typography 
-                          variant="h6" 
-                          component="h3" 
-                          sx={{ 
+                        <Typography
+                          variant="h6"
+                          component="h3"
+                          sx={{
                             fontWeight: 700,
                             fontSize: '1.25rem',
                             mb: 1,
@@ -418,8 +418,8 @@ const StudentDashboard = () => {
                           {lesson.title}
                         </Typography>
 
-                        <Typography 
-                          variant="body2" 
+                        <Typography
+                          variant="body2"
                           color="text.secondary"
                           sx={{
                             lineHeight: 1.6,

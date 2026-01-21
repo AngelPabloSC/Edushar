@@ -39,7 +39,7 @@ const LessonDetail = () => {
   const [showQuestion, setShowQuestion] = useState(true);
 
   const lessonData = getLessonQuestions(parseInt(lessonId));
-  
+
   // Calculate progress
   const progressPercentage = Math.round((completedQuestions.length / (lessonData?.totalQuestions || 1)) * 100);
 
@@ -106,11 +106,11 @@ const LessonDetail = () => {
       setShowQuestion(true);
     }, 200);
   };
-  
+
   const handleFinish = () => {
     navigate('/estudiante/lecciones');
   };
-  
+
   const isLastQuestion = currentQuestion === lessonData.questions.length - 1;
 
   return (
@@ -128,7 +128,7 @@ const LessonDetail = () => {
           boxShadow: 1,
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ px: { xs: 3, sm: 4, md: 6 } }}>
           <Box
             sx={{
               display: 'flex',
@@ -164,7 +164,7 @@ const LessonDetail = () => {
                 </Typography>
               </Box>
             </Box>
-            
+
             {/* Timer and Progress */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               {/* Timer */}
@@ -186,7 +186,7 @@ const LessonDetail = () => {
                   {formatTime(timer)}
                 </Typography>
               </Box>
-              
+
               {/* Progress Badge */}
               <Chip
                 icon={<CheckCircleIcon />}
@@ -200,13 +200,13 @@ const LessonDetail = () => {
                   },
                 }}
               />
-              
+
               {/* Close Button */}
               <Tooltip title="Salir de la lección" arrow>
                 <IconButton
                   onClick={() => navigate('/estudiante/lecciones')}
                   aria-label="Salir de la lección"
-                  sx={{ 
+                  sx={{
                     color: 'text.secondary',
                     transition: 'all 0.3s',
                     '&:hover': {
@@ -220,7 +220,7 @@ const LessonDetail = () => {
               </Tooltip>
             </Box>
           </Box>
-          
+
           {/* Progress Bar */}
           <LinearProgress
             variant="determinate"
@@ -238,11 +238,11 @@ const LessonDetail = () => {
       </Paper>
 
       {/* Main Content */}
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
         <Paper
           elevation={0}
           sx={{
-            borderRadius: 3,
+            borderRadius: 2,
             overflow: 'hidden',
             border: '1px solid',
             borderColor: 'divider',
@@ -338,7 +338,7 @@ const LessonDetail = () => {
                           sx={{
                             border: '2px solid',
                             borderColor: isSelected ? 'secondary.main' : 'divider',
-                            borderRadius: 3,
+                            borderRadius: 2,
                             p: 2.5,
                             mb: 2,
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -378,7 +378,7 @@ const LessonDetail = () => {
                 borderColor: 'divider',
               }}
             >
-              <Tooltip 
+              <Tooltip
                 title={currentQuestion === 0 ? "Esta es la primera pregunta" : "Volver a la pregunta anterior"}
                 arrow
               >
@@ -405,7 +405,7 @@ const LessonDetail = () => {
                   </Button>
                 </span>
               </Tooltip>
-              
+
               {isLastQuestion ? (
                 <Tooltip title="Completar y salir de la lección" arrow>
                   <span>
@@ -432,7 +432,7 @@ const LessonDetail = () => {
                   </span>
                 </Tooltip>
               ) : (
-                <Tooltip 
+                <Tooltip
                   title={!selectedAnswer ? "Selecciona una respuesta para continuar" : "Ir a la siguiente pregunta"}
                   arrow
                 >
@@ -486,7 +486,7 @@ const LessonDetail = () => {
             >
               Progreso
             </Typography>
-            
+
             {/* Progress percentage */}
             <Box sx={{ mb: 3, textAlign: 'center' }}>
               <Typography variant="h3" fontWeight="bold" color="secondary.main">
@@ -504,7 +504,7 @@ const LessonDetail = () => {
 
                 return (
                   <Grid item xs={3} key={index}>
-                    <Tooltip 
+                    <Tooltip
                       title={`Pregunta ${index + 1}${isCompleted ? ' - Completada' : isCurrent ? ' - Actual' : ''}`}
                       arrow
                     >
@@ -516,8 +516,8 @@ const LessonDetail = () => {
                           bgcolor: isCompleted
                             ? 'success.main'
                             : isCurrent
-                            ? 'secondary.main'
-                            : alpha(theme.palette.text.disabled, 0.1),
+                              ? 'secondary.main'
+                              : alpha(theme.palette.text.disabled, 0.1),
                           color: isCompleted || isCurrent ? 'white' : 'text.disabled',
                           fontWeight: 'bold',
                           fontSize: '0.875rem',
@@ -532,8 +532,8 @@ const LessonDetail = () => {
                             bgcolor: isCompleted
                               ? 'success.dark'
                               : isCurrent
-                              ? 'secondary.dark'
-                              : alpha(theme.palette.text.disabled, 0.2),
+                                ? 'secondary.dark'
+                                : alpha(theme.palette.text.disabled, 0.2),
                             transform: 'scale(1.15)',
                             boxShadow: 2,
                           },

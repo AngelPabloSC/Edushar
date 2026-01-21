@@ -4,12 +4,12 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/context/AuthContext';
+import { useLoginContext } from '../hooks/context/LoginContext';
 import { useSidebarContext } from '../hooks/context/sidebardContext';
 
 const Header2 = () => {
   const { toggleSidebar } = useSidebarContext();
-  const { user, logout } = useAuth();
+  const { user, logout } = useLoginContext();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 

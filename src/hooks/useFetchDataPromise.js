@@ -10,7 +10,7 @@ export const useFetchDataPromise = () => {
 
         return await fetch(urlApi, {
             method,
-            ...(method !== "GET" && { body: JSON.stringify(additionalData)}),
+            ...(method !== "GET" && { body: JSON.stringify(additionalData) }),
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${Token.accessToken}`,
@@ -23,11 +23,11 @@ export const useFetchDataPromise = () => {
             .catch(() => ({ code: "COD_ERR", data: {}, message: "Error" }))
             .then(async (response) => {
                 const dataJson = await response.json()
-                const { code, result, info } = dataJson
-                return {
-                    code, data: result, message: info
-                }
 
+                const { code, data, message } = dataJson
+                return {
+                    code, data, message
+                }
             });
     }
     return {

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../hooks/context/AuthContext';
+import { useLoginContext } from '../hooks/context/LoginContext';
 import { Box, CircularProgress } from '@mui/material';
 
 /**
@@ -9,7 +9,7 @@ import { Box, CircularProgress } from '@mui/material';
  * Opcionalmente verifica el rol del usuario
  */
 const ProtectRoute = ({ children, requiredRole }) => {
-  const { user, isLoggedIn, loading } = useAuth();
+  const { user, isLoggedIn, loading } = useLoginContext();
 
   // Mostrar loading mientras se verifica la autenticación
   if (loading) {
@@ -33,12 +33,25 @@ const ProtectRoute = ({ children, requiredRole }) => {
   }
 
   // Si se requiere un rol específico, verificar
-  if (requiredRole && user?.rol !== requiredRole) {
-    // Redirigir a la página principal si no tiene el rol correcto
-    return <Navigate to="/" replace />;
+  if (requiredRole) {
+    // Mapeo de roles del API a roles internos
+    const roleMapping = {
+      'admin': 'ADMIN',
+      'student': 'ESTUDIANTE',
+      'ADMIN': 'ADMIN',
+      'ESTUDIANTE': 'ESTUDIANTE'
+    };
+    
+    const userRole = user?.role || user?.rol;
+    const mappedUserRole = roleMapping[userRole] || userRole;
+    
+    if (mappedUserRole !== requiredRole) {
+
+      return <Navigate to="/" replace />;
+    }
   }
 
-  // Usuario autenticado y con rol correcto (si se requiere)
+
   return <>{children}</>;
 };
 

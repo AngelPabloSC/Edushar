@@ -42,6 +42,7 @@ const Auth = () => {
     handleRegisterChange,
     handleLoginSubmit,
     handleRegisterSubmit,
+    handleGoogleSignIn,
   } = useAuth();
 
   return (
@@ -279,6 +280,8 @@ const Auth = () => {
                     fullWidth
                     variant="outlined"
                     size="large"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
                     startIcon={
                       <Box
                         component="img"
@@ -510,6 +513,8 @@ const Auth = () => {
                     fullWidth
                     variant="outlined"
                     size="large"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoading}
                     startIcon={
                       <Box
                         component="img"

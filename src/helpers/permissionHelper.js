@@ -83,6 +83,14 @@ export const helpPermission = () => {
         ],
     };
 
+    // Mapeo de roles del API a roles internos
+    const roleMapping = {
+        'admin': 'ADMIN',
+        'student': 'ESTUDIANTE',
+        'ADMIN': 'ADMIN',
+        'ESTUDIANTE': 'ESTUDIANTE'
+    };
+
     const objectRol = {
         ADMIN: objectMenuAdmin,
         ESTUDIANTE: objectMenuStudent,
@@ -98,14 +106,18 @@ export const helpPermission = () => {
         if (!customRol) {
             try {
                 datauserObject = JSON.parse(datauser);
-                rol = datauserObject['rol'];
+                // Intentar obtener 'role' primero (API nuevo), luego 'rol' (legacy)
+                rol = datauserObject['role'] || datauserObject['rol'];
             } catch (error) {
                 console.error('Error parsing user data:', error);
                 return { menuItems: [], routes: [] };
             }
         }
 
-        const menuFilter = objectRol[rol] || { menuItems: [], routes: [] };
+        // Mapear el rol del API al formato interno
+        const mappedRole = roleMapping[rol] || rol;
+
+        const menuFilter = objectRol[mappedRole] || { menuItems: [], routes: [] };
         return menuFilter;
     };
 

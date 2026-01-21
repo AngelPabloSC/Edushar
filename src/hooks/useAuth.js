@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useAuth as useAuthContext } from './context/AuthContext';
 import validationRules from '../utils/validationRules';
-import { authenticateUser, registerUser } from '../data/mockUsers';
+import { registerUser } from '../data/mockUsers';
+import { useLogin } from './useLogin';
+import { useGoogleLogin } from './useGoogleLogin';
 
 const useAuth = () => {
-    const { login } = useAuthContext();
+    const { handleLogin } = useLogin();
+    const { handleGoogleLogin } = useGoogleLogin();
     const [tabValue, setTabValue] = useState(0);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -35,6 +37,7 @@ const useAuth = () => {
         // Limpiar errores al cambiar de tab
         setLoginErrors({});
         setRegisterErrors({});
+        setAuthError('');
     };
 
     // Función de validación genérica
@@ -150,17 +153,13 @@ const useAuth = () => {
             return;
         }
 
-        // Autenticar usuario
+        // Autenticar usuario con la API real
         setIsLoading(true);
         try {
-            const result = await authenticateUser(loginData.email, loginData.password);
-
-            if (result.success) {
-                // Llamar a la función login del contexto
-                login(result.data);
-            } else {
-                setAuthError(result.error);
-            }
+            await handleLogin({
+                email: loginData.email,
+                password: loginData.password
+            });
         } catch (error) {
             console.error('Error during login:', error);
             setAuthError('Ocurrió un error al iniciar sesión. Por favor, intenta de nuevo.');
@@ -219,20 +218,36 @@ const useAuth = () => {
             return;
         }
 
-        // Registrar usuario
+        // Registrar usuario (todavía usa mock)
         setIsLoading(true);
         try {
             const result = await registerUser(registerData);
 
             if (result.success) {
                 // Llamar a la función login del contexto para autenticar automáticamente
-                login(result.data);
+                await handleLogin({
+                    email: registerData.email,
+                    password: registerData.password
+                });
             } else {
                 setAuthError(result.error);
             }
         } catch (error) {
             console.error('Error during registration:', error);
             setAuthError('Ocurrió un error al registrarse. Por favor, intenta de nuevo.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        setIsLoading(true);
+        setAuthError('');
+        try {
+            await handleGoogleLogin();
+        } catch (error) {
+            console.error('Error during Google sign-in:', error);
+            setAuthError('Error al iniciar sesión con Google. Por favor, intenta de nuevo.');
         } finally {
             setIsLoading(false);
         }
@@ -260,6 +275,7 @@ const useAuth = () => {
         handleRegisterChange,
         handleLoginSubmit,
         handleRegisterSubmit,
+        handleGoogleSignIn,
     };
 };
 

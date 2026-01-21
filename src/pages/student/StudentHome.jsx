@@ -6,7 +6,7 @@ import {
   Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/context/AuthContext';
+import { useAuth } from '../../hooks/context/LoginContext';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';

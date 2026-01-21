@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import PublicLayout from '../layouts/PublicLayout';
 import LoadingFallback from '../components/LoadingFallback';
+import PublicRoute from './PublicRoute';
 
 // Lazy load page components
 const Landing = lazy(() => import('../pages/public/Landing'));
@@ -13,7 +14,11 @@ const NotFound = lazy(() => import('../pages/NotFound'));
 const publicRoutes = [
   {
     path: '/',
-    element: <PublicLayout />,
+    element: (
+      <PublicRoute>
+        <PublicLayout />
+      </PublicRoute>
+    ),
     children: [
       {
         index: true,

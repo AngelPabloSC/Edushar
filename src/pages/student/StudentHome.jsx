@@ -26,7 +26,7 @@ const StudentHome = () => {
   const currentProgress = {
     moduleName: 'Nivel 1: Fundamentos',
     lessonName: 'La Familia',
-    lessonId: 2, // ID de la lección en progreso
+    lessonId: 1, // ID de la lección en progreso
     percentage: 60,
     totalLessons: 8,
     completedLessons: 2,
@@ -95,7 +95,7 @@ const StudentHome = () => {
       icon: HistoryEduIcon,
       color: '#5D4037',
       bgColor: 'rgba(93, 64, 55, 0.1)',
-      action: () => navigate('/estudiante/historias'),
+      action: () => navigate('/estudiante/cuentos'),
       buttonText: 'Ver biblioteca',
       disabled: false,
     }

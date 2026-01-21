@@ -18,7 +18,8 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    Chip
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate, Link
 import SearchIcon from '@mui/icons-material/Search';
@@ -119,44 +120,78 @@ const AdminStories = () => {
                 </Button>
             </Box>
 
-             {/* Filters & Tabs */}
+             {/* Filters & Tabs - Enhanced with Don Norman's Principles */}
              <Box sx={{ mb: 6, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', pb: 0 }}>
-                <Box sx={{ display: 'flex', gap: 4, overflowX: 'auto' }}>
+                <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', flexWrap: 'wrap' }}>
                     {['Todos', 'Mito', 'Leyenda', 'Naturaleza', 'Tradición', 'Fábula'].map((tab) => {
                         const isActive = activeTab === tab;
                         return (
-                             <Box 
+                             <Chip
                                 key={tab}
+                                label={tab}
                                 onClick={() => handleTabChange(tab)}
                                 sx={{ 
-                                    pb: 1.5,
-                                    pt: 2,
-                                    borderBottom: '3px solid',
-                                    borderColor: isActive ? 'primary.main' : 'transparent',
-                                    color: isActive ? 'text.primary' : 'text.secondary',
-                                    fontWeight: isActive ? 800 : 600,
+                                    height: 36,
+                                    px: 1,
                                     fontSize: '0.9rem',
+                                    fontWeight: isActive ? 800 : 600,
+                                    bgcolor: isActive ? 'text.primary' : 'transparent',
+                                    color: isActive ? 'background.paper' : 'text.secondary',
+                                    border: '2px solid',
+                                    borderColor: isActive ? 'text.primary' : 'divider',
+                                    borderRadius: 2,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s',
-                                    '&:hover': { color: 'text.primary' }
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    // Affordances - looks clickable
+                                    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+                                    // Feedback - hover effects
+                                    '&:hover': { 
+                                        bgcolor: isActive ? 'text.secondary' : alpha(theme.palette.text.primary, 0.08),
+                                        borderColor: 'text.primary',
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
+                                    },
+                                    // Feedback - active state
+                                    '&:active': {
+                                        transform: 'translateY(0px)',
+                                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)'
+                                    }
                                 }}
-                            >
-                                {tab}
-                            </Box>
+                            />
                         );
                     })}
                 </Box>
-                <Button 
-                    startIcon={<FilterListIcon />} 
-                    sx={{ 
-                        display: { xs: 'none', md: 'flex' }, 
-                        mb: 1, 
-                        fontWeight: 600, 
-                        color: 'text.secondary' 
-                    }}
+                {/* Visibility & Affordances - Clear filter button with tooltip */}
+                <Tooltip 
+                    title="Opciones de filtrado avanzado" 
+                    arrow 
+                    placement="left"
+                    TransitionComponent={Fade}
                 >
-                    Filtros
-                </Button>
+                    <IconButton 
+                        sx={{ 
+                            display: { xs: 'none', md: 'flex' }, 
+                            mb: 0.5,
+                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            color: 'text.primary',
+                            border: '2px solid',
+                            borderColor: 'divider',
+                            borderRadius: 2,
+                            transition: 'all 0.3s',
+                            // Feedback - hover effects
+                            '&:hover': { 
+                                bgcolor: 'text.primary',
+                                color: 'background.paper',
+                                borderColor: 'text.primary',
+                                transform: 'rotate(180deg)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                            }
+                        }}
+                        aria-label="Filtros avanzados"
+                    >
+                        <FilterListIcon />
+                    </IconButton>
+                </Tooltip>
              </Box>
 
              {/* Search Bar */}

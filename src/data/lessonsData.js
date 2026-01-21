@@ -1,4 +1,83 @@
+// Comprehensive lessons data with images, progress, and lock states
 export const lessonsData = [
+    // Nivel 1: Fundamentos
+    {
+        id: 1,
+        title: 'Saludos Básicos',
+        description: 'Aprende a decir hola, adiós y a presentarte respetuosamente en la cultura Shuar.',
+        levelName: 'Nivel 1: Fundamentos',
+        level: 1,
+        image: 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=800&q=80',
+        completed: true,
+        inProgress: false,
+        locked: false,
+        progress: 100,
+    },
+    {
+        id: 2,
+        title: 'La Familia',
+        description: 'Vocabulario esencial para describir a los miembros de tu familia y las relaciones de parentesco.',
+        levelName: 'Nivel 1: Fundamentos',
+        level: 1,
+        image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?w=800&q=80',
+        completed: false,
+        inProgress: true,
+        locked: false,
+        progress: 60,
+    },
+    {
+        id: 3,
+        title: 'Los Números',
+        description: 'Aprende a contar del 1 al 20 y los conceptos básicos de cantidad en Shuar.',
+        levelName: 'Nivel 1: Fundamentos',
+        level: 1,
+        image: 'https://images.unsplash.com/photo-1596495577886-d920f1fb7238?w=800&q=80',
+        completed: false,
+        inProgress: false,
+        locked: true,
+        progress: 0,
+    },
+    // Nivel 2: Intermedio
+    {
+        id: 4,
+        title: 'Verbos Comunes',
+        description: 'Acciones cotidianas: comer, dormir, caminar y trabajar.',
+        levelName: 'Nivel 2: Intermedio',
+        level: 2,
+        image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&q=80',
+        completed: false,
+        inProgress: false,
+        locked: true,
+        progress: 0,
+    },
+    {
+        id: 5,
+        title: 'La Naturaleza',
+        description: 'Nombres de árboles, plantas y fenómenos naturales de la selva.',
+        levelName: 'Nivel 2: Intermedio',
+        level: 2,
+        image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80',
+        completed: false,
+        inProgress: false,
+        locked: true,
+        progress: 0,
+    },
+    {
+        id: 6,
+        title: 'Cultura y Tradición',
+        description: 'Explora las costumbres, vestimenta y rituales del pueblo Shuar.',
+        levelName: 'Nivel 2: Intermedio',
+        level: 2,
+        image: 'https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=800&q=80',
+        completed: false,
+        inProgress: false,
+        locked: true,
+        progress: 0,
+    },
+];
+
+// Legacy data for admin panel
+export const lessonsDataLegacy = [
     {
         id: 1,
         order: '01',
@@ -81,7 +160,7 @@ export const lessonColumns = [
 export const getLessonsByLevel = () => {
     const grouped = {};
 
-    lessonsData.forEach(lesson => {
+    lessonsDataLegacy.forEach(lesson => {
         const level = lesson.level;
         if (!grouped[level]) {
             grouped[level] = {

@@ -128,12 +128,17 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
                                 onClick={() => onEdit(story)}
                                 startIcon={<EditIcon sx={{ fontSize: 16 }} />}
                                 sx={{ 
-                                    bgcolor: alpha(theme.palette.primary.main, 0.08), 
-                                    color: 'primary.dark',
+                                    bgcolor: 'text.primary', // Dark brown background
+                                    color: 'background.paper', // White text
                                     boxShadow: 'none',
                                     fontWeight: 700,
                                     borderRadius: 2,
-                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15), boxShadow: 'none' }
+                                    transition: 'all 0.3s',
+                                    '&:hover': { 
+                                        bgcolor: 'text.secondary', 
+                                        boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                                        transform: 'translateY(-2px)'
+                                    }
                                 }}
                             >
                                 Editar

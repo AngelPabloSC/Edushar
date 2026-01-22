@@ -20,6 +20,15 @@ export const useGoogleLogin = () => {
             // 2. Obtener el ID token
             const idToken = await result.user.getIdToken();
 
+            console.log('✅ Google authentication successful');
+            console.log('User info:', {
+                email: result.user.email,
+                displayName: result.user.displayName,
+                photoURL: result.user.photoURL,
+                uid: result.user.uid
+            });
+            console.log('📤 Sending idToken to backend...');
+
             // 3. Enviar token al backend para verificación y registro/login
             const response = await getFechData({
                 endPoint: 'api/google-login',
@@ -27,10 +36,14 @@ export const useGoogleLogin = () => {
                 additionalData: { idToken }
             });
 
+            console.log('📥 Backend response:', response);
+
             // 4. Si es exitoso, guardar en contexto
             if (response.code === 'COD_OK') {
+                console.log('✅ Login successful, saving to context');
                 login(response.data);
             } else {
+                console.error('❌ Backend returned error:', response);
                 // Mostrar error del backend
                 handleOpenDialog();
                 setDialongContent({

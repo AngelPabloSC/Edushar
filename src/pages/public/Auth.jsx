@@ -18,32 +18,45 @@ import {
   useTheme,
   Alert,
   CircularProgress,
+
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import useAuth from '../../hooks/useAuth';
+import { useLogin } from '../../hooks/useLogin';
+import { useRegister } from '../../hooks/useRegister';
 
 const Auth = () => {
   const theme = useTheme();
+  
+  // Login hook
   const {
     tabValue,
     showPassword,
     showConfirmPassword,
     loginData,
-    registerData,
     loginErrors,
-    registerErrors,
-    isLoading,
-    authError,
+    isLoading: loginLoading,
+    authError: loginError,
     setShowPassword,
     setShowConfirmPassword,
     handleTabChange,
     handleLoginChange,
-    handleRegisterChange,
     handleLoginSubmit,
-    handleRegisterSubmit,
     handleGoogleSignIn,
-  } = useAuth();
+  } = useLogin();
+
+  // Register hook
+  const {
+    registerData,
+    registerErrors,
+    isLoading: registerLoading,
+    handleRegisterChange,
+    handleRegisterSubmit,
+  } = useRegister();
+
+  // Combined loading and error states
+  const isLoading = loginLoading || registerLoading;
+  const authError = loginError;
 
   return (
     <Box

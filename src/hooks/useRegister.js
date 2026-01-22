@@ -1,23 +1,14 @@
 import { useState } from 'react';
+import { useLoginContext } from './context/LoginContext';
+import { useSnackBarContext } from './context/SnackbarContext';
 import validationRules from '../utils/validationRules';
-import { registerUser } from '../data/mockUsers';
-import { useLogin } from './useLogin';
-import { useGoogleLogin } from './useGoogleLogin';
 
-const useAuth = () => {
-    const { handleLogin } = useLogin();
-    const { handleGoogleLogin } = useGoogleLogin();
-    const [tabValue, setTabValue] = useState(0);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+export const useRegister = () => {
+    const { login } = useLoginContext();
+    const { handleSetDataSnackbar } = useSnackBarContext();
+
+    // States
     const [isLoading, setIsLoading] = useState(false);
-    const [authError, setAuthError] = useState('');
-
-    const [loginData, setLoginData] = useState({
-        email: '',
-        password: '',
-    });
-
     const [registerData, setRegisterData] = useState({
         firstName: '',
         lastName: '',
@@ -27,20 +18,9 @@ const useAuth = () => {
         confirmPassword: '',
         acceptTerms: false,
     });
-
-    // Estados para errores de validación
-    const [loginErrors, setLoginErrors] = useState({});
     const [registerErrors, setRegisterErrors] = useState({});
 
-    const handleTabChange = (event, newValue) => {
-        setTabValue(newValue);
-        // Limpiar errores al cambiar de tab
-        setLoginErrors({});
-        setRegisterErrors({});
-        setAuthError('');
-    };
-
-    // Función de validación genérica
+    // Generic Field Validation
     const validateField = (name, value, rules) => {
         if (!value && rules.required) {
             return validationRules.required;
@@ -61,30 +41,7 @@ const useAuth = () => {
         return '';
     };
 
-    const handleLoginChange = (e) => {
-        const { name, value } = e.target;
-        setLoginData({
-            ...loginData,
-            [name]: value,
-        });
-
-        // Validar en tiempo real
-        let error = '';
-        if (name === 'email') {
-            error = validateField(name, value, {
-                required: true,
-                pattern: validationRules.email
-            });
-        } else if (name === 'password') {
-            error = validateField(name, value, { required: true });
-        }
-
-        setLoginErrors({
-            ...loginErrors,
-            [name]: error,
-        });
-    };
-
+    // Register Form Change Handler
     const handleRegisterChange = (e) => {
         const { name, value, type, checked } = e.target;
         const fieldValue = type === 'checkbox' ? checked : value;
@@ -94,7 +51,7 @@ const useAuth = () => {
             [name]: fieldValue,
         });
 
-        // Validar en tiempo real
+        // Real-time validation
         let error = '';
         if (name === 'firstName' || name === 'lastName') {
             error = validateField(name, value, {
@@ -108,7 +65,6 @@ const useAuth = () => {
             });
         } else if (name === 'birthdate') {
             error = validateField(name, value, { required: true });
-            // Validar edad mínima (13 años)
             if (!error && value) {
                 const birthDate = new Date(value);
                 const today = new Date();
@@ -134,45 +90,88 @@ const useAuth = () => {
         });
     };
 
-    const handleLoginSubmit = async (e) => {
-        e.preventDefault();
-        setAuthError('');
-
-        // Validar todos los campos
-        const errors = {};
-        errors.email = validateField('email', loginData.email, {
-            required: true,
-            pattern: validationRules.email
-        });
-        errors.password = validateField('password', loginData.password, { required: true });
-
-        setLoginErrors(errors);
-
-        // Si hay errores, no enviar
-        if (Object.values(errors).some(error => error !== '')) {
-            return;
-        }
-
-        // Autenticar usuario con la API real
+    // Register API Call
+    const handleRegisterAPI = async (data) => {
         setIsLoading(true);
         try {
-            await handleLogin({
-                email: loginData.email,
-                password: loginData.password
-            });
+            // Crear FormData para enviar archivo de foto
+            const formData = new FormData();
+
+            // Agregar campos de texto
+            formData.append('email', data.email);
+            formData.append('password', data.password);
+            formData.append('firstName', data.firstName);
+            formData.append('lastName', data.lastName);
+            formData.append('birthdate', data.birthdate);
+            formData.append('role', data.role || 'student');
+
+            // Agregar foto si existe
+            if (data.photoProfile) {
+                formData.append('photoProfile', data.photoProfile);
+            }
+
+            console.log('📤 Sending registration data...');
+
+            // Enviar al backend
+            const response = await fetch(
+                `${import.meta.env.VITE_URL_FETCH}/api/users/create`,
+                {
+                    method: 'POST',
+                    body: formData,
+                }
+            );
+
+            const responseData = await response.json();
+            console.log('📥 Registration response:', responseData);
+
+            if (responseData.code === 'COD_OK') {
+                console.log('✅ Registration successful');
+
+                // Mostrar snackbar de éxito
+                handleSetDataSnackbar({
+                    message: responseData.data?.token
+                        ? '¡Cuenta creada! Iniciando sesión...'
+                        : '¡Cuenta creada exitosamente! Por favor inicia sesión.',
+                    type: 'success'
+                });
+
+                // Si el backend retorna token, hacer login automático después de 1.5s
+                if (responseData.data && responseData.data.user && responseData.data.token) {
+                    console.log('🔐 Has user and token - will auto-login in 1.5s');
+                    setTimeout(() => {
+                        console.log('🚀 Executing login with data:', responseData.data);
+                        login(responseData.data);
+                    }, 1500);
+                    return { success: true, data: responseData.data, shouldSwitchToLogin: false };
+                } else {
+                    console.log('⚠️ No auto-login - backend did not return token');
+                    return { success: true, data: responseData.data, shouldSwitchToLogin: true };
+                }
+            } else {
+                console.error('❌ Registration failed:', responseData);
+                handleSetDataSnackbar({
+                    message: responseData.message || 'No se pudo crear la cuenta. Intenta nuevamente.',
+                    type: 'error'
+                });
+                return { success: false, error: responseData.message };
+            }
         } catch (error) {
-            console.error('Error during login:', error);
-            setAuthError('Ocurrió un error al iniciar sesión. Por favor, intenta de nuevo.');
+            console.error('Error en registro:', error);
+            handleSetDataSnackbar({
+                message: 'Error de conexión. Verifica tu internet e intenta nuevamente.',
+                type: 'error'
+            });
+            return { success: false, error: error.message };
         } finally {
             setIsLoading(false);
         }
     };
 
+    // Register Form Submit
     const handleRegisterSubmit = async (e) => {
         e.preventDefault();
-        setAuthError('');
 
-        // Validar todos los campos
+        // Validate all fields
         const errors = {};
         errors.firstName = validateField('firstName', registerData.firstName, {
             required: true,
@@ -188,7 +187,6 @@ const useAuth = () => {
         });
         errors.birthdate = validateField('birthdate', registerData.birthdate, { required: true });
 
-        // Validar edad
         if (!errors.birthdate && registerData.birthdate) {
             const birthDate = new Date(registerData.birthdate);
             const today = new Date();
@@ -213,70 +211,32 @@ const useAuth = () => {
 
         setRegisterErrors(errors);
 
-        // Si hay errores, no enviar
         if (Object.values(errors).some(error => error !== '')) {
             return;
         }
 
-        // Registrar usuario (todavía usa mock)
-        setIsLoading(true);
-        try {
-            const result = await registerUser(registerData);
+        // Call API
+        const result = await handleRegisterAPI({
+            email: registerData.email,
+            password: registerData.password,
+            firstName: registerData.firstName,
+            lastName: registerData.lastName,
+            birthdate: registerData.birthdate,
+            role: 'student',
+            photoProfile: registerData.photoProfile
+        });
 
-            if (result.success) {
-                // Llamar a la función login del contexto para autenticar automáticamente
-                await handleLogin({
-                    email: registerData.email,
-                    password: registerData.password
-                });
-            } else {
-                setAuthError(result.error);
-            }
-        } catch (error) {
-            console.error('Error during registration:', error);
-            setAuthError('Ocurrió un error al registrarse. Por favor, intenta de nuevo.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        setIsLoading(true);
-        setAuthError('');
-        try {
-            await handleGoogleLogin();
-        } catch (error) {
-            console.error('Error during Google sign-in:', error);
-            setAuthError('Error al iniciar sesión con Google. Por favor, intenta de nuevo.');
-        } finally {
-            setIsLoading(false);
-        }
+        return result;
     };
 
     return {
         // States
-        tabValue,
-        showPassword,
-        showConfirmPassword,
-        loginData,
         registerData,
-        loginErrors,
         registerErrors,
         isLoading,
-        authError,
-
-        // Setters
-        setShowPassword,
-        setShowConfirmPassword,
 
         // Handlers
-        handleTabChange,
-        handleLoginChange,
         handleRegisterChange,
-        handleLoginSubmit,
         handleRegisterSubmit,
-        handleGoogleSignIn,
     };
 };
-
-export default useAuth;

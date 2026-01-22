@@ -14,18 +14,18 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
 
 
     return (
-        <Paper 
+        <Paper
             elevation={0}
             onClick={onClick ? () => onClick(story) : undefined}
-            sx={{ 
-                borderRadius: 4, 
-                overflow: 'hidden', 
-                border: '1px solid', 
+            sx={{
+                borderRadius: 2,
+                overflow: 'hidden',
+                border: '1px solid',
                 borderColor: 'divider',
                 bgcolor: 'background.paper',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor: onClick ? 'pointer' : 'default',
-                '&:hover': { 
+                '&:hover': {
                     transform: onClick ? 'translateY(-4px)' : 'none',
                     boxShadow: onClick ? '0 12px 24px -4px rgba(0,0,0,0.08)' : 'none',
                     borderColor: onClick ? 'primary.main' : 'divider'
@@ -34,44 +34,44 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
         >
             {/* Cover Image & Badges */}
             <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
-                <Box 
+                <Box
                     component="img"
                     src={story?.cover || 'https://via.placeholder.com/400x225'}
                     alt={story?.title?.es || 'Story cover'}
-                    sx={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover' 
+                    sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
                     }}
                 />
                 <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 1 }}>
-                     <Chip 
-                        label={story?.category || 'General'} 
+                    <Chip
+                        label={story?.category || 'General'}
                         size="small"
-                        sx={{ 
-                            height: 20, 
-                            fontSize: '0.65rem', 
+                        sx={{
+                            height: 20,
+                            fontSize: '0.65rem',
                             fontWeight: 800,
                             textTransform: 'uppercase',
                             bgcolor: alpha(theme.palette.primary.main, 0.9),
                             color: 'white',
                             border: 'none',
                             backdropFilter: 'blur(4px)'
-                        }} 
+                        }}
                     />
-                    <Chip 
-                        label={story?.status || 'Borrador'} 
+                    <Chip
+                        label={story?.status || 'Borrador'}
                         size="small"
-                        sx={{ 
-                            height: 20, 
-                            fontSize: '0.65rem', 
+                        sx={{
+                            height: 20,
+                            fontSize: '0.65rem',
                             fontWeight: 800,
                             textTransform: 'uppercase',
                             bgcolor: story?.status === 'Publicado' ? alpha(theme.palette.info.main, 0.9) : alpha(theme.palette.grey[500], 0.9),
                             color: 'white',
                             border: 'none',
                             backdropFilter: 'blur(4px)'
-                        }} 
+                        }}
                     />
                 </Box>
             </Box>
@@ -80,11 +80,11 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
             <Box sx={{ p: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                     <Box>
-                        <Typography 
-                            variant="h6" 
-                            fontWeight={800} 
-                            sx={{ 
-                                lineHeight: 1.2, 
+                        <Typography
+                            variant="h6"
+                            fontWeight={800}
+                            sx={{
+                                lineHeight: 1.2,
                                 mb: 0.5,
                                 fontSize: '1.1rem',
                                 color: 'text.primary'
@@ -92,11 +92,11 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
                         >
                             {story?.title?.es || 'Sin título'}
                         </Typography>
-                        <Typography 
-                            variant="body2" 
-                            sx={{ 
+                        <Typography
+                            variant="body2"
+                            sx={{
                                 color: theme.palette.success.main, // Using green for Shuar context
-                                fontWeight: 500, 
+                                fontWeight: 500,
                                 fontStyle: 'italic',
                                 fontSize: '0.85rem'
                             }}
@@ -121,21 +121,21 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
                 {(onEdit || onDelete) && (
                     <Box sx={{ display: 'flex', gap: 1, pt: 2, borderTop: '1px solid', borderColor: alpha(theme.palette.divider, 0.5) }}>
                         {onEdit && (
-                            <Button 
-                                fullWidth 
-                                variant="contained" 
+                            <Button
+                                fullWidth
+                                variant="contained"
                                 size="small"
                                 onClick={() => onEdit(story)}
                                 startIcon={<EditIcon sx={{ fontSize: 16 }} />}
-                                sx={{ 
+                                sx={{
                                     bgcolor: 'text.primary', // Dark brown background
                                     color: 'background.paper', // White text
                                     boxShadow: 'none',
                                     fontWeight: 700,
                                     borderRadius: 2,
                                     transition: 'all 0.3s',
-                                    '&:hover': { 
-                                        bgcolor: 'text.secondary', 
+                                    '&:hover': {
+                                        bgcolor: 'text.secondary',
                                         boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
                                         transform: 'translateY(-2px)'
                                     }
@@ -145,13 +145,13 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
                             </Button>
                         )}
                         {onDelete && (
-                            <Button 
-                                fullWidth 
-                                variant="text" 
+                            <Button
+                                fullWidth
+                                variant="text"
                                 size="small"
                                 onClick={() => onDelete(story.id)}
                                 startIcon={<DeleteIcon sx={{ fontSize: 16 }} />}
-                                sx={{ 
+                                sx={{
                                     color: 'text.secondary',
                                     fontWeight: 700,
                                     borderRadius: 2,

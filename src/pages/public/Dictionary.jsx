@@ -37,7 +37,7 @@ const Dictionary = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -97,7 +97,7 @@ const Dictionary = () => {
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
-              borderRadius: 3,
+              borderRadius: 2,
               bgcolor: 'background.paper',
               boxShadow: 2,
               pr: 1,
@@ -118,16 +118,16 @@ const Dictionary = () => {
 
       {/* Dictionary Results */}
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 6 }}>
-        {loading 
+        {loading
           ? [1, 2, 3].map((n) => <DictionaryCard key={n} loading={true} />)
           : dictionaryEntries
-              .filter(entry => 
-                entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
-              )
-              .map((entry) => (
-                <DictionaryCard key={entry.id} entry={entry} />
-              ))
+            .filter(entry =>
+              entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((entry) => (
+              <DictionaryCard key={entry.id} entry={entry} />
+            ))
         }
       </Box>
 

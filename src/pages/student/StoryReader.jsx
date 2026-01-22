@@ -66,7 +66,7 @@ const StoryReader = () => {
           boxShadow: 1,
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ px: { xs: 3, sm: 4, md: 6 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 2 }}>
             <Button
               startIcon={<ArrowBackIcon />}
@@ -211,7 +211,7 @@ const StoryReader = () => {
       </Box>
 
       {/* Content */}
-      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
+      <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 }, px: { xs: 3, sm: 4, md: 6 } }}>
         {/* Introduction */}
         <Box sx={{ maxWidth: 800, mx: 'auto', mb: 10, textAlign: 'center' }}>
           <Box sx={{ width: 64, height: 4, bgcolor: 'error.main', mx: 'auto', mb: 4, borderRadius: 10, opacity: 0.6 }} />
@@ -236,7 +236,7 @@ const StoryReader = () => {
               elevation={0}
               sx={{
                 p: { xs: 3, md: 4 },
-                borderRadius: 4,
+                borderRadius: 2,
                 transition: 'all 0.3s',
                 border: '1px solid transparent',
                 '&:hover': {

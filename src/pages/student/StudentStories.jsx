@@ -41,7 +41,7 @@ const StudentStories = () => {
   ];
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Header */}
       <Box sx={{ mb: 6 }}>
         <Typography
@@ -173,8 +173,8 @@ const StudentStories = () => {
           <Grid container spacing={3}>
             {stories.map((story) => (
               <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                <StoryCard 
-                  story={story} 
+                <StoryCard
+                  story={story}
                   onClick={() => navigate(`/estudiante/cuentos/${story.id}`)}
                 />
               </Grid>

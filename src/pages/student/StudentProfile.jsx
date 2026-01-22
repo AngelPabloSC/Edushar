@@ -63,7 +63,7 @@ const StudentProfile = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
       {/* Profile Header */}
       <Paper
         elevation={0}
@@ -199,7 +199,7 @@ const StudentProfile = () => {
                   elevation={0}
                   sx={{
                     p: 3,
-                    borderRadius: 3,
+                    borderRadius: 2,
                     border: '2px solid',
                     borderColor: 'divider',
                     display: 'flex',
@@ -351,7 +351,7 @@ const StudentProfile = () => {
               elevation={0}
               sx={{
                 p: 4,
-                borderRadius: 3,
+                borderRadius: 2,
                 border: '1px solid',
                 borderColor: 'divider',
               }}
@@ -382,16 +382,16 @@ const StudentProfile = () => {
                           ? medal.color === 'warning'
                             ? 'rgba(255, 193, 7, 0.15)'
                             : medal.color === 'info'
-                            ? 'rgba(33, 150, 243, 0.15)'
-                            : 'rgba(76, 175, 80, 0.15)'
+                              ? 'rgba(33, 150, 243, 0.15)'
+                              : 'rgba(76, 175, 80, 0.15)'
                           : 'rgba(0, 0, 0, 0.05)',
                         border: '2px solid',
                         borderColor: medal.earned
                           ? medal.color === 'warning'
                             ? 'warning.main'
                             : medal.color === 'info'
-                            ? 'info.main'
-                            : 'success.main'
+                              ? 'info.main'
+                              : 'success.main'
                           : 'divider',
                         display: 'flex',
                         alignItems: 'center',
@@ -400,8 +400,8 @@ const StudentProfile = () => {
                           ? medal.color === 'warning'
                             ? 'warning.main'
                             : medal.color === 'info'
-                            ? 'info.main'
-                            : 'success.main'
+                              ? 'info.main'
+                              : 'success.main'
                           : 'text.disabled',
                       }}
                     >

@@ -128,12 +128,12 @@ const AdminDictionaryEditor = () => {
 
     const actions = (
         <>
-            <Button 
-                variant="outlined" 
+            <Button
+                variant="outlined"
                 onClick={handleSaveClick}
                 startIcon={<SaveIcon />}
-                sx={{ 
-                    borderRadius: 3, px: 4, py: 1, fontWeight: 700, 
+                sx={{
+                    borderRadius: 3, px: 4, py: 1, fontWeight: 700,
                     borderColor: 'text.primary', color: 'text.primary',
                     borderWidth: 2,
                     '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'transparent' }
@@ -141,11 +141,11 @@ const AdminDictionaryEditor = () => {
             >
                 Guardar Borrador
             </Button>
-            <Button 
-                variant="contained" 
+            <Button
+                variant="contained"
                 onClick={handlePublishClick}
                 startIcon={<PublishIcon />}
-                sx={{ 
+                sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'secondary.main', color: 'white',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
@@ -164,21 +164,21 @@ const AdminDictionaryEditor = () => {
 
     return (
         <>
-            <EditorHeader 
+            <EditorHeader
                 breadcrumbs={breadcrumbs}
                 onBack={handleBack}
                 lastSaved="Guardado automático activo"
                 showLastSaved={true}
             />
 
-            <Container maxWidth="md" sx={{ pt: 4, pb: 12 }}>
-                <PageHeader 
+            <Container maxWidth="md" sx={{ pt: 4, pb: 12, px: { xs: 3, sm: 4, md: 6 } }}>
+                <PageHeader
                     title={isEditMode ? 'Editar Término del Diccionario' : 'Nuevo Término del Diccionario'}
                     subtitle="Complete la información del término en Shuar y su traducción al español."
                 />
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    
+
                     {/* Imagen de referencia */}
                     <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
                         <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', mb: 2, display: 'block' }}>
@@ -211,9 +211,9 @@ const AdminDictionaryEditor = () => {
                                 <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                     Palabra en Shuar *
                                 </Typography>
-                                <TextField 
-                                    fullWidth 
-                                    variant="outlined" 
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
                                     value={formData.wordShuar}
                                     onChange={handleChange('wordShuar')}
                                     placeholder="Ej: Nua"
@@ -224,9 +224,9 @@ const AdminDictionaryEditor = () => {
                                 <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                     Traducción al Español *
                                 </Typography>
-                                <TextField 
-                                    fullWidth 
-                                    variant="outlined" 
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
                                     value={formData.wordSpanish}
                                     onChange={handleChange('wordSpanish')}
                                     placeholder="Ej: Mujer"
@@ -269,11 +269,11 @@ const AdminDictionaryEditor = () => {
                                 <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                     Ejemplo en Shuar
                                 </Typography>
-                                <TextField 
-                                    fullWidth 
+                                <TextField
+                                    fullWidth
                                     multiline
                                     rows={2}
-                                    variant="outlined" 
+                                    variant="outlined"
                                     value={formData.exampleShuar}
                                     onChange={handleChange('exampleShuar')}
                                     placeholder="Escriba una oración de ejemplo en Shuar..."
@@ -284,11 +284,11 @@ const AdminDictionaryEditor = () => {
                                 <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                     Traducción del Ejemplo (Español)
                                 </Typography>
-                                <TextField 
-                                    fullWidth 
+                                <TextField
+                                    fullWidth
                                     multiline
                                     rows={2}
-                                    variant="outlined" 
+                                    variant="outlined"
                                     value={formData.exampleSpanish}
                                     onChange={handleChange('exampleSpanish')}
                                     placeholder="Traducción de la oración al español..."
@@ -301,14 +301,14 @@ const AdminDictionaryEditor = () => {
                 </Box>
             </Container>
 
-            <EditorFooter 
+            <EditorFooter
                 actions={actions}
                 savingStatus="Campos obligatorios completos"
             />
 
             {/* Confirmation Dialog */}
-            <Dialog 
-                open={isDialogOpen} 
+            <Dialog
+                open={isDialogOpen}
                 onClose={handleCloseDialog}
                 PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
             >
@@ -322,9 +322,9 @@ const AdminDictionaryEditor = () => {
                     <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
                         Cancelar
                     </Button>
-                    <Button 
-                        onClick={handleConfirmAction} 
-                        variant="contained" 
+                    <Button
+                        onClick={handleConfirmAction}
+                        variant="contained"
                         color={dialongContent.color || 'primary'}
                         sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
                         autoFocus

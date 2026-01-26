@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useFetchDataPromise } from './useFetchDataPromise';
 import { useDialong } from './useDialog';
 import { useLoginContext } from './context/LoginContext';
 import { useGoogleLogin } from './useGoogleLogin';
+import { useToggle } from './useToggle';
+import { useFormValidation } from './useFormValidation';
 import validationRules from '../utils/validationRules';
 
 export const useLogin = () => {
@@ -18,77 +20,55 @@ export const useLogin = () => {
     const { login } = useLoginContext();
     const { handleGoogleLogin } = useGoogleLogin();
 
-    // UI States
+    // UI States - using useToggle for boolean states
     const [tabValue, setTabValue] = useState(0);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [showPassword, toggleShowPassword] = useToggle(false);
+    const [showConfirmPassword, toggleShowConfirmPassword] = useToggle(false);
     const [isLoading, setIsLoading] = useState(false);
     const [authError, setAuthError] = useState('');
 
-    // Form Data
-    const [loginData, setLoginData] = useState({
-        email: '',
-        password: '',
-    });
+    // Form validation hook
+    const {
+        data: loginData,
+        errors: loginErrors,
+        handleChange: baseHandleChange,
+        validateAll,
+        setErrors: setLoginErrors,
+    } = useFormValidation(
+        {
+            email: '',
+            password: '',
+        },
+        validationRules
+    );
 
-    // Validation Errors
-    const [loginErrors, setLoginErrors] = useState({});
-
-    // Tab Change Handler
-    const handleTabChange = (event, newValue) => {
+    // Tab Change Handler - memoized
+    const handleTabChange = useCallback((event, newValue) => {
         setTabValue(newValue);
         setLoginErrors({});
         setAuthError('');
-    };
+    }, [setLoginErrors]);
 
-    // Generic Field Validation
-    const validateField = (name, value, rules) => {
-        if (!value && rules.required) {
-            return validationRules.required;
-        }
-
-        if (rules.pattern && value && !rules.pattern.value.test(value)) {
-            return rules.pattern.message;
-        }
-
-        if (rules.minLength && value && value.length < rules.minLength) {
-            return validationRules.minLength(rules.minLength).message;
-        }
-
-        if (rules.maxLength && value && value.length > rules.maxLength) {
-            return validationRules.maxLength(rules.maxLength).message;
-        }
-
-        return '';
-    };
-
-    // Login Form Change Handler
-    const handleLoginChange = (e) => {
+    // Login Form Change Handler - memoized with proper event typing
+    const handleLoginChange = useCallback((e) => {
         const { name, value } = e.target;
-        setLoginData({
-            ...loginData,
-            [name]: value,
-        });
 
-        // Real-time validation
-        let error = '';
+        // Determine validation rules based on field
+        let fieldRules = null;
         if (name === 'email') {
-            error = validateField(name, value, {
+            fieldRules = {
                 required: true,
                 pattern: validationRules.email
-            });
+            };
         } else if (name === 'password') {
-            error = validateField(name, value, { required: true });
+            fieldRules = { required: true };
         }
 
-        setLoginErrors({
-            ...loginErrors,
-            [name]: error,
-        });
-    };
+        baseHandleChange(e, fieldRules);
+    }, [baseHandleChange]);
 
-    // Login API Call
-    const handleLoginAPI = async (data) => {
+    // Login API Call - memoized
+    const handleLoginAPI = useCallback(async (data) => {
         try {
             const response = await getFechData({
                 endPoint: 'api/login',
@@ -114,24 +94,23 @@ export const useLogin = () => {
                 message: "Error al momento de enviar los datos"
             });
         }
-    };
+    }, [getFechData, login, handleOpenDialog, setDialongContent]);
 
-    // Login Form Submit
-    const handleLoginSubmit = async (e) => {
+    // Login Form Submit - memoized
+    const handleLoginSubmit = useCallback(async (e) => {
         e.preventDefault();
         setAuthError('');
 
         // Validate all fields
-        const errors = {};
-        errors.email = validateField('email', loginData.email, {
-            required: true,
-            pattern: validationRules.email
+        const isValid = validateAll({
+            email: {
+                required: true,
+                pattern: validationRules.email
+            },
+            password: { required: true }
         });
-        errors.password = validateField('password', loginData.password, { required: true });
 
-        setLoginErrors(errors);
-
-        if (Object.values(errors).some(error => error !== '')) {
+        if (!isValid) {
             return;
         }
 
@@ -147,10 +126,10 @@ export const useLogin = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [loginData, validateAll, handleLoginAPI]);
 
-    // Google Sign In
-    const handleGoogleSignIn = async () => {
+    // Google Sign In - memoized
+    const handleGoogleSignIn = useCallback(async () => {
         setIsLoading(true);
         setAuthError('');
         try {
@@ -161,7 +140,7 @@ export const useLogin = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [handleGoogleLogin]);
 
     return {
         // States
@@ -175,11 +154,11 @@ export const useLogin = () => {
         isOpen,
         dialongContent,
 
-        // Setters
-        setShowPassword,
-        setShowConfirmPassword,
+        // Setters - now using toggle functions
+        setShowPassword: toggleShowPassword,
+        setShowConfirmPassword: toggleShowConfirmPassword,
 
-        // Handlers
+        // Handlers - all memoized with useCallback
         handleTabChange,
         handleLoginChange,
         handleLoginSubmit,

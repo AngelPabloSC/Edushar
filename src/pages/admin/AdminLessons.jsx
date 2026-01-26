@@ -5,11 +5,9 @@ import {
   Button,
   Chip,
   IconButton,
-  Avatar,
   useTheme,
   alpha,
   TextField,
-  InputAdornment,
   MenuItem,
   Select,
   Tooltip,
@@ -18,12 +16,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Alert,
+  Skeleton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -39,6 +40,7 @@ import { useAdminLessons } from '../../hooks/pages/useAdminLessons';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
 import { useDialong } from '../../hooks/useDialog';
+import { useCrudAdminLesson } from '../../hooks/useCrudAdminLesson';
 
 const iconMap = {
   menu_book: <MenuBookIcon />,
@@ -58,6 +60,19 @@ const AdminLessons = () => {
       stats,
       data
   } = useAdminLessons();
+
+  // Fetch real lessons from API with optimized state
+  const { 
+    lessonData, 
+    lessons, 
+    tableState, 
+    loading, 
+    handlePageChange, 
+    handleReset,
+    handleReloadLessons
+  } = useCrudAdminLesson();
+  
+  const { code, message } = lessonData;
 
   const { handleSetDataSnackbar } = useSnackBarContext();
   const { isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
@@ -83,16 +98,12 @@ const AdminLessons = () => {
   const columns = [
 
     {
-      name: "order",
-      label: "Orden",
+      name: "id",
+      label: "ID",
       options: {
-        filter: true,
-        sort: true,
-        customBodyRender: (value) => (
-            <Typography variant="body2" fontWeight={600} color="text.secondary" align="center">
-                {String(value).padStart(2, '0')}
-            </Typography>
-        )
+        filter: false,
+        sort: false,
+        display: false,
       }
     },
     {
@@ -102,9 +113,6 @@ const AdminLessons = () => {
         filter: true,
         sort: true,
         customBodyRender: (value, tableMeta) => {
-            const rowId = tableMeta.rowIndex;
-            const iconKey = data[rowId]?.icon || 'menu_book'; 
-            
             return (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                     <Box sx={{ 
@@ -120,15 +128,14 @@ const AdminLessons = () => {
                         transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': { transform: 'scale(1.1) rotate(-5deg)' }
                     }}>
-                        {iconMap[iconKey]}
+                        <MenuBookIcon />
                     </Box>
                     <Box>
                         <Typography variant="subtitle1" fontWeight={800} color="text.primary" sx={{ lineHeight: 1.2, mb: 0.5 }}>
                             {value}
                         </Typography>
-                        {/* Adding visible 'type' or metadata helps visibility principle by providing context */}
                         <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ display: 'block' }}>
-                            {data[rowId]?.type || 'Lección Estándar'}
+                            {lessons[tableMeta.rowIndex]?.exercises?.length || 0} ejercicios
                         </Typography>
                     </Box>
                 </Box>
@@ -136,7 +143,19 @@ const AdminLessons = () => {
         }
       }
     },
-// ... (omitting level and status for brevity if unchanged, but will include to keep block clean if needed)
+    {
+      name: "description",
+      label: "Descripción",
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: (value) => (
+            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {value || 'Sin descripción'}
+            </Typography>
+        )
+      }
+    },
     {
       name: "level",
       label: "Nivel",
@@ -159,32 +178,38 @@ const AdminLessons = () => {
       }
     },
     {
-      name: "status",
-      label: "Estado",
+      name: "duration",
+      label: "Duración",
       options: {
-        filter: true,
+        filter: false,
+        sort: true,
+        customBodyRender: (value) => (
+            <Typography variant="body2" color="text.secondary">
+                {value} min
+            </Typography>
+        )
+      }
+    },
+    {
+      name: "totalPoints",
+      label: "Puntos",
+      options: {
+        filter: false,
         sort: true,
         customBodyRender: (value) => (
             <Chip 
                 label={value} 
-                size="small" 
+                size="small"
                 sx={{ 
                     fontWeight: 700, 
-                    borderRadius: 2,
-                    px: 1.5,
-                    height: 28,
-                    bgcolor: value === 'Publicada' ? alpha(theme.palette.success.main, 0.1) : 
-                             value === 'Borrador' ? alpha(theme.palette.warning.main, 0.1) : theme.palette.action.selected,
-                    color: value === 'Publicada' ? 'success.dark' : 
-                           value === 'Borrador' ? 'warning.dark' : 'text.secondary',
-                    border: '1px solid',
-                    borderColor: value === 'Publicada' ? alpha(theme.palette.success.main, 0.2) : 
-                                 value === 'Borrador' ? alpha(theme.palette.warning.main, 0.2) : 'transparent'
+                    bgcolor: alpha(theme.palette.warning.main, 0.1),
+                    color: 'warning.dark'
                 }} 
             />
         )
       }
     },
+
     {
         name: "actions",
         label: "Acciones",
@@ -207,7 +232,7 @@ const AdminLessons = () => {
                         <IconButton 
                             size="small" 
                             component={Link}
-                            to={`/admin/lecciones/editar/${data[tableMeta.rowIndex]?.id || tableMeta.rowIndex}`}
+                            to={`/admin/lecciones/editar/${lessons[tableMeta.rowIndex]?.id}`}
                             sx={{ 
                                 color: 'text.secondary', 
                                 transition: 'all 0.2s',
@@ -220,7 +245,7 @@ const AdminLessons = () => {
                     <Tooltip title="Eliminar" arrow TransitionComponent={Fade}>
                         <IconButton 
                             size="small" 
-                            onClick={() => handleDeleteClick(data[tableMeta.rowIndex]?.id)}
+                            onClick={() => handleDeleteClick(lessons[tableMeta.rowIndex]?.id)}
                             sx={{ 
                             color: 'text.secondary', 
                             transition: 'all 0.2s',
@@ -260,28 +285,30 @@ const AdminLessons = () => {
             </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
-            <Tooltip title="Cambiar el orden">
-                <Button 
-                    variant="outlined" 
-                    startIcon={<SwapVertIcon />}
+            <Tooltip title="Recargar datos">
+                <IconButton
+                    onClick={handleReloadLessons}
                     sx={{ 
-                        borderRadius: 3, 
-                        textTransform: 'none', 
-                        fontWeight: 700, 
-                        py: 1.25, px: 3,
+                        borderRadius: 3,
+                        width: 44,
+                        height: 44,
+                        border: '1px solid',
                         borderColor: 'divider',
-                        color: 'text.primary',
+                        color: 'text.secondary',
                         bgcolor: 'white',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                        '&:hover': { bgcolor: 'action.hover', borderColor: 'divider' }
+                        '&:hover': { 
+                            bgcolor: 'primary.main', 
+                            color: 'white',
+                            borderColor: 'primary.main',
+                            transform: 'rotate(180deg)',
+                            transition: 'all 0.3s ease'
+                        }
                     }}
                 >
-                    Reordenar
-                </Button>
+                    <RefreshIcon />
+                </IconButton>
             </Tooltip>
-            {/* Keeping the New Lesson button implementation from previous step, assuming it is good now */}
-
-
             <Button 
                 component={Link}
                 to="/admin/lecciones/crear"
@@ -411,7 +438,19 @@ const AdminLessons = () => {
          </Box>
       </Box>
 
+      {/* Loading State */}
+      {loading && (
+        <Skeleton width="100%" height={400} variant="rounded" sx={{ borderRadius: 4 }} />
+      )}
+
+      {!loading && code !== 'COD_OK' && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {message || 'Error al cargar las lecciones'}
+        </Alert>
+      )}
+
       {/* Data Table */}
+      {!loading && code === 'COD_OK' && (
       <Box sx={{ 
           '& .MuiPaper-root': { boxShadow: '0 4px 24px rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider', borderRadius: 4, overflow: 'hidden' },
           '& .MuiTableCell-head': { bgcolor: alpha(theme.palette.background.paper, 0.5), fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', letterSpacing: '0.05em' },
@@ -419,7 +458,7 @@ const AdminLessons = () => {
       }}>
         <TableMain 
             title="" 
-            data={data} 
+            data={lessons} 
             columns={columns} 
             options={{
                 elevation: 0,
@@ -433,11 +472,13 @@ const AdminLessons = () => {
             }}
         />
       </Box>
+      )}
 
-      {/* Pagination (Visual Match) */}
+      {/* Pagination */}
+      {!loading && code === 'COD_OK' && (
       <Paper elevation={0} sx={{ mt: -2, p: 2, border: '1px solid', borderColor: 'divider', borderTop: 'none', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper' }}>
           <Typography variant="body2" color="text.secondary" fontWeight={500}>
-             Mostrando <Box component="span" fontWeight="bold" color="text.primary">1 - 4</Box> de <Box component="span" fontWeight="bold" color="text.primary">{stats.total}</Box> lecciones
+             Mostrando <Box component="span" fontWeight="bold" color="text.primary">1 - {lessons.length}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{tableState.count}</Box> lecciones
           </Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
               <IconButton size="small" disabled sx={{ border: '1px solid', borderColor: 'divider' }}><ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} /></IconButton>
@@ -447,6 +488,7 @@ const AdminLessons = () => {
               <IconButton size="small" sx={{ border: '1px solid', borderColor: 'divider' }}><ChevronRightIcon sx={{ fontSize: 16 }} /></IconButton>
           </Box>
       </Paper>
+      )}
 
       {/* Summary Cards */}
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mt: 4 }}>

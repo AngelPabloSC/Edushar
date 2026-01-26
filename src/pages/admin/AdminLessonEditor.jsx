@@ -48,6 +48,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useSidebarContext } from '../../hooks/context/sidebardContext';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
 import { useDialong } from '../../hooks/useDialog';
+import { useCrudAdminLesson } from '../../hooks/useCrudAdminLesson';
 import EditorHeader from '../../components/EditorHeader';
 import EditorFooter from '../../components/EditorFooter';
 import PageHeader from '../../components/PageHeader';
@@ -57,23 +58,75 @@ const AdminLessonEditor = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = Boolean(id);
-    const { isOpen } = useSidebarContext(); // Sidebar Context
-    const { handleSetDataSnackbar } = useSnackBarContext(); // Snackbar Context
-    const { isOpen: isDialogOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong(); // Dialog Hook
+    const { isOpen } = useSidebarContext();
+    const { handleSetDataSnackbar } = useSnackBarContext();
+    const { isOpen: isDialogOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
+    const { 
+        createLesson, 
+        createLoading, 
+        updateLesson, 
+        updateLoading, 
+        fetchLessonById, 
+        currentLesson, 
+        fetchLoading: loadingLesson 
+    } = useCrudAdminLesson();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [pendingAction, setPendingAction] = useState(null);
 
-    const performSaveDraft = () => {
+    const performSaveDraft = async () => {
+        // For now, just show success message (draft functionality could be added later)
         handleSetDataSnackbar({ message: 'Borrador guardado exitosamente', type: 'success' });
         handleCloseDialog();
     };
 
-    const performPublish = () => {
-        // Logic to publish lesson would go here
-        handleSetDataSnackbar({ message: 'Lección publicada correctamente', type: 'success' });
-        handleCloseDialog();
-        navigate('/admin/lecciones'); // Navigate back after success
+    const performPublish = async () => {
+        try {
+            // Format exercises to match API structure
+            const formattedExercises = lessonData.exercises.map(ex => ({
+                type: ex.type,
+                question: ex.question,
+                options: ex.options || [],
+                correctAnswer: ex.correctAnswer || '',
+                tip: ex.tip || ''
+            }));
+
+            // Prepare lesson data for API
+            const lessonPayload = {
+                title: lessonData.title,
+                level: lessonData.level,
+                description: lessonData.description,
+                duration: lessonData.duration,
+                totalPoints: lessonData.totalPoints,
+                content: {
+                    intro: lessonData.content.intro,
+                    videoUrl: lessonData.content.videoUrl,
+                    text: lessonData.content.text
+                },
+                exercises: formattedExercises
+            };
+
+            const result = isEditMode 
+                ? await updateLesson(id, lessonPayload)
+                : await createLesson(lessonPayload);
+            
+            if (result.success) {
+                handleSetDataSnackbar({ 
+                    message: isEditMode ? 'Lección actualizada correctamente' : 'Lección publicada correctamente', 
+                    type: 'success' 
+                });
+                handleCloseDialog();
+                setTimeout(() => {
+                    navigate('/admin/lecciones');
+                }, 1500);
+            } else {
+                handleSetDataSnackbar({ message: result.error || 'Error al publicar la lección', type: 'error' });
+                handleCloseDialog();
+            }
+        } catch (error) {
+            handleSetDataSnackbar({ message: 'Error al publicar la lección', type: 'error' });
+            handleCloseDialog();
+        }
     };
 
     const handleConfirmAction = () => {
@@ -108,17 +161,84 @@ const AdminLessonEditor = () => {
 
     const [lessonData, setLessonData] = useState({
         title: '',
-        level: 'A1 - Principiante',
-        prerequisite: 'Ninguno',
-        content: '',
-        exercises: [
-            { id: 1, type: 'multiple_choice', question: "¿Cómo se dice 'Pájaro' en Shuar?", options: ['Chikirpu', 'Ikiama', 'Yawa', 'Aujuju'], correct: 0 },
-            { id: 2, type: 'fill_in_blanks', content: "El animal más veloz es el [Yawá-pish].", question: "" }
-        ]
+        level: 'Básico',
+        description: '',
+        duration: 15,
+        totalPoints: 100,
+        content: {
+            intro: '',
+            videoUrl: '',
+            text: ''
+        },
+        exercises: []
     });
+
+    // Load lesson data when in edit mode
+    useEffect(() => {
+        if (isEditMode && currentLesson) {
+            setLessonData({
+                title: currentLesson.title || '',
+                level: currentLesson.level || 'Básico',
+                description: currentLesson.description || '',
+                duration: currentLesson.duration || 15,
+                totalPoints: currentLesson.totalPoints || 100,
+                content: {
+                    intro: currentLesson.content?.intro || '',
+                    videoUrl: currentLesson.content?.videoUrl || '',
+                    text: currentLesson.content?.text || ''
+                },
+                exercises: currentLesson.exercises || []
+            });
+        }
+    }, [isEditMode, currentLesson]);
+
+    // Fetch lesson data when in edit mode
+    useEffect(() => {
+        if (isEditMode && id) {
+            fetchLessonById(id);
+        }
+    }, [isEditMode, id]);
 
     const handleBack = () => {
         navigate('/admin/lecciones');
+    };
+
+    // Exercise management functions
+    const handleAddExercise = (type) => {
+        const newExercise = {
+            id: Date.now(),
+            type: type,
+            question: '',
+            options: type === 'multiple_choice' ? ['', '', '', ''] : ['Verdadero', 'Falso'],
+            correctAnswer: '',
+            tip: ''
+        };
+        setLessonData({ ...lessonData, exercises: [...lessonData.exercises, newExercise] });
+    };
+
+    const handleUpdateExercise = (index, field, value) => {
+        const updatedExercises = [...lessonData.exercises];
+        updatedExercises[index] = { ...updatedExercises[index], [field]: value };
+        setLessonData({ ...lessonData, exercises: updatedExercises });
+    };
+
+    const handleUpdateExerciseOption = (exerciseIndex, optionIndex, value) => {
+        const updatedExercises = [...lessonData.exercises];
+        const updatedOptions = [...updatedExercises[exerciseIndex].options];
+        updatedOptions[optionIndex] = value;
+        updatedExercises[exerciseIndex] = { ...updatedExercises[exerciseIndex], options: updatedOptions };
+        setLessonData({ ...lessonData, exercises: updatedExercises });
+    };
+
+    const handleSetCorrectAnswer = (exerciseIndex, answer) => {
+        const updatedExercises = [...lessonData.exercises];
+        updatedExercises[exerciseIndex] = { ...updatedExercises[exerciseIndex], correctAnswer: answer };
+        setLessonData({ ...lessonData, exercises: updatedExercises });
+    };
+
+    const handleDeleteExercise = (index) => {
+        const updatedExercises = lessonData.exercises.filter((_, i) => i !== index);
+        setLessonData({ ...lessonData, exercises: updatedExercises });
     };
 
     const actions = (
@@ -202,6 +322,18 @@ const AdminLessonEditor = () => {
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Descripción</Typography>
+                                        <TextField
+                                            fullWidth
+                                            multiline
+                                            rows={3}
+                                            placeholder="Describe brevemente el contenido de esta lección..."
+                                            value={lessonData.description}
+                                            onChange={(e) => setLessonData({ ...lessonData, description: e.target.value })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={4}>
                                         <Typography variant="subtitle2" fontWeight={700} gutterBottom>Nivel</Typography>
                                         <Select
                                             fullWidth
@@ -209,23 +341,30 @@ const AdminLessonEditor = () => {
                                             onChange={(e) => setLessonData({ ...lessonData, level: e.target.value })}
                                             sx={{ borderRadius: 2 }}
                                         >
-                                            <MenuItem value="A1 - Principiante">Principiante</MenuItem>
-                                            <MenuItem value="A2 - Elemental">Intermedio</MenuItem>
-                                            <MenuItem value="B1 - Intermedio">Avanzado</MenuItem>
+                                            <MenuItem value="Básico">Básico</MenuItem>
+                                            <MenuItem value="Intermedio">Intermedio</MenuItem>
+                                            <MenuItem value="Avanzado">Avanzado</MenuItem>
                                         </Select>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Prerrequisito</Typography>
-                                        <Select
+                                    <Grid item xs={12} md={4}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Duración (minutos)</Typography>
+                                        <TextField
                                             fullWidth
-                                            value={lessonData.prerequisite}
-                                            onChange={(e) => setLessonData({ ...lessonData, prerequisite: e.target.value })}
-                                            sx={{ borderRadius: 2 }}
-                                        >
-                                            <MenuItem value="Ninguno">Ninguno</MenuItem>
-                                            <MenuItem value="Gramática I">Gramática Básica I</MenuItem>
-                                            <MenuItem value="Intro Shuar">Introducción al Shuar</MenuItem>
-                                        </Select>
+                                            type="number"
+                                            value={lessonData.duration}
+                                            onChange={(e) => setLessonData({ ...lessonData, duration: parseInt(e.target.value) || 0 })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} md={4}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Puntos Totales</Typography>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            value={lessonData.totalPoints}
+                                            onChange={(e) => setLessonData({ ...lessonData, totalPoints: parseInt(e.target.value) || 0 })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        />
                                     </Grid>
                                 </Grid>
                             </Box>
@@ -235,55 +374,58 @@ const AdminLessonEditor = () => {
                     {/* CONF: Lesson Content Card */}
                     <Grid item xs={12}>
                         <Paper elevation={0} sx={{ borderRadius: 3, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
-                            <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.background.paper, 0.5), display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box sx={{ px: 3, py: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.background.paper, 0.5) }}>
                                 <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <ArticleIcon color="primary" /> Contenido de la Lección
                                 </Typography>
-                                <Button startIcon={<ImageIcon />} size="small" sx={{ fontWeight: 700, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) } }}>
-                                    Subir Imagen
-                                </Button>
                             </Box>
                             <Box sx={{ p: 3 }}>
-                                {/* Fake Toolbar matching HTML */}
-                                <Box sx={{
-                                    display: 'flex', flexWrap: 'wrap', gap: 0.5,
-                                    p: 1,
-                                    border: '1px solid', borderColor: 'divider',
-                                    borderBottom: 0,
-                                    borderTopLeftRadius: 8, borderTopRightRadius: 8,
-                                    bgcolor: 'action.hover'
-                                }}>
-                                    <IconButton size="small"><FormatBoldIcon /></IconButton>
-                                    <IconButton size="small"><FormatItalicIcon /></IconButton>
-                                    <IconButton size="small"><FormatUnderlinedIcon /></IconButton>
-                                    <Box sx={{ width: 1, height: 24, bgcolor: 'divider', mx: 0.5, alignSelf: 'center' }} />
-                                    <IconButton size="small"><FormatListBulletedIcon /></IconButton>
-                                    <IconButton size="small"><FormatListNumberedIcon /></IconButton>
-                                    <Box sx={{ width: 1, height: 24, bgcolor: 'divider', mx: 0.5, alignSelf: 'center' }} />
-                                    <IconButton size="small"><InsertLinkIcon /></IconButton>
-                                    <IconButton size="small"><TranslateIcon /></IconButton>
-                                </Box>
-                                <TextField
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Introducción</Typography>
+                                        <TextField
+                                            fullWidth
+                                            multiline
+                                            rows={3}
+                                            placeholder="Introduce la lección y explica qué aprenderán los estudiantes..."
+                                            value={lessonData.content.intro}
+                                            onChange={(e) => setLessonData({ 
+                                                ...lessonData, 
+                                                content: { ...lessonData.content, intro: e.target.value }
+                                            })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>URL del Video (opcional)</Typography>
+                                        <TextField
+                                            fullWidth
+                                            placeholder="https://youtube.com/ejemplo"
+                                            value={lessonData.content.videoUrl}
+                                            onChange={(e) => setLessonData({ 
+                                                ...lessonData, 
+                                                content: { ...lessonData.content, videoUrl: e.target.value }
+                                            })}
+                                            sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" fontWeight={700} gutterBottom>Contenido de la Lección</Typography>
+                                        <TextField
                                     fullWidth
                                     multiline
                                     minRows={12}
                                     placeholder="Escriba aquí el cuerpo de la lección, incluya vocabulario y contextos culturales..."
-                                    value={lessonData.content}
-                                    onChange={(e) => setLessonData({ ...lessonData, content: e.target.value })}
+                                    value={lessonData.content.text}
+                                    onChange={(e) => setLessonData({ ...lessonData, content: { ...lessonData.content, text: e.target.value } })}
                                     sx={{
                                         '& .MuiOutlinedInput-root': {
                                             borderTopLeftRadius: 0, borderTopRightRadius: 0, borderRadius: 2
                                         }
                                     }}
                                 />
-
-                                <Box sx={{ mt: 3, border: '2px dashed', borderColor: 'divider', borderRadius: 3, p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', bgcolor: alpha(theme.palette.background.default, 0.5) }}>
-                                    <Box sx={{ width: 64, height: 64, borderRadius: '50%', bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2, color: 'primary.main' }}>
-                                        <CloudUploadIcon fontSize="large" />
-                                    </Box>
-                                    <Typography variant="subtitle2" fontWeight={700}>Arrastra una imagen o haz clic para subir</Typography>
-                                    <Typography variant="caption" color="text.secondary">PNG, JPG hasta 5MB</Typography>
-                                </Box>
+                                    </Grid>
+                                </Grid>
                             </Box>
                         </Paper>
                     </Grid>
@@ -306,7 +448,11 @@ const AdminLessonEditor = () => {
                                         bgcolor: alpha(theme.palette.background.default, 0.3),
                                         position: 'relative'
                                     }}>
-                                        <IconButton size="small" sx={{ position: 'absolute', top: 12, right: 12, color: 'error.main', bgcolor: 'white', '&:hover': { bgcolor: '#ffebee' } }}>
+                                        <IconButton 
+                                            size="small" 
+                                            onClick={() => handleDeleteExercise(index)}
+                                            sx={{ position: 'absolute', top: 12, right: 12, color: 'error.main', bgcolor: 'white', '&:hover': { bgcolor: '#ffebee' } }}
+                                        >
                                             <DeleteIcon fontSize="small" />
                                         </IconButton>
 
@@ -320,60 +466,82 @@ const AdminLessonEditor = () => {
                                                 {index + 1}
                                             </Box>
                                             <Typography variant="subtitle2" fontWeight={700} color="text.secondary">
-                                                {ex.type === 'multiple_choice' ? 'Opción Múltiple' : 'Completar Espacios'}
+                                                {ex.type === 'multiple_choice' ? 'Opción Múltiple' : ex.type === 'true_false' ? 'Verdadero/Falso' : 'Completar Espacios'}
                                             </Typography>
                                         </Box>
 
-                                        {ex.type === 'multiple_choice' ? (
-                                            <>
-                                                <TextField
-                                                    fullWidth
-                                                    variant="standard"
-                                                    placeholder="¿Cómo se dice 'Pájaro' en Shuar?"
-                                                    value={ex.question}
-                                                    sx={{ mb: 2, '& .MuiInput-input': { fontSize: '1.1rem', fontWeight: 600 } }}
-                                                />
-                                                <Grid container spacing={2}>
-                                                    {ex.options.map((opt, optIndex) => (
-                                                        <Grid item xs={12} key={optIndex}>
-                                                            <Paper elevation={0} sx={{
-                                                                p: 1.5,
-                                                                border: '1px solid', borderColor: 'divider',
-                                                                borderRadius: 2,
-                                                                bgcolor: 'background.paper',
-                                                                display: 'flex', alignItems: 'center', gap: 1
-                                                            }}>
-                                                                <Radio checked={ex.correct === optIndex} size="small" />
-                                                                <TextField fullWidth variant="standard" value={opt} InputProps={{ disableUnderline: true }} />
-                                                            </Paper>
-                                                        </Grid>
-                                                    ))}
+                                        {/* Question Field */}
+                                        <TextField
+                                            fullWidth
+                                            variant="standard"
+                                            placeholder="Escribe la pregunta aquí..."
+                                            value={ex.question}
+                                            onChange={(e) => handleUpdateExercise(index, 'question', e.target.value)}
+                                            sx={{ mb: 2, '& .MuiInput-input': { fontSize: '1.1rem', fontWeight: 600 } }}
+                                        />
+
+                                        {/* Options */}
+                                        <Grid container spacing={2} sx={{ mb: 2 }}>
+                                            {ex.options.map((opt, optIndex) => (
+                                                <Grid item xs={12} key={optIndex}>
+                                                    <Paper elevation={0} sx={{
+                                                        p: 1.5,
+                                                        border: '2px solid',
+                                                        borderColor: ex.correctAnswer === opt && opt !== '' ? 'success.main' : 'divider',
+                                                        borderRadius: 2,
+                                                        bgcolor: 'background.paper',
+                                                        display: 'flex', alignItems: 'center', gap: 1
+                                                    }}>
+                                                        <Radio 
+                                                            checked={ex.correctAnswer === opt && opt !== ''} 
+                                                            size="small"
+                                                            onChange={() => handleSetCorrectAnswer(index, opt)}
+                                                            disabled={opt === ''}
+                                                        />
+                                                        <TextField 
+                                                            fullWidth 
+                                                            variant="standard" 
+                                                            value={opt} 
+                                                            onChange={(e) => handleUpdateExerciseOption(index, optIndex, e.target.value)}
+                                                            placeholder={`Opción ${optIndex + 1}`}
+                                                            disabled={ex.type === 'true_false'}
+                                                            InputProps={{ disableUnderline: true }} 
+                                                        />
+                                                    </Paper>
                                                 </Grid>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block' }}>
-                                                    Use corchetes [ ] para definir la palabra correcta, ej: El [sol] sale.
-                                                </Typography>
-                                                <TextField
-                                                    fullWidth
-                                                    multiline
-                                                    rows={2}
-                                                    value={ex.content}
-                                                    placeholder="El animal más veloz es el [Yawá-pish]."
-                                                    sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
-                                                />
-                                            </>
-                                        )}
+                                            ))}
+                                        </Grid>
+
+                                        {/* Tip Field */}
+                                        <TextField
+                                            fullWidth
+                                            multiline
+                                            rows={2}
+                                            placeholder="Pista o ayuda para el estudiante (opcional)..."
+                                            value={ex.tip}
+                                            onChange={(e) => handleUpdateExercise(index, 'tip', e.target.value)}
+                                            sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
+                                            label="Pista"
+                                        />
                                     </Paper>
                                 ))}
 
                                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                    <Button variant="outlined" startIcon={<AddCircleIcon />} sx={{ flex: 1, borderRadius: 3, py: 1.5, fontWeight: 700, borderColor: 'primary.main', color: 'primary.main' }}>
+                                    <Button 
+                                        variant="outlined" 
+                                        startIcon={<AddCircleIcon />} 
+                                        onClick={() => handleAddExercise('multiple_choice')}
+                                        sx={{ flex: 1, borderRadius: 3, py: 1.5, fontWeight: 700, borderColor: 'primary.main', color: 'primary.main' }}
+                                    >
                                         Añadir Opción Múltiple
                                     </Button>
-                                    <Button variant="outlined" startIcon={<FormatUnderlinedIcon />} sx={{ flex: 1, borderRadius: 3, py: 1.5, fontWeight: 700, borderColor: 'primary.main', color: 'primary.main' }}>
-                                        Añadir Espacio en Blanco
+                                    <Button 
+                                        variant="outlined" 
+                                        startIcon={<CheckCircleIcon />} 
+                                        onClick={() => handleAddExercise('true_false')}
+                                        sx={{ flex: 1, borderRadius: 3, py: 1.5, fontWeight: 700, borderColor: 'primary.main', color: 'primary.main' }}
+                                    >
+                                        Añadir Verdadero/Falso
                                     </Button>
                                 </Box>
                             </Box>

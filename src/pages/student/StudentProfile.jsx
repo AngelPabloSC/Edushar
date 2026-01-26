@@ -7,8 +7,10 @@ import {
   Paper,
   Grid,
   Chip,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
-import { useState } from 'react';
+import { useUserProfile } from '../../hooks/useUserProfile';
 import { studentProfileData } from '../../data/profileData';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
@@ -28,8 +30,17 @@ import StarIcon from '@mui/icons-material/Star';
  * Muestra estadísticas, medallas y actividad reciente
  */
 const StudentProfile = () => {
-  const [user] = useState(studentProfileData.user);
+  const { user: apiUser, loading, error } = useUserProfile();
   const { stats, medals, activities } = studentProfileData;
+
+  // Format user data from API
+  const user = apiUser ? {
+    name: `${apiUser.firstName} ${apiUser.lastName}`,
+    avatar: apiUser.photoProfile,
+    email: apiUser.email,
+    level: 'Nivel Intermedio', // This could come from stats later
+    streak: 7, // This could come from stats later
+  } : null;
 
   const getMedalIcon = (type) => {
     switch (type) {
@@ -64,7 +75,24 @@ const StudentProfile = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
-      {/* Profile Header */}
+      {/* Loading State */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+          <CircularProgress size={60} sx={{ color: 'secondary.main' }} />
+        </Box>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+      )}
+
+      {/* Profile Content - Only show when user data is loaded */}
+      {!loading && user && (
+        <>
+          {/* Profile Header */}
       <Paper
         elevation={0}
         sx={{
@@ -518,6 +546,8 @@ const StudentProfile = () => {
           </Paper>
         </Grid>
       </Grid>
+        </>
+      )}
     </Container>
   );
 };

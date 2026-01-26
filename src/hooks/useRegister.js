@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useLoginContext } from './context/LoginContext';
 import { useSnackBarContext } from './context/SnackbarContext';
+import { useFormValidation } from './useFormValidation';
 import validationRules from '../utils/validationRules';
 
 export const useRegister = () => {
@@ -9,89 +10,80 @@ export const useRegister = () => {
 
     // States
     const [isLoading, setIsLoading] = useState(false);
-    const [registerData, setRegisterData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        birthdate: '',
-        password: '',
-        confirmPassword: '',
-        acceptTerms: false,
-    });
-    const [registerErrors, setRegisterErrors] = useState({});
 
-    // Generic Field Validation
-    const validateField = (name, value, rules) => {
-        if (!value && rules.required) {
-            return validationRules.required;
-        }
+    // Form validation hook
+    const {
+        data: registerData,
+        errors: registerErrors,
+        handleChange: baseHandleChange,
+        validateAll,
+        setFieldError,
+    } = useFormValidation(
+        {
+            firstName: '',
+            lastName: '',
+            email: '',
+            birthdate: '',
+            password: '',
+            confirmPassword: '',
+            acceptTerms: false,
+        },
+        validationRules
+    );
 
-        if (rules.pattern && value && !rules.pattern.value.test(value)) {
-            return rules.pattern.message;
-        }
+    // Register Form Change Handler - memoized
+    const handleRegisterChange = useCallback((e) => {
+        const { name, value } = e.target;
 
-        if (rules.minLength && value && value.length < rules.minLength) {
-            return validationRules.minLength(rules.minLength).message;
-        }
+        // Determine validation rules based on field
+        let fieldRules = null;
 
-        if (rules.maxLength && value && value.length > rules.maxLength) {
-            return validationRules.maxLength(rules.maxLength).message;
-        }
-
-        return '';
-    };
-
-    // Register Form Change Handler
-    const handleRegisterChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        const fieldValue = type === 'checkbox' ? checked : value;
-
-        setRegisterData({
-            ...registerData,
-            [name]: fieldValue,
-        });
-
-        // Real-time validation
-        let error = '';
         if (name === 'firstName' || name === 'lastName') {
-            error = validateField(name, value, {
+            fieldRules = {
                 required: true,
                 pattern: validationRules.text
-            });
+            };
         } else if (name === 'email') {
-            error = validateField(name, value, {
+            fieldRules = {
                 required: true,
                 pattern: validationRules.email
-            });
+            };
         } else if (name === 'birthdate') {
-            error = validateField(name, value, { required: true });
-            if (!error && value) {
+            fieldRules = { required: true };
+
+            // Additional age validation
+            baseHandleChange(e, fieldRules);
+
+            if (value) {
                 const birthDate = new Date(value);
                 const today = new Date();
                 const age = today.getFullYear() - birthDate.getFullYear();
                 if (age < 13) {
-                    error = 'Debes ser mayor de 13 años';
+                    setFieldError(name, 'Debes ser mayor de 13 años');
                 }
             }
+            return; // Early return to avoid double validation
         } else if (name === 'password') {
-            error = validateField(name, value, {
+            fieldRules = {
                 required: true,
                 pattern: validationRules.password
-            });
+            };
         } else if (name === 'confirmPassword') {
+            // Custom validation for password match
+            baseHandleChange(e, null);
             if (value !== registerData.password) {
-                error = 'Las contraseñas no coinciden';
+                setFieldError(name, 'Las contraseñas no coinciden');
+            } else {
+                setFieldError(name, '');
             }
+            return;
         }
 
-        setRegisterErrors({
-            ...registerErrors,
-            [name]: error,
-        });
-    };
+        baseHandleChange(e, fieldRules);
+    }, [baseHandleChange, registerData.password, setFieldError]);
 
-    // Register API Call
-    const handleRegisterAPI = async (data) => {
+    // Register API Call - memoized
+    const handleRegisterAPI = useCallback(async (data) => {
         setIsLoading(true);
         try {
             // Crear FormData para enviar archivo de foto
@@ -165,53 +157,57 @@ export const useRegister = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [login, handleSetDataSnackbar]);
 
-    // Register Form Submit
-    const handleRegisterSubmit = async (e) => {
+    // Register Form Submit - memoized
+    const handleRegisterSubmit = useCallback(async (e) => {
         e.preventDefault();
 
         // Validate all fields
-        const errors = {};
-        errors.firstName = validateField('firstName', registerData.firstName, {
-            required: true,
-            pattern: validationRules.text
-        });
-        errors.lastName = validateField('lastName', registerData.lastName, {
-            required: true,
-            pattern: validationRules.text
-        });
-        errors.email = validateField('email', registerData.email, {
-            required: true,
-            pattern: validationRules.email
-        });
-        errors.birthdate = validateField('birthdate', registerData.birthdate, { required: true });
+        const fieldsConfig = {
+            firstName: {
+                required: true,
+                pattern: validationRules.text
+            },
+            lastName: {
+                required: true,
+                pattern: validationRules.text
+            },
+            email: {
+                required: true,
+                pattern: validationRules.email
+            },
+            birthdate: { required: true },
+            password: {
+                required: true,
+                pattern: validationRules.password
+            },
+        };
 
-        if (!errors.birthdate && registerData.birthdate) {
+        const isValid = validateAll(fieldsConfig);
+
+        // Additional validations
+        if (registerData.birthdate) {
             const birthDate = new Date(registerData.birthdate);
             const today = new Date();
             const age = today.getFullYear() - birthDate.getFullYear();
             if (age < 13) {
-                errors.birthdate = 'Debes ser mayor de 13 años';
+                setFieldError('birthdate', 'Debes ser mayor de 13 años');
+                return;
             }
         }
 
-        errors.password = validateField('password', registerData.password, {
-            required: true,
-            pattern: validationRules.password
-        });
-
         if (registerData.password !== registerData.confirmPassword) {
-            errors.confirmPassword = 'Las contraseñas no coinciden';
+            setFieldError('confirmPassword', 'Las contraseñas no coinciden');
+            return;
         }
 
         if (!registerData.acceptTerms) {
-            errors.acceptTerms = 'Debes aceptar los términos y condiciones';
+            setFieldError('acceptTerms', 'Debes aceptar los términos y condiciones');
+            return;
         }
 
-        setRegisterErrors(errors);
-
-        if (Object.values(errors).some(error => error !== '')) {
+        if (!isValid) {
             return;
         }
 
@@ -227,7 +223,7 @@ export const useRegister = () => {
         });
 
         return result;
-    };
+    }, [registerData, validateAll, handleRegisterAPI, setFieldError]);
 
     return {
         // States
@@ -235,7 +231,7 @@ export const useRegister = () => {
         registerErrors,
         isLoading,
 
-        // Handlers
+        // Handlers - all memoized with useCallback
         handleRegisterChange,
         handleRegisterSubmit,
     };

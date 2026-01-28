@@ -2,8 +2,8 @@ import { Suspense, lazy } from 'react';
 import ProtectRoute from './ProtectRoute';
 import PrivateLayout from '../layouts/PrivateLayout';
 import LoadingFallback from '../components/LoadingFallback';
-import AdminModeration from '../pages/admin/AdminModeration';
-import AdminLessons from '../pages/admin/AdminLessons';
+const AdminModeration = lazy(() => import('../pages/admin/AdminModeration'));
+const AdminLessons = lazy(() => import('../pages/admin/AdminLessons'));
 const AdminLessonEditor = lazy(() => import('../pages/admin/AdminLessonEditor'));
 const AdminStories = lazy(() => import('../pages/admin/AdminStories'));
 const AdminStoryEditor = lazy(() => import('../pages/admin/AdminStoryEditor'));
@@ -23,11 +23,11 @@ const adminRoutes = [
     children: [
       {
         path: 'dashboard',
-        element: <AdminModeration />,
+        element: <Suspense fallback={<LoadingFallback />}><AdminModeration /></Suspense>,
       },
       {
         path: 'lecciones',
-        element: <AdminLessons />,
+        element: <Suspense fallback={<LoadingFallback />}><AdminLessons /></Suspense>,
       },
       {
         path: 'lecciones/crear',

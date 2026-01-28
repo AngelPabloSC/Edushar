@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import {
   Card,
   CardMedia,
@@ -210,4 +211,5 @@ DictionaryCard.propTypes = {
   loading: PropTypes.bool,
 };
 
-export default DictionaryCard;
+// Memoize component to prevent unnecessary re-renders
+export default memo(DictionaryCard);

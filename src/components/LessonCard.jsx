@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Card, CardMedia, CardContent, CardActionArea, Typography, Button, Skeleton } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PropTypes from 'prop-types';
@@ -137,4 +138,5 @@ LessonCard.propTypes = {
   loading: PropTypes.bool,
 };
 
-export default LessonCard;
+// Memoize component to prevent unnecessary re-renders
+export default memo(LessonCard);

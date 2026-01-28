@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useFetchDataPromise } from './useFetchDataPromise';
 
 /**
@@ -20,7 +20,7 @@ export const useCrudAdminLesson = () => {
     const [tableState, setTableState] = useState({
         count: 0,
         currentPage: 0,
-        perPage: 10
+        perPage: 1000
     });
 
     // Fetch control state
@@ -36,7 +36,7 @@ export const useCrudAdminLesson = () => {
     const [deleteLoading, setDeleteLoading] = useState(false);
 
     // ========== FETCH ALL LESSONS ==========
-    const fetchLessons = async (page = 1, limit = 10) => {
+    const fetchLessons = useCallback(async (page = 1, limit = 1000) => {
         setLessonData(prev => ({ ...prev, loading: true }));
 
         try {
@@ -59,7 +59,7 @@ export const useCrudAdminLesson = () => {
                 setTableState({
                     count: pagination.total || 0,
                     currentPage: (pagination.page || 1) - 1, // MUI uses 0-based index
-                    perPage: pagination.limit || 10
+                    perPage: pagination.limit || 1000
                 });
             } else {
                 setLessonData({
@@ -78,13 +78,13 @@ export const useCrudAdminLesson = () => {
             });
             console.error('Error fetching lessons:', err);
         }
-    };
+    }, [getFechData]);
 
     // Auto-fetch lessons on mount and when isFetch changes
     useEffect(() => {
         if (!isFetch) return;
 
-        fetchLessons(1, 10);
+        fetchLessons(1, 1000); // Fetch all lessons
         setIsFetch(false);
     }, [isFetch]);
 

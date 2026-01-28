@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Box, Typography, Button, IconButton, Chip, Paper, useTheme, alpha } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -168,4 +169,5 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
     );
 };
 
-export default StoryCard;
+// Memoize component to prevent unnecessary re-renders
+export default memo(StoryCard);

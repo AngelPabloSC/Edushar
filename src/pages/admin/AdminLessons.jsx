@@ -18,7 +18,13 @@ import {
   DialogActions,
   Alert,
   Skeleton,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Grid,
 } from '@mui/material';
+import { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -35,6 +41,9 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
+import CloseIcon from '@mui/icons-material/Close';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import QuizIcon from '@mui/icons-material/Quiz';
 import TableMain from '../../components/TableMain';
 import { useAdminLessons } from '../../hooks/pages/useAdminLessons';
 import { useNavigate, Link } from 'react-router-dom';
@@ -67,6 +76,8 @@ const AdminLessons = () => {
     lessons, 
     tableState, 
     loading, 
+    deleteLoading,
+    deleteLesson,
     handlePageChange, 
     handleReset,
     handleReloadLessons
@@ -77,14 +88,33 @@ const AdminLessons = () => {
   const { handleSetDataSnackbar } = useSnackBarContext();
   const { isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
 
-  const handleConfirmDelete = () => {
-      // Mock delete logic
-      handleSetDataSnackbar({ message: 'Lección eliminada correctamente', type: 'success' });
+  // State to track which lesson is being deleted
+  const [lessonToDelete, setLessonToDelete] = useState(null);
+
+  // State for filters
+  const [levelFilter, setLevelFilter] = useState('');
+
+  // State for lesson details dialog
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [selectedLesson, setSelectedLesson] = useState(null);
+
+  const handleConfirmDelete = async () => {
+      if (!lessonToDelete) return;
+
+      const result = await deleteLesson(lessonToDelete);
+      
+      if (result.success) {
+          handleSetDataSnackbar({ message: result.message || 'Lección eliminada correctamente', type: 'success' });
+      } else {
+          handleSetDataSnackbar({ message: result.error || 'Error al eliminar la lección', type: 'error' });
+      }
+      
       handleCloseDialog();
-      // In a real app, you'd trigger a data refresh here
+      setLessonToDelete(null);
   };
 
-  const handleDeleteClick = (rowId) => {
+  const handleDeleteClick = (lessonId) => {
+      setLessonToDelete(lessonId);
       setDialongContent({
           title: "Eliminar Lección",
           message: "¿Estás seguro de que deseas eliminar esta lección? Esta acción no se puede deshacer.",
@@ -93,6 +123,29 @@ const AdminLessons = () => {
       });
       handleOpenDialog();
   };
+
+  const handleViewDetails = (lesson) => {
+      setSelectedLesson(lesson);
+      setDetailsDialogOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+      setDetailsDialogOpen(false);
+      setSelectedLesson(null);
+  };
+
+  // Filter lessons based on search query and level
+  const filteredLessons = lessons.filter(lesson => {
+    // Filter by search query
+    const matchesSearch = !searchQuery || 
+      lesson.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lesson.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Filter by level
+    const matchesLevel = !levelFilter || lesson.level === levelFilter;
+    
+    return matchesSearch && matchesLevel;
+  });
 
     // Custom Columns Definition for TableMain
   const columns = [
@@ -220,7 +273,10 @@ const AdminLessons = () => {
             customBodyRender: (value, tableMeta) => (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                      <Tooltip title="Ver detalles" arrow TransitionComponent={Fade}>
-                        <IconButton size="small" sx={{ 
+                        <IconButton 
+                            size="small" 
+                            onClick={() => handleViewDetails(lessons[tableMeta.rowIndex])}
+                            sx={{ 
                             color: 'text.secondary', 
                             transition: 'all 0.2s',
                             '&:hover': { color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1), transform: 'translateY(-2px)' } 
@@ -360,7 +416,8 @@ const AdminLessons = () => {
          </Box>
          <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', md: 'auto' }, p: 0.5 }}>
              <Select 
-                defaultValue="" 
+                value={levelFilter}
+                onChange={(e) => setLevelFilter(e.target.value)}
                 displayEmpty
                 variant="standard"
                 disableUnderline
@@ -379,9 +436,9 @@ const AdminLessons = () => {
                 }}
             >
                 <MenuItem value="">Todos los Niveles</MenuItem>
-                <MenuItem value="a1">A1 - Principiante</MenuItem>
-                <MenuItem value="a2">A2 - Elemental</MenuItem>
-                <MenuItem value="b1">B1 - Intermedio</MenuItem>
+                <MenuItem value="Básico">Básico</MenuItem>
+                <MenuItem value="Intermedio">Intermedio</MenuItem>
+                <MenuItem value="Avanzado">Avanzado</MenuItem>
              </Select>
              <Tooltip title="Filtros avanzados">
                 <IconButton sx={{ 
@@ -396,47 +453,6 @@ const AdminLessons = () => {
          </Box>
       </Paper>
 
-      {/* Tabs - Glassmorphism Style */}
-      <Box sx={{ mb: 4 }}>
-         <Box sx={{ 
-             display: 'inline-flex', 
-             p: 0.75, 
-             bgcolor: 'rgba(255,255,255,0.5)', 
-             borderRadius: 4, 
-             gap: 1,
-             border: '1px solid',
-             borderColor: 'rgba(0,0,0,0.05)',
-             backdropFilter: 'blur(4px)'
-        }}>
-            {['Todas', 'Borradores', 'Publicada', 'Archivada'].map((tab) => {
-                const isActive = activeTab === tab;
-                return (
-                    <Box 
-                        key={tab}
-                        onClick={() => handleTabChange(tab)}
-                        sx={{ 
-                            py: 1.25, px: 3.5,
-                            borderRadius: 3,
-                            cursor: 'pointer',
-                            // High contrast fix
-                            color: isActive ? 'white' : 'text.secondary',
-                            bgcolor: isActive ? 'text.primary' : 'transparent',
-                            fontWeight: isActive ? 700 : 600,
-                            boxShadow: isActive ? '0 4px 12px rgba(68, 42, 42, 0.3)' : 'none',
-                            transform: isActive ? 'scale(1.02)' : 'none',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                            '&:hover': { 
-                                color: isActive ? 'white' : 'text.primary',
-                                bgcolor: isActive ? 'text.secondary' : 'rgba(0,0,0,0.04)'
-                            }
-                        }}
-                    >
-                        {tab}
-                    </Box>
-                );
-            })}
-         </Box>
-      </Box>
 
       {/* Loading State */}
       {loading && (
@@ -458,7 +474,7 @@ const AdminLessons = () => {
       }}>
         <TableMain 
             title="" 
-            data={lessons} 
+            data={filteredLessons} 
             columns={columns} 
             options={{
                 elevation: 0,
@@ -476,16 +492,16 @@ const AdminLessons = () => {
 
       {/* Pagination - Only show if more than one page */}
       {!loading && code === 'COD_OK' && (() => {
-        const itemsPerPage = tableState.rowsPerPage || 10;
-        const totalPages = Math.ceil(tableState.count / itemsPerPage);
-        const currentPage = tableState.page + 1; // Convert 0-indexed to 1-indexed
-        const startItem = tableState.page * itemsPerPage + 1;
-        const endItem = Math.min(startItem + itemsPerPage - 1, tableState.count);
+        const itemsPerPage = tableState.perPage || 1000;
+        const totalPages = Math.ceil(filteredLessons.length / itemsPerPage);
+        const currentPage = tableState.currentPage + 1; // Convert 0-indexed to 1-indexed
+        const startItem = tableState.currentPage * itemsPerPage + 1;
+        const endItem = Math.min(startItem + itemsPerPage - 1, filteredLessons.length);
         
         return (
           <Paper elevation={0} sx={{ mt: -2, p: 2, border: '1px solid', borderColor: 'divider', borderTop: 'none', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper' }}>
             <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{tableState.count}</Box> lecciones
+              Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{filteredLessons.length}</Box> lecciones
             </Typography>
             
             {/* Only show pagination controls if there's more than one page */}
@@ -494,7 +510,7 @@ const AdminLessons = () => {
                 <IconButton 
                   size="small" 
                   disabled={currentPage === 1}
-                  onClick={() => handlePageChange(tableState.page - 1)}
+                  onClick={() => handlePageChange(tableState.currentPage - 1, itemsPerPage)}
                   sx={{ border: '1px solid', borderColor: 'divider' }}
                 >
                   <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} />
@@ -518,7 +534,7 @@ const AdminLessons = () => {
                       key={pageNum}
                       variant={currentPage === pageNum ? "contained" : "text"}
                       size="small" 
-                      onClick={() => handlePageChange(pageNum - 1)}
+                      onClick={() => handlePageChange(pageNum - 1, itemsPerPage)}
                       sx={{ 
                         minWidth: 32, 
                         px: 0, 
@@ -539,7 +555,7 @@ const AdminLessons = () => {
                 <IconButton 
                   size="small" 
                   disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(tableState.page + 1)}
+                  onClick={() => handlePageChange(tableState.currentPage + 1, itemsPerPage)}
                   sx={{ border: '1px solid', borderColor: 'divider' }}
                 >
                   <ChevronRightIcon sx={{ fontSize: 16 }} />
@@ -560,7 +576,7 @@ const AdminLessons = () => {
               </Box>
               <Box>
                   <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Total Lecciones</Typography>
-                  <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.total}</Typography>
+                  <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{filteredLessons.length}</Typography>
               </Box>
           </Paper>
           {/* Card 2 */}
@@ -570,19 +586,10 @@ const AdminLessons = () => {
               </Box>
               <Box>
                   <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Publicadas</Typography>
-                  <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.published}</Typography>
+                  <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{filteredLessons.length}</Typography>
               </Box>
           </Paper>
-          {/* Card 3 */}
-          <Paper elevation={0} sx={{ flex: 1, p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
-                <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: theme.palette.action.hover, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary' }}>
-                  <PendingIcon fontSize="large" />
-              </Box>
-              <Box>
-                  <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Revisión</Typography>
-                  <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.review}</Typography>
-              </Box>
-          </Paper>
+
       </Box>
 
 
@@ -590,7 +597,7 @@ const AdminLessons = () => {
         {/* Delete Confirmation Dialog */}
         <Dialog 
             open={isOpen} 
-            onClose={handleCloseDialog}
+            onClose={deleteLoading ? undefined : handleCloseDialog}
             PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
         >
             <DialogTitle sx={{ fontWeight: 'bold' }}>{dialongContent.title}</DialogTitle>
@@ -600,20 +607,296 @@ const AdminLessons = () => {
                 </Typography>
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 2 }}>
-                <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                <Button 
+                    onClick={handleCloseDialog} 
+                    disabled={deleteLoading}
+                    sx={{ fontWeight: 'bold', color: 'text.secondary' }}
+                >
                     Cancelar
                 </Button>
                 <Button 
                     onClick={handleConfirmDelete} 
                     variant="contained" 
                     color={dialongContent.color || 'error'}
+                    disabled={deleteLoading}
                     sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
                     autoFocus
                 >
-                    {dialongContent.confirmText || 'Eliminar'}
+                    {deleteLoading ? 'Eliminando...' : (dialongContent.confirmText || 'Eliminar')}
                 </Button>
             </DialogActions>
         </Dialog>
+
+      {/* Lesson Details Dialog */}
+      <Dialog 
+          open={detailsDialogOpen} 
+          onClose={handleCloseDetails}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{ sx: { borderRadius: 4, maxHeight: '90vh' } }}
+      >
+          <DialogTitle sx={{ 
+              fontWeight: 'bold', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              pb: 2
+          }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box sx={{ 
+                      width: 48, 
+                      height: 48, 
+                      borderRadius: 3, 
+                      background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.2)} 100%)`, 
+                      color: 'primary.main',
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center'
+                  }}>
+                      <MenuBookIcon />
+                  </Box>
+                  <Typography variant="h6" fontWeight={800}>
+                      Detalles de la Lección
+                  </Typography>
+              </Box>
+              <IconButton onClick={handleCloseDetails} size="small">
+                  <CloseIcon />
+              </IconButton>
+          </DialogTitle>
+          <DialogContent sx={{ pt: 3 }}>
+              {selectedLesson && (
+                  <Box>
+                      {/* Basic Information */}
+                      <Box sx={{ mb: 3 }}>
+                          <Typography variant="h5" fontWeight={800} gutterBottom color="text.primary">
+                              {selectedLesson.title}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary" paragraph>
+                              {selectedLesson.description}
+                          </Typography>
+                      </Box>
+
+                      <Divider sx={{ my: 3 }} />
+
+                      {/* Metadata Grid */}
+                      <Grid container spacing={2} sx={{ mb: 3 }}>
+                          <Grid item xs={6} sm={3}>
+                              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: 2 }}>
+                                  <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 0.5 }}>
+                                      Nivel
+                                  </Typography>
+                                  <Chip 
+                                      label={selectedLesson.level} 
+                                      size="small"
+                                      variant="outlined"
+                                      sx={{ fontWeight: 700 }}
+                                  />
+                              </Paper>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.info.main, 0.05), borderRadius: 2 }}>
+                                  <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 0.5 }}>
+                                      Duración
+                                  </Typography>
+                                  <Typography variant="h6" fontWeight={800}>
+                                      {selectedLesson.duration} min
+                                  </Typography>
+                              </Paper>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.warning.main, 0.05), borderRadius: 2 }}>
+                                  <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 0.5 }}>
+                                      Puntos
+                                  </Typography>
+                                  <Typography variant="h6" fontWeight={800} color="warning.dark">
+                                      {selectedLesson.totalPoints}
+                                  </Typography>
+                              </Paper>
+                          </Grid>
+                          <Grid item xs={6} sm={3}>
+                              <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.success.main, 0.05), borderRadius: 2 }}>
+                                  <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 0.5 }}>
+                                      Ejercicios
+                                  </Typography>
+                                  <Typography variant="h6" fontWeight={800} color="success.dark">
+                                      {selectedLesson.exercises?.length || 0}
+                                  </Typography>
+                              </Paper>
+                          </Grid>
+                      </Grid>
+
+                      <Divider sx={{ my: 3 }} />
+
+                      {/* Content Section */}
+                      {selectedLesson.content && (
+                          <Box sx={{ mb: 3 }}>
+                              <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <LibraryBooksIcon color="primary" />
+                                  Contenido
+                              </Typography>
+                              
+                              {selectedLesson.content.intro && (
+                                  <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom>
+                                          Introducción
+                                      </Typography>
+                                      <Typography variant="body2" color="text.secondary">
+                                          {selectedLesson.content.intro}
+                                      </Typography>
+                                  </Paper>
+                              )}
+
+                              {selectedLesson.content.videoUrl && (
+                                  <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                          <VideoLibraryIcon fontSize="small" />
+                                          Video
+                                      </Typography>
+                                      <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                                          {selectedLesson.content.videoUrl}
+                                      </Typography>
+                                  </Paper>
+                              )}
+
+                              {selectedLesson.content.text && (
+                                  <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom>
+                                          Texto
+                                      </Typography>
+                                      <Typography variant="body2" color="text.secondary">
+                                          {selectedLesson.content.text}
+                                      </Typography>
+                                  </Paper>
+                              )}
+                          </Box>
+                      )}
+
+                      <Divider sx={{ my: 3 }} />
+
+                      {/* Exercises Section */}
+                      {selectedLesson.exercises && selectedLesson.exercises.length > 0 && (
+                          <Box>
+                              <Typography variant="h6" fontWeight={700} gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                  <QuizIcon color="primary" />
+                                  Ejercicios ({selectedLesson.exercises.length})
+                              </Typography>
+                              
+                              {selectedLesson.exercises.map((exercise, index) => (
+                                  <Paper 
+                                      key={index} 
+                                      elevation={0} 
+                                      sx={{ 
+                                          p: 2.5, 
+                                          mb: 2, 
+                                          bgcolor: 'background.default', 
+                                          borderRadius: 2,
+                                          border: '1px solid',
+                                          borderColor: 'divider'
+                                      }}
+                                  >
+                                      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                                          <Chip 
+                                              label={`#${index + 1}`} 
+                                              size="small" 
+                                              sx={{ 
+                                                  fontWeight: 700, 
+                                                  bgcolor: 'primary.main', 
+                                                  color: 'white',
+                                                  minWidth: 40
+                                              }} 
+                                          />
+                                          <Box sx={{ flex: 1 }}>
+                                              <Chip 
+                                                  label={exercise.type || 'Pregunta'} 
+                                                  size="small" 
+                                                  variant="outlined"
+                                                  sx={{ mb: 1, fontWeight: 600 }}
+                                              />
+                                              <Typography variant="body1" fontWeight={700} color="text.primary" gutterBottom>
+                                                  {exercise.question}
+                                              </Typography>
+                                          </Box>
+                                      </Box>
+
+                                      {exercise.options && exercise.options.length > 0 && (
+                                          <Box sx={{ ml: 6, mb: 2 }}>
+                                              <Typography variant="caption" color="text.secondary" fontWeight={600} sx={{ display: 'block', mb: 1 }}>
+                                                  Opciones:
+                                              </Typography>
+                                              <List dense sx={{ bgcolor: 'background.paper', borderRadius: 1 }}>
+                                                  {exercise.options.map((option, optIndex) => (
+                                                      <ListItem 
+                                                          key={optIndex}
+                                                          sx={{
+                                                              bgcolor: exercise.correctAnswer === option 
+                                                                  ? alpha(theme.palette.success.main, 0.1) 
+                                                                  : 'transparent',
+                                                              borderRadius: 1,
+                                                              mb: 0.5
+                                                          }}
+                                                      >
+                                                          <ListItemText 
+                                                              primary={option}
+                                                              primaryTypographyProps={{
+                                                                  variant: 'body2',
+                                                                  fontWeight: exercise.correctAnswer === option ? 700 : 400,
+                                                                  color: exercise.correctAnswer === option ? 'success.dark' : 'text.primary'
+                                                              }}
+                                                          />
+                                                          {exercise.correctAnswer === option && (
+                                                              <CheckCircleIcon fontSize="small" sx={{ color: 'success.main', ml: 1 }} />
+                                                          )}
+                                                      </ListItem>
+                                                  ))}
+                                              </List>
+                                          </Box>
+                                      )}
+
+                                      {exercise.tip && (
+                                          <Box sx={{ ml: 6, p: 1.5, bgcolor: alpha(theme.palette.info.main, 0.05), borderRadius: 1, borderLeft: '3px solid', borderColor: 'info.main' }}>
+                                              <Typography variant="caption" color="info.dark" fontWeight={600} sx={{ display: 'block', mb: 0.5 }}>
+                                                  💡 Pista:
+                                              </Typography>
+                                              <Typography variant="body2" color="text.secondary">
+                                                  {exercise.tip}
+                                              </Typography>
+                                          </Box>
+                                      )}
+                                  </Paper>
+                              ))}
+                          </Box>
+                      )}
+                  </Box>
+              )}
+          </DialogContent>
+          <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+              <Button 
+                  onClick={handleCloseDetails} 
+                  variant="outlined"
+                  sx={{ fontWeight: 'bold', borderRadius: 2 }}
+              >
+                  Cerrar
+              </Button>
+              <Button 
+                  component={Link}
+                  to={`/admin/lecciones/editar/${selectedLesson?.id}`}
+                  variant="contained" 
+                  startIcon={<EditIcon />}
+                  sx={{ 
+                      borderRadius: 2, 
+                      fontWeight: 'bold', 
+                      px: 3, 
+                      boxShadow: 'none',
+                      bgcolor: 'text.primary',
+                      '&:hover': { bgcolor: 'text.secondary' }
+                  }}
+              >
+                  Editar Lección
+              </Button>
+          </DialogActions>
+      </Dialog>
 
     </Box>
   );

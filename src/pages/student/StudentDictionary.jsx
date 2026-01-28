@@ -150,7 +150,7 @@ const StudentDictionary = () => {
             ¿No encuentras lo que buscas?
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 3, fontSize: '1rem' }}>
-            Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber!
+            Nuestra comunidad está expandiendo constantemente el diccionario. Si falta una palabra, ¡háznoslo saber
           </Typography>
           <Button
             variant="contained"

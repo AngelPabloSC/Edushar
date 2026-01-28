@@ -474,21 +474,82 @@ const AdminLessons = () => {
       </Box>
       )}
 
-      {/* Pagination */}
-      {!loading && code === 'COD_OK' && (
-      <Paper elevation={0} sx={{ mt: -2, p: 2, border: '1px solid', borderColor: 'divider', borderTop: 'none', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper' }}>
-          <Typography variant="body2" color="text.secondary" fontWeight={500}>
-             Mostrando <Box component="span" fontWeight="bold" color="text.primary">1 - {lessons.length}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{tableState.count}</Box> lecciones
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-              <IconButton size="small" disabled sx={{ border: '1px solid', borderColor: 'divider' }}><ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} /></IconButton>
-              <Button variant="contained" size="small" sx={{ minWidth: 32, px: 0, bgcolor: 'primary.main', color: 'white', fontWeight: 'bold', boxShadow: theme.shadows[2] }}>1</Button>
-              <Button variant="text" size="small" sx={{ minWidth: 32, px: 0, color: 'text.secondary', fontWeight: 'bold' }}>2</Button>
-              <Button variant="text" size="small" sx={{ minWidth: 32, px: 0, color: 'text.secondary', fontWeight: 'bold' }}>3</Button>
-              <IconButton size="small" sx={{ border: '1px solid', borderColor: 'divider' }}><ChevronRightIcon sx={{ fontSize: 16 }} /></IconButton>
-          </Box>
-      </Paper>
-      )}
+      {/* Pagination - Only show if more than one page */}
+      {!loading && code === 'COD_OK' && (() => {
+        const itemsPerPage = tableState.rowsPerPage || 10;
+        const totalPages = Math.ceil(tableState.count / itemsPerPage);
+        const currentPage = tableState.page + 1; // Convert 0-indexed to 1-indexed
+        const startItem = tableState.page * itemsPerPage + 1;
+        const endItem = Math.min(startItem + itemsPerPage - 1, tableState.count);
+        
+        return (
+          <Paper elevation={0} sx={{ mt: -2, p: 2, border: '1px solid', borderColor: 'divider', borderTop: 'none', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper' }}>
+            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+              Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{tableState.count}</Box> lecciones
+            </Typography>
+            
+            {/* Only show pagination controls if there's more than one page */}
+            {totalPages > 1 && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <IconButton 
+                  size="small" 
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(tableState.page - 1)}
+                  sx={{ border: '1px solid', borderColor: 'divider' }}
+                >
+                  <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} />
+                </IconButton>
+                
+                {/* Generate page buttons dynamically */}
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button 
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "contained" : "text"}
+                      size="small" 
+                      onClick={() => handlePageChange(pageNum - 1)}
+                      sx={{ 
+                        minWidth: 32, 
+                        px: 0, 
+                        bgcolor: currentPage === pageNum ? 'primary.main' : 'transparent',
+                        color: currentPage === pageNum ? 'white' : 'text.secondary',
+                        fontWeight: 'bold', 
+                        boxShadow: currentPage === pageNum ? theme.shadows[2] : 'none',
+                        '&:hover': {
+                          bgcolor: currentPage === pageNum ? 'primary.dark' : 'action.hover'
+                        }
+                      }}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+                
+                <IconButton 
+                  size="small" 
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(tableState.page + 1)}
+                  sx={{ border: '1px solid', borderColor: 'divider' }}
+                >
+                  <ChevronRightIcon sx={{ fontSize: 16 }} />
+                </IconButton>
+              </Box>
+            )}
+          </Paper>
+        );
+      })()}
+
 
       {/* Summary Cards */}
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3, mt: 4 }}>

@@ -26,6 +26,8 @@ export default defineConfig({
     }),
   ],
   build: {
+    // Disable inlining of small assets to avoid MIME type issues
+    assetsInlineLimit: 0,
     // Enable source maps for production debugging
     sourcemap: false,
     // Optimize chunk size warnings
@@ -34,37 +36,18 @@ export default defineConfig({
     target: 'es2015',
     rollupOptions: {
       output: {
-        // Manual chunk splitting strategy - optimized for performance
+        // Manual chunk splitting strategy - simplified for stability
         manualChunks: (id) => {
-          // React core - critical for initial load
-          if (id.includes('node_modules/react') ||
-            id.includes('node_modules/react-dom') ||
-            id.includes('node_modules/react-router-dom')) {
-            return 'react-vendor';
-          }
-
-          // Material-UI core - split by usage
-          if (id.includes('@mui/material')) {
-            return 'mui-core';
-          }
-
-          // Material-UI icons - separate chunk (lazy loaded)
-          if (id.includes('@mui/icons-material')) {
-            return 'mui-icons';
-          }
-
-          // Firebase - separate chunk
-          if (id.includes('firebase')) {
-            return 'firebase';
-          }
-
-          // Notistack - separate chunk
-          if (id.includes('notistack')) {
-            return 'notistack';
-          }
-
-          // Other node_modules
           if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+              return 'vendor-react';
+            }
+            if (id.includes('@mui')) {
+              return 'vendor-mui';
+            }
+            if (id.includes('firebase')) {
+              return 'vendor-firebase';
+            }
             return 'vendor';
           }
         },

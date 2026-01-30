@@ -36,18 +36,9 @@ export default defineConfig({
     target: 'es2015',
     rollupOptions: {
       output: {
-        // Manual chunk splitting strategy - simplified for stability
+        // Manual chunk splitting strategy - consolidated into a single vendor chunk for stability
         manualChunks: (id) => {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react';
-            }
-            if (id.includes('@mui')) {
-              return 'vendor-mui';
-            }
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
-            }
             return 'vendor';
           }
         },

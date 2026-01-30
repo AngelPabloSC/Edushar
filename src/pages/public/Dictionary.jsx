@@ -9,14 +9,13 @@ import {
   Grid,
   Skeleton,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import DictionaryCard from '../../components/DictionaryCard';
-
-import { dictionaryEntries, dictionaryStats } from '../../data/dictionaryData';
+import { usePublicDictionary } from '../../hooks/pages/usePublicDictionary';
 
 /**
  * Página Pública del Diccionario Bilingüe Shuar-Español
@@ -24,17 +23,10 @@ import { dictionaryEntries, dictionaryStats } from '../../data/dictionaryData';
  */
 const Dictionary = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  const stats = dictionaryStats;
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  
+  // Use custom hook for real data
+  const { entries, loading, stats } = usePublicDictionary();
 
   return (
     <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
@@ -120,7 +112,7 @@ const Dictionary = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mb: 6 }}>
         {loading
           ? [1, 2, 3].map((n) => <DictionaryCard key={n} loading={true} />)
-          : dictionaryEntries
+          : entries
             .filter(entry =>
               entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) ||
               entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
@@ -132,7 +124,12 @@ const Dictionary = () => {
       </Box>
 
       {/* Empty State / Suggestion */}
-      {!loading && (
+      {!loading && entries.length > 0 && (
+         entries.filter(entry =>
+              entry.wordShuar.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              entry.wordSpanish.toLowerCase().includes(searchQuery.toLowerCase())
+            ).length === 0
+      ) && (
         <Paper
           elevation={0}
           sx={{
@@ -174,6 +171,24 @@ const Dictionary = () => {
           </Button>
         </Paper>
       )}
+      
+       {/* Global Empty State (No entries at all) */}
+       {!loading && entries.length === 0 && (
+           <Paper
+           elevation={0}
+           sx={{
+             p: 6,
+             mt: 4,
+             textAlign: 'center',
+             bgcolor: 'background.paper',
+             borderRadius: 4,
+           }}
+         >
+           <Typography variant="h5" fontWeight="bold" color="text.secondary">
+             No hay palabras en el diccionario aún.
+           </Typography>
+         </Paper>
+       )}
 
       {/* Footer Stats */}
       <Box

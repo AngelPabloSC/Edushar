@@ -106,8 +106,9 @@ const LessonCard = ({ title, description, image, onClick, loading = false }) => 
             {description}
           </Typography>
 
-          {/* Button */}
+          {/* Button - Rendered as div to avoid button nesting error */}
           <Button
+            component="div"
             variant="outlined"
             color="secondary"
             startIcon={<VisibilityIcon />}

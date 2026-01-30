@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { useLoginContext } from './context/LoginContext';
-import { useSnackBarContext } from './context/SnackbarContext';
-import { useFormValidation } from './useFormValidation';
-import validationRules from '../utils/validationRules';
+import { useLoginContext } from '../context/LoginContext';
+import { useSnackBarContext } from '../context/SnackbarContext';
+import { useFormValidation } from '../ui/useFormValidation';
+import validationRules from '../../utils/validationRules';
 
 export const useRegister = () => {
     const { login } = useLoginContext();

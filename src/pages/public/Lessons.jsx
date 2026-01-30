@@ -1,16 +1,15 @@
-import { Box, Container, Typography, TextField, InputAdornment, Grid, Divider } from '@mui/material';
+import { Box, Container, Typography, TextField, InputAdornment, Grid, Divider, CircularProgress, Skeleton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Filter1Icon from '@mui/icons-material/Filter1';
 import Filter2Icon from '@mui/icons-material/Filter2';
-import { useState } from 'react';
+import Filter3Icon from '@mui/icons-material/Filter3';
 import { useNavigate } from 'react-router-dom';
 import LessonCard from '../../components/LessonCard';
-import { getLessonsByLevel } from '../../data/lessonsData';
+import { usePublicLessons } from '../../hooks/pages/usePublicLessons';
 
 const Lessons = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const lessonsByLevel = getLessonsByLevel();
+  const { lessonsByLevel, loading, error, searchQuery, setSearchQuery } = usePublicLessons();
 
   const handleLessonClick = (lessonId) => {
     navigate('/login');
@@ -19,6 +18,7 @@ const Lessons = () => {
   const levelIcons = {
     1: Filter1Icon,
     2: Filter2Icon,
+    3: Filter3Icon,
   };
 
   return (
@@ -139,8 +139,48 @@ const Lessons = () => {
           />
         </Box>
 
+
+        {/* Loading State */}
+        {loading && (
+          <Box sx={{ mb: 10 }}>
+            {/* Dummy Level Header Skeleton */}
+             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4, pb: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Skeleton variant="rectangular" width={60} height={60} sx={{ borderRadius: 2 }} />
+                <Box>
+                    <Skeleton variant="text" width={300} height={40} />
+                    <Skeleton variant="text" width={400} height={20} />
+                </Box>
+             </Box>
+             
+             {/* Skeletons Grid */}
+             <Grid container spacing={{ xs: 3, md: 4 }}>
+                {[1, 2, 3].map((item) => (
+                  <Grid key={item} size={{ xs: 12, sm: 6, md: 4 }}>
+                     <LessonCard loading={true} />
+                  </Grid>
+                ))}
+             </Grid>
+          </Box>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <Box sx={{ textAlign: 'center', py: 10 }}>
+            <Typography color="error" variant="h6">{error}</Typography>
+          </Box>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && lessonsByLevel.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 10 }}>
+            <Typography color="text.secondary" variant="h6">
+              No se encontraron lecciones disponibles.
+            </Typography>
+          </Box>
+        )}
+
         {/* Lessons by Level */}
-        {lessonsByLevel.map((levelData) => {
+        {!loading && !error && lessonsByLevel.map((levelData) => {
           const LevelIcon = levelIcons[levelData.level] || Filter1Icon;
 
           return (
@@ -184,7 +224,9 @@ const Lessons = () => {
                   <Typography variant="body2" color="text.secondary">
                     {levelData.level === 1
                       ? 'Introducción al vocabulario y estructuras básicas.'
-                      : 'Expandiendo el vocabulario y frases cotidianas.'}
+                      : levelData.level === 2
+                      ? 'Expandiendo el vocabulario y frases cotidianas.'
+                      : 'Dominio avanzado y contextos complejos.'}
                   </Typography>
                 </Box>
               </Box>

@@ -1,6 +1,6 @@
 import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Tooltip, TextField, InputAdornment, LinearProgress, Paper, Button, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { lessonsData } from '../../data/lessonsData';
+import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
 import LockIcon from '@mui/icons-material/Lock';
 import SearchIcon from '@mui/icons-material/Search';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -13,15 +13,15 @@ import { useState, useEffect } from 'react';
  */
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Use custom hook for data
+  const { 
+    lessonsByLevel, 
+    globalStats, 
+    loading, 
+    error,
+    searchQuery, 
+    setSearchQuery 
+  } = useStudentLessons();
 
   const handleLessonClick = (lessonId, isLocked) => {
     if (!isLocked) {
@@ -29,33 +29,9 @@ const StudentDashboard = () => {
     }
   };
 
-  // Calcular progreso global
-  const completedLessons = lessonsData.filter(l => l.completed).length;
-  const totalLessons = lessonsData.length;
-  const globalProgress = Math.round((completedLessons / totalLessons) * 100);
-
-  // Filtrar lecciones por búsqueda
-  const filteredLessons = lessonsData.filter(lesson =>
-    lesson.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    lesson.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Agrupar lecciones filtradas por nivel
-  const lessonsByLevel = filteredLessons.reduce((acc, lesson) => {
-    const level = lesson.levelName;
-    if (!acc[level]) {
-      acc[level] = [];
-    }
-    acc[level].push(lesson);
-    return acc;
-  }, {});
-
-  // Función para determinar el estado de la lección
+  // Helper to get status string if needed (though we have booleans)
   const getLessonStatus = (lesson) => {
-    if (lesson.completed) return 'completed';
-    if (lesson.inProgress) return 'in-progress';
-    if (lesson.locked) return 'locked';
-    return 'available';
+    return lesson.status; // 'locked', 'available', 'in-progress', 'completed'
   };
 
   return (
@@ -143,19 +119,19 @@ const StudentDashboard = () => {
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
               <Box>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Nivel 1: Principiante
+                  Progreso General
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Has completado {completedLessons} de {totalLessons} lecciones
+                  Has completado {globalStats.completed} de {globalStats.total} lecciones
                 </Typography>
               </Box>
               <Typography variant="h5" fontWeight="bold" color="secondary.main">
-                {globalProgress}%
+                {globalStats.percentage}%
               </Typography>
             </Box>
             <LinearProgress
               variant="determinate"
-              value={globalProgress}
+              value={globalStats.percentage}
               sx={{
                 height: 12,
                 borderRadius: 10,
@@ -285,7 +261,7 @@ const StudentDashboard = () => {
                       onClick={() => handleLessonClick(lesson.id, isLocked)}
                       disabled={isLocked}
                       sx={{
-                        height: '100%',
+                        flexGrow: 1,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'stretch',
@@ -405,18 +381,25 @@ const StudentDashboard = () => {
 
                       {/* Contenido de la Card */}
                       <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Typography
-                          variant="h6"
-                          component="h3"
-                          sx={{
-                            fontWeight: 700,
-                            fontSize: '1.25rem',
-                            mb: 1,
-                            color: isLocked ? 'text.secondary' : 'text.primary',
-                          }}
-                        >
-                          {lesson.title}
-                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                            <Typography
+                              variant="h6"
+                              component="h3"
+                              sx={{
+                                fontWeight: 700,
+                                fontSize: '1.25rem',
+                                color: isLocked ? 'text.secondary' : 'text.primary',
+                                lineHeight: 1.2
+                              }}
+                            >
+                              {lesson.title}
+                            </Typography>
+                            {isCompleted && (
+                                <Typography variant="caption" fontWeight="bold" sx={{ color: 'success.main', whiteSpace: 'nowrap', ml: 1, bgcolor: 'rgba(76, 175, 80, 0.1)', px: 1, py: 0.5, borderRadius: 1 }}>
+                                    {lesson.score || 0} XP
+                                </Typography>
+                            )}
+                        </Box>
 
                         <Typography
                           variant="body2"
@@ -431,38 +414,46 @@ const StudentDashboard = () => {
                           {lesson.description}
                         </Typography>
 
-                        {/* Barra de progreso para lecciones en curso */}
-                        {isInProgress && (
+                        {/* Barra de progreso para lecciones en curso o completadas */}
+                        {(isInProgress || isCompleted) && (
                           <Box sx={{ mb: 2 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                               <Typography variant="caption" color="text.secondary" fontWeight="600">
                                 Progreso
                               </Typography>
-                              <Typography variant="caption" color="text.secondary" fontWeight="600">
-                                {lesson.progress || 60}%
+                              <Typography 
+                                variant="caption" 
+                                color={isCompleted ? "success.main" : "text.secondary"} 
+                                fontWeight="600"
+                              >
+                                {isCompleted ? (lesson.progress || 100) : (lesson.progress || 60)}%
                               </Typography>
                             </Box>
                             <LinearProgress
                               variant="determinate"
-                              value={lesson.progress || 60}
+                              value={isCompleted ? (lesson.progress || 100) : (lesson.progress || 60)}
+                              color={isCompleted ? "success" : "secondary"}
                               sx={{
                                 height: 8,
                                 borderRadius: 10,
                                 bgcolor: 'rgba(0, 0, 0, 0.05)',
                                 '& .MuiLinearProgress-bar': {
                                   borderRadius: 10,
-                                  bgcolor: 'secondary.main',
                                 },
                               }}
                             />
                           </Box>
                         )}
+                      </CardContent>
+                    </CardActionArea>
 
+                    <Box sx={{ p: 2, pt: 0 }}>
                         {/* Botón de acción */}
                         {isCompleted && (
                           <Button
                             variant="outlined"
                             fullWidth
+                            onClick={() => handleLessonClick(lesson.id, isLocked)}
                             sx={{
                               py: 1.5,
                               borderWidth: 2,
@@ -484,6 +475,7 @@ const StudentDashboard = () => {
                           <Button
                             variant="contained"
                             fullWidth
+                            onClick={() => handleLessonClick(lesson.id, isLocked)}
                             sx={{
                               py: 1.5,
                               bgcolor: 'secondary.main',
@@ -518,20 +510,24 @@ const StudentDashboard = () => {
                         )}
 
                         {!isLocked && !isCompleted && !isInProgress && (
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              color: 'secondary.main',
-                              fontWeight: 600,
-                              fontSize: '0.875rem',
-                            }}
-                          >
-                            Comenzar lección →
-                          </Box>
+                           <Button
+                           variant="text"
+                           fullWidth
+                           onClick={() => handleLessonClick(lesson.id, isLocked)}
+                           sx={{
+                             py: 1.5,
+                             color: 'secondary.main',
+                             fontWeight: 600,
+                             justifyContent: 'flex-start',
+                             '&:hover': {
+                               bgcolor: 'rgba(209, 154, 74, 0.1)',
+                             }
+                           }}
+                         >
+                           Comenzar lección →
+                         </Button>
                         )}
-                      </CardContent>
-                    </CardActionArea>
+                    </Box>
                   </Card>
                 </Grid>
               );

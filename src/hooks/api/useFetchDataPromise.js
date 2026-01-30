@@ -1,11 +1,13 @@
+import { useCallback } from 'react';
+
 export const useFetchDataPromise = () => {
 
-    const userToken = localStorage.getItem("user")
-
-    const Token = JSON.parse(userToken || "{}")
 
 
-    const getFechData = async ({ endPoint, method = "POST", additionalData, }) => {
+
+    const getFechData = useCallback(async ({ endPoint, method = "POST", additionalData, }) => {
+        const userToken = localStorage.getItem("user")
+        const Token = JSON.parse(userToken || "{}")
         const urlApi = `${import.meta.env.VITE_URL_FETCH}/${endPoint}`
 
         return await fetch(urlApi, {
@@ -14,11 +16,7 @@ export const useFetchDataPromise = () => {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${Token.accessToken}`,
-
             },
-
-
-
         })
             .catch(() => ({ code: "COD_ERR", data: {}, message: "Error" }))
             .then(async (response) => {
@@ -29,7 +27,7 @@ export const useFetchDataPromise = () => {
                     code, data, message
                 }
             });
-    }
+    }, [])
     return {
         getFechData
     }

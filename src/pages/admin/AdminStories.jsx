@@ -30,7 +30,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 
 import { useAdminStories } from '../../hooks/pages/useAdminStories';
-import { useDialong } from '../../hooks/useDialog';
+import { useDialong } from '../../hooks/ui/useDialog';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
 import StoryCard from '../../components/StoryCard';
 

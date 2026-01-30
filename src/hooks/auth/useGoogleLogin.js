@@ -1,8 +1,8 @@
 import { signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../config/firebase';
-import { useFetchDataPromise } from './useFetchDataPromise';
-import { useLoginContext } from './context/LoginContext';
-import { useDialong } from './useDialog';
+import { auth, googleProvider } from '../../config/firebase';
+import { useFetchDataPromise } from '../api/useFetchDataPromise';
+import { useLoginContext } from '../context/LoginContext';
+import { useDialong } from '../ui/useDialog';
 
 export const useGoogleLogin = () => {
     const { getFechData } = useFetchDataPromise();

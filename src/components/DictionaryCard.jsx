@@ -10,7 +10,6 @@ import {
   Skeleton,
 } from '@mui/material';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import PropTypes from 'prop-types';
 
 /**
@@ -72,6 +71,62 @@ const DictionaryCard = ({ entry, loading = false }) => {
     );
   }
 
+  const handlePronounce = () => {
+    if ('speechSynthesis' in window) {
+      // Cancelar cualquier pronunciación anterior
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(entry.wordSpanish);
+      
+      // Intentar obtener las voces disponibles
+      let voices = window.speechSynthesis.getVoices();
+      
+      // Función para seleccionar la mejor voz
+      const selectVoice = () => {
+        // Buscar voces en español
+        const esVoices = voices.filter(voice => voice.lang.startsWith('es'));
+        
+        // Priorizar voces de alta calidad (Google, Microsoft, Paulina, Monica)
+        let bestVoice = esVoices.find(voice => 
+          voice.name.includes('Google') || 
+          voice.name.includes('Paulina') || 
+          voice.name.includes('Monica') || 
+          voice.name.includes('Jorge')
+        );
+
+        // Si no encuentra una específica, usar la primera en español disponible
+        if (!bestVoice && esVoices.length > 0) {
+          bestVoice = esVoices[0];
+        }
+
+        if (bestVoice) {
+          utterance.voice = bestVoice;
+          utterance.lang = bestVoice.lang;
+        } else {
+             // Fallback
+             utterance.lang = 'es-ES';
+        }
+        
+        utterance.rate = 0.9; // Un poco más fluido
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
+      };
+
+      // Si las voces ya están cargadas
+      if (voices.length > 0) {
+        selectVoice();
+      } else {
+        // En algunos navegadores (Chrome), las voces se cargan asincrónicamente
+        window.speechSynthesis.onvoiceschanged = () => {
+          voices = window.speechSynthesis.getVoices();
+          selectVoice();
+          // Limpiar el evento para evitar fugas o múltiples llamadas
+          window.speechSynthesis.onvoiceschanged = null;
+        };
+      }
+    }
+  };
+
   return (
     <Card
       elevation={0}
@@ -112,7 +167,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
                 fontSize: { xs: '1.5rem', md: '2rem' },
               }}
             >
-              {entry.wordShuar}
+              {entry.wordSpanish}
             </Typography>
             <Typography
               variant="h6"
@@ -123,7 +178,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
                 fontSize: { xs: '1rem', md: '1.25rem' },
               }}
             >
-              {entry.wordSpanish}
+              {entry.wordShuar}
             </Typography>
           </Box>
           <Chip
@@ -178,6 +233,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
         <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
           <Button
             size="small"
+            onClick={handlePronounce}
             startIcon={<VolumeUpIcon />}
             sx={{
               color: 'secondary.main',

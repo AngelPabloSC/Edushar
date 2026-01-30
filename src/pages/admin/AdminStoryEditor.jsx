@@ -39,7 +39,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 
 import { useSidebarContext } from '../../hooks/context/sidebardContext';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
-import { useDialong } from '../../hooks/useDialog';
+import { useDialong } from '../../hooks/ui/useDialog';
 import EditorHeader from '../../components/EditorHeader';
 import EditorFooter from '../../components/EditorFooter';
 import PageHeader from '../../components/PageHeader';

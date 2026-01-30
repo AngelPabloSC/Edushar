@@ -22,8 +22,8 @@ import {
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { useLogin } from '../../hooks/useLogin';
-import { useRegister } from '../../hooks/useRegister';
+import { useLogin } from '../../hooks/auth/useLogin';
+import { useRegister } from '../../hooks/auth/useRegister';
 
 const Auth = () => {
   const theme = useTheme();

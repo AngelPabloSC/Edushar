@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { useUserProfile } from '../../hooks/useUserProfile';
+import { useUserProfile } from '../../hooks/auth/useUserProfile';
 import { studentProfileData } from '../../data/profileData';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';

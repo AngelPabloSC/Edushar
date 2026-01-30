@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFetchDataPromise } from './useFetchDataPromise';
+import { useFetchDataPromise } from '../api/useFetchDataPromise';
 
 /**
  * Custom hook to fetch user profile data from the API

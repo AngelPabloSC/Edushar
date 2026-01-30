@@ -35,7 +35,7 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
  * Página de Contribuciones del Estudiante
  * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
  */
-import { useDialong } from '../../hooks/useDialog';
+import { useDialong } from '../../hooks/ui/useDialog';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
 import validationRules from '../../utils/validationRules';
 

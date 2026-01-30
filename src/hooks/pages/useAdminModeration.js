@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useDialong } from '../useDialog';
+import { useDialong } from '../ui/useDialog';
 import { useSnackBarContext } from '../context/SnackbarContext';
 import { moderationStats, contributions } from '../../data/adminData';
 

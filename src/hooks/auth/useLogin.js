@@ -1,11 +1,11 @@
 import { useState, useCallback } from 'react';
-import { useFetchDataPromise } from './useFetchDataPromise';
-import { useDialong } from './useDialog';
-import { useLoginContext } from './context/LoginContext';
+import { useFetchDataPromise } from '../api/useFetchDataPromise';
+import { useDialong } from '../ui/useDialog';
+import { useLoginContext } from '../context/LoginContext';
 import { useGoogleLogin } from './useGoogleLogin';
-import { useToggle } from './useToggle';
-import { useFormValidation } from './useFormValidation';
-import validationRules from '../utils/validationRules';
+import { useToggle } from '../ui/useToggle';
+import { useFormValidation } from '../ui/useFormValidation';
+import validationRules from '../../utils/validationRules';
 
 export const useLogin = () => {
     // API hooks

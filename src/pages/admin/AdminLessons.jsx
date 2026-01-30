@@ -24,7 +24,7 @@ import {
   ListItemText,
   Grid,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -44,12 +44,14 @@ import PendingIcon from '@mui/icons-material/Pending';
 import CloseIcon from '@mui/icons-material/Close';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import QuizIcon from '@mui/icons-material/Quiz';
+import InfoIcon from '@mui/icons-material/Info';
+import ArticleIcon from '@mui/icons-material/Article';
 import TableMain from '../../components/TableMain';
 import { useAdminLessons } from '../../hooks/pages/useAdminLessons';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
-import { useDialong } from '../../hooks/useDialog';
-import { useCrudAdminLesson } from '../../hooks/useCrudAdminLesson';
+import { useDialong } from '../../hooks/ui/useDialog';
+import { useCrudAdminLesson } from '../../hooks/api/useCrudAdminLesson';
 
 const iconMap = {
   menu_book: <MenuBookIcon />,
@@ -98,6 +100,26 @@ const AdminLessons = () => {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedLesson, setSelectedLesson] = useState(null);
 
+  // State for client-side pagination
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(() => {
+    try {
+      const saved = localStorage.getItem('adminLessons_rowsPerPage');
+      return saved ? parseInt(saved, 10) : 5;
+    } catch {
+      return 5;
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem('adminLessons_rowsPerPage', rowsPerPage.toString());
+  }, [rowsPerPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+      setPage(0);
+  }, [searchQuery, levelFilter]);
+
   const handleConfirmDelete = async () => {
       if (!lessonToDelete) return;
 
@@ -135,6 +157,7 @@ const AdminLessons = () => {
   };
 
   // Filter lessons based on search query and level
+  console.log("Filtering lessons. Total:", lessons.length, "Filter:", levelFilter);
   const filteredLessons = lessons.filter(lesson => {
     // Filter by search query
     const matchesSearch = !searchQuery || 
@@ -143,9 +166,16 @@ const AdminLessons = () => {
     
     // Filter by level
     const matchesLevel = !levelFilter || lesson.level === levelFilter;
-    
+    if (matchesLevel && levelFilter) console.log("Match found for filter:", levelFilter, "Lesson:", lesson.title, "Level:", lesson.level);
+
     return matchesSearch && matchesLevel;
   });
+
+  // Calculate paginated lessons
+  const paginatedLessons = filteredLessons.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
     // Custom Columns Definition for TableMain
   const columns = [
@@ -321,9 +351,24 @@ const AdminLessons = () => {
       
       {/* Breadcrumbs - High Contrast */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
-        <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-            Admin
-        </Typography>
+        <Link to="/admin/dashboard" style={{ textDecoration: 'none' }}>
+            <Typography 
+                variant="body2" 
+                color="text.secondary" 
+                fontWeight={600} 
+                sx={{ 
+                    cursor: 'pointer', 
+                    transition: 'all 0.2s',
+                    '&:hover': { 
+                        color: 'text.primary', 
+                        textDecoration: 'underline',
+                        fontWeight: 700
+                    } 
+                }}
+            >
+                Admin
+            </Typography>
+        </Link>
         <ChevronRightIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
         <Typography variant="body2" color="text.primary" fontWeight={700}>
             Lecciones
@@ -354,9 +399,9 @@ const AdminLessons = () => {
                         bgcolor: 'white',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
                         '&:hover': { 
-                            bgcolor: 'primary.main', 
+                            bgcolor: 'text.primary', 
                             color: 'white',
-                            borderColor: 'primary.main',
+                            borderColor: 'text.primary',
                             transform: 'rotate(180deg)',
                             transition: 'all 0.3s ease'
                         }
@@ -440,16 +485,6 @@ const AdminLessons = () => {
                 <MenuItem value="Intermedio">Intermedio</MenuItem>
                 <MenuItem value="Avanzado">Avanzado</MenuItem>
              </Select>
-             <Tooltip title="Filtros avanzados">
-                <IconButton sx={{ 
-                    borderRadius: 3, width: 44, height: 44,
-                    border: '1px solid', borderColor: 'divider',
-                    color: 'text.secondary',
-                    '&:hover': { bgcolor: 'text.primary', color: 'white' }
-                }}>
-                    <FilterListIcon />
-                </IconButton>
-             </Tooltip>
          </Box>
       </Paper>
 
@@ -468,13 +503,13 @@ const AdminLessons = () => {
       {/* Data Table */}
       {!loading && code === 'COD_OK' && (
       <Box sx={{ 
-          '& .MuiPaper-root': { boxShadow: '0 4px 24px rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider', borderRadius: 4, overflow: 'hidden' },
+          '& .MuiPaper-root': { boxShadow: '0 4px 24px rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider', borderRadius: '16px 16px 0 0', borderBottom: 'none', overflow: 'hidden' },
           '& .MuiTableCell-head': { bgcolor: alpha(theme.palette.background.paper, 0.5), fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', letterSpacing: '0.05em' },
           '& .MuiTableRow-root': { transition: 'bgcolor 0.2s', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) } }
       }}>
         <TableMain 
             title="" 
-            data={filteredLessons} 
+            data={paginatedLessons} 
             columns={columns} 
             options={{
                 elevation: 0,
@@ -490,41 +525,68 @@ const AdminLessons = () => {
       </Box>
       )}
 
-      {/* Pagination - Only show if more than one page */}
+      {/* Pagination - Custom Client Side */}
       {!loading && code === 'COD_OK' && (() => {
-        const itemsPerPage = tableState.perPage || 1000;
-        const totalPages = Math.ceil(filteredLessons.length / itemsPerPage);
-        const currentPage = tableState.currentPage + 1; // Convert 0-indexed to 1-indexed
-        const startItem = tableState.currentPage * itemsPerPage + 1;
-        const endItem = Math.min(startItem + itemsPerPage - 1, filteredLessons.length);
+        const totalItems = filteredLessons.length;
+        const totalPages = Math.ceil(totalItems / rowsPerPage);
+        const startItem = page * rowsPerPage + 1;
+        const endItem = Math.min((page + 1) * rowsPerPage, totalItems);
         
         return (
-          <Paper elevation={0} sx={{ mt: -2, p: 2, border: '1px solid', borderColor: 'divider', borderTop: 'none', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper' }}>
-            <Typography variant="body2" color="text.secondary" fontWeight={500}>
-              Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{filteredLessons.length}</Box> lecciones
-            </Typography>
+          <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: '0 0 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper', flexWrap: 'wrap', gap: 2, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
             
-            {/* Only show pagination controls if there's more than one page */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{totalItems}</Box> lecciones
+                </Typography>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2, borderLeft: '1px solid', borderColor: 'divider', pl: 2 }}>
+                    <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                        Filas por página:
+                    </Typography>
+                    <Select
+                        value={rowsPerPage}
+                        onChange={(e) => {
+                            setRowsPerPage(e.target.value);
+                            setPage(0);
+                        }}
+                        variant="standard"
+                        disableUnderline
+                        sx={{ 
+                            fontSize: '0.875rem', 
+                            fontWeight: 700,
+                            '& .MuiSelect-select': { py: 0, pr: '24px !important' } 
+                        }}
+                    >
+                        <MenuItem value={5}>5</MenuItem>
+                        <MenuItem value={10}>10</MenuItem>
+                    </Select>
+                </Box>
+            </Box>
+            
+            {/* Pagination Controls */}
             {totalPages > 1 && (
               <Box sx={{ display: 'flex', gap: 1 }}>
                 <IconButton 
                   size="small" 
-                  disabled={currentPage === 1}
-                  onClick={() => handlePageChange(tableState.currentPage - 1, itemsPerPage)}
+                  disabled={page === 0}
+                  onClick={() => setPage(prev => Math.max(0, prev - 1))}
                   sx={{ border: '1px solid', borderColor: 'divider' }}
                 >
-                  <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 16 }} />
+                  <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 20 }} />
                 </IconButton>
                 
                 {/* Generate page buttons dynamically */}
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                  let pageNum;
+                  let pageNum; // 0-indexed for logic, but we display +1
+                  const currentPage = page; // 0-indexed
+                  
                   if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
+                    pageNum = i;
+                  } else if (currentPage <= 2) {
+                    pageNum = i;
                   } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
+                    pageNum = totalPages - 5 + i;
                   } else {
                     pageNum = currentPage - 2 + i;
                   }
@@ -534,31 +596,33 @@ const AdminLessons = () => {
                       key={pageNum}
                       variant={currentPage === pageNum ? "contained" : "text"}
                       size="small" 
-                      onClick={() => handlePageChange(pageNum - 1, itemsPerPage)}
+                      onClick={() => setPage(pageNum)}
                       sx={{ 
-                        minWidth: 32, 
+                        minWidth: 40, 
+                        height: 40,
+                        borderRadius: 2,
                         px: 0, 
                         bgcolor: currentPage === pageNum ? 'primary.main' : 'transparent',
                         color: currentPage === pageNum ? 'white' : 'text.secondary',
                         fontWeight: 'bold', 
-                        boxShadow: currentPage === pageNum ? theme.shadows[2] : 'none',
+                        boxShadow: currentPage === pageNum ? theme.shadows[4] : 'none',
                         '&:hover': {
                           bgcolor: currentPage === pageNum ? 'primary.dark' : 'action.hover'
                         }
                       }}
                     >
-                      {pageNum}
+                      {pageNum + 1}
                     </Button>
                   );
                 })}
                 
                 <IconButton 
                   size="small" 
-                  disabled={currentPage === totalPages}
-                  onClick={() => handlePageChange(tableState.currentPage + 1, itemsPerPage)}
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
                   sx={{ border: '1px solid', borderColor: 'divider' }}
                 >
-                  <ChevronRightIcon sx={{ fontSize: 16 }} />
+                  <ChevronRightIcon sx={{ fontSize: 20 }} />
                 </IconButton>
               </Box>
             )}
@@ -670,6 +734,23 @@ const AdminLessons = () => {
                   <Box>
                       {/* Basic Information */}
                       <Box sx={{ mb: 3 }}>
+                          {selectedLesson.image && (
+                              <Box sx={{ 
+                                  width: '100%', 
+                                  height: 200, 
+                                  borderRadius: 2, 
+                                  overflow: 'hidden', 
+                                  mb: 3,
+                                  boxShadow: 2 
+                              }}>
+                                  <img 
+                                      src={selectedLesson.image} 
+                                      alt={selectedLesson.title} 
+                                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                  />
+                              </Box>
+                          )}
+
                           <Typography variant="h5" fontWeight={800} gutterBottom color="text.primary">
                               {selectedLesson.title}
                           </Typography>
@@ -738,34 +819,72 @@ const AdminLessons = () => {
                               </Typography>
                               
                               {selectedLesson.content.intro && (
-                                  <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'background.default', borderRadius: 2 }}>
-                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom>
+                                  <Paper elevation={0} sx={{ 
+                                      p: 3, 
+                                      mb: 3, 
+                                      bgcolor: 'white', 
+                                      borderRadius: 3,
+                                      border: '1px solid',
+                                      borderColor: 'divider'
+                                  }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="text.primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                          <InfoIcon fontSize="small" color="primary" />
                                           Introducción
                                       </Typography>
-                                      <Typography variant="body2" color="text.secondary">
+                                      <Typography variant="body2" color="text.primary" sx={{ 
+                                          whiteSpace: 'pre-line', 
+                                          lineHeight: 1.6,
+                                          bgcolor: 'background.default',
+                                          p: 2,
+                                          borderRadius: 2,
+                                          border: '1px solid',
+                                          borderColor: 'divider'
+                                      }}>
                                           {selectedLesson.content.intro}
                                       </Typography>
                                   </Paper>
                               )}
 
                               {selectedLesson.content.videoUrl && (
-                                  <Paper elevation={0} sx={{ p: 2, mb: 2, bgcolor: 'background.default', borderRadius: 2 }}>
-                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                          <VideoLibraryIcon fontSize="small" />
-                                          Video
+                                  <Paper elevation={0} sx={{ 
+                                      p: 3, 
+                                      mb: 3, 
+                                      bgcolor: 'white', 
+                                      borderRadius: 3,
+                                      border: '1px solid',
+                                      borderColor: 'divider'
+                                  }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="text.primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                          <VideoLibraryIcon fontSize="small" color="primary" />
+                                          Video URL
                                       </Typography>
-                                      <Typography variant="body2" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
+                                      <Typography variant="body2" color="text.primary" sx={{ wordBreak: 'break-all', fontFamily: 'monospace', bgcolor: 'background.default', p: 1, borderRadius: 1, border: '1px solid', borderColor: 'divider' }}>
                                           {selectedLesson.content.videoUrl}
                                       </Typography>
                                   </Paper>
                               )}
 
                               {selectedLesson.content.text && (
-                                  <Paper elevation={0} sx={{ p: 2, bgcolor: 'background.default', borderRadius: 2 }}>
-                                      <Typography variant="subtitle2" fontWeight={700} color="primary" gutterBottom>
-                                          Texto
+                                  <Paper elevation={0} sx={{ 
+                                      p: 3, 
+                                      bgcolor: 'white', 
+                                      borderRadius: 3,
+                                      border: '1px solid',
+                                      borderColor: 'divider'
+                                  }}>
+                                      <Typography variant="subtitle2" fontWeight={700} color="text.primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                          <ArticleIcon fontSize="small" color="primary" />
+                                          Contenido Principal
                                       </Typography>
-                                      <Typography variant="body2" color="text.secondary">
+                                      <Typography variant="body2" color="text.primary" sx={{ 
+                                          whiteSpace: 'pre-line', 
+                                          lineHeight: 1.8,
+                                          bgcolor: 'background.default',
+                                          p: 2,
+                                          borderRadius: 2,
+                                          border: '1px solid',
+                                          borderColor: 'divider'
+                                      }}>
                                           {selectedLesson.content.text}
                                       </Typography>
                                   </Paper>
@@ -809,7 +928,11 @@ const AdminLessons = () => {
                                           />
                                           <Box sx={{ flex: 1 }}>
                                               <Chip 
-                                                  label={exercise.type || 'Pregunta'} 
+                                                  label={
+                                                      exercise.type === 'multiple_choice' ? 'Opción Múltiple' : 
+                                                      exercise.type === 'true_false' ? 'Verdadero/Falso' : 
+                                                      'Pregunta'
+                                                  } 
                                                   size="small" 
                                                   variant="outlined"
                                                   sx={{ mb: 1, fontWeight: 600 }}
@@ -871,11 +994,26 @@ const AdminLessons = () => {
                   </Box>
               )}
           </DialogContent>
-          <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+          <DialogActions sx={{ px: 3, py: 3, borderTop: '1px solid', borderColor: 'divider', bgcolor: 'background.paper', gap: 2 }}>
               <Button 
                   onClick={handleCloseDetails} 
                   variant="outlined"
-                  sx={{ fontWeight: 'bold', borderRadius: 2 }}
+                  size="large"
+                  color="inherit"
+                  sx={{ 
+                      fontWeight: 800, 
+                      borderRadius: 2,
+                      borderWidth: 2,
+                      borderColor: 'text.secondary',
+                      color: 'text.secondary',
+                      px: 3,
+                      '&:hover': {
+                          borderWidth: 2,
+                          borderColor: 'text.primary',
+                          color: 'text.primary',
+                          bgcolor: 'action.hover'
+                      }
+                  }}
               >
                   Cerrar
               </Button>
@@ -883,14 +1021,22 @@ const AdminLessons = () => {
                   component={Link}
                   to={`/admin/lecciones/editar/${selectedLesson?.id}`}
                   variant="contained" 
+                  size="large"
                   startIcon={<EditIcon />}
                   sx={{ 
                       borderRadius: 2, 
-                      fontWeight: 'bold', 
-                      px: 3, 
-                      boxShadow: 'none',
-                      bgcolor: 'text.primary',
-                      '&:hover': { bgcolor: 'text.secondary' }
+                      fontWeight: 800, 
+                      px: 4, 
+                      py: 1,
+                      boxShadow: 4,
+                      bgcolor: 'text.primary', // Dark brown background
+                      color: 'white',          // White text
+                      '&:hover': { 
+                          bgcolor: 'text.secondary',
+                          boxShadow: 6,
+                          transform: 'translateY(-2px)'
+                      },
+                      transition: 'all 0.2s'
                   }}
               >
                   Editar Lección

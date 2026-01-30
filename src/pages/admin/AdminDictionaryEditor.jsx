@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     Box,
@@ -27,20 +27,10 @@ import EditorHeader from '../../components/EditorHeader';
 import EditorFooter from '../../components/EditorFooter';
 import PageHeader from '../../components/PageHeader';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
-import { useDialong } from '../../hooks/useDialog';
+import { useDialong } from '../../hooks/ui/useDialog';
+import { useFetchDataPromise } from '../../hooks/api/useFetchDataPromise';
 
-// Mock data para simular edición
-const mockTerms = [
-    {
-        id: 1,
-        wordShuar: 'Nua',
-        wordSpanish: 'Mujer',
-        category: 'Sustantivo',
-        exampleShuar: 'Ii nuari jutai.',
-        exampleSpanish: 'Nuestra mujer es fuerte.',
-        image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-    },
-];
+
 
 const AdminDictionaryEditor = () => {
     const { id } = useParams();
@@ -49,6 +39,9 @@ const AdminDictionaryEditor = () => {
 
     const { handleSetDataSnackbar } = useSnackBarContext();
     const { isOpen: isDialogOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
+    const { getFechData } = useFetchDataPromise();
+    
+    const fileInputRef = useRef(null);
 
     const [pendingAction, setPendingAction] = useState(null);
     const [formData, setFormData] = useState({
@@ -60,22 +53,45 @@ const AdminDictionaryEditor = () => {
         image: null,
     });
 
-    // Simular carga de datos en modo edición
+    // Cargar datos en modo edición
     useEffect(() => {
         if (isEditMode) {
-            const term = mockTerms.find(t => t.id === parseInt(id));
-            if (term) {
-                setFormData({
-                    wordShuar: term.wordShuar || '',
-                    wordSpanish: term.wordSpanish || '',
-                    category: term.category || '',
-                    exampleShuar: term.exampleShuar || '',
-                    exampleSpanish: term.exampleSpanish || '',
-                    image: term.image || null,
-                });
-            }
+             const fetchEntry = async () => {
+                try {
+                    const response = await getFechData({
+                        endPoint: 'api/dictionary/list',
+                        method: 'POST',
+                        additionalData: {} 
+                    });
+
+                    if (response.code === 'COD_OK') {
+                        const items = response.data?.items || [];
+                        const term = items.find(t => t.id === parseInt(id));
+                        
+                        if (term) {
+                            setFormData({
+                                wordShuar: term.wordShuar || '',
+                                wordSpanish: term.wordSpanish || '',
+                                category: term.category || '',
+                                exampleShuar: Array.isArray(term.examples) ? term.examples[0] : (term.examples || ''),
+                                exampleSpanish: '', // Backend support for this field pending
+                                image: term.image || null,
+                            });
+                        } else {
+                            handleSetDataSnackbar({ message: 'Término no encontrado', type: 'error' });
+                            navigate('/admin/diccionario');
+                        }
+                    } else {
+                         handleSetDataSnackbar({ message: 'Error al cargar los datos', type: 'error' });
+                    }
+                } catch (error) {
+                    console.error("Error fetching entry", error);
+                    handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+                }
+             };
+             fetchEntry();
         }
-    }, [id, isEditMode]);
+    }, [id, isEditMode, getFechData, handleSetDataSnackbar, navigate]);
 
     const handleChange = (field) => (event) => {
         setFormData({ ...formData, [field]: event.target.value });
@@ -85,66 +101,112 @@ const AdminDictionaryEditor = () => {
         navigate('/admin/diccionario');
     };
 
-    const performSave = () => {
-        handleSetDataSnackbar({ message: 'Término guardado como borrador', type: 'success' });
-        handleCloseDialog();
-    };
 
-    const performPublish = () => {
-        handleSetDataSnackbar({ message: 'Término publicado exitosamente', type: 'success' });
-        navigate('/admin/diccionario');
-        handleCloseDialog();
-    };
-
-    const handleConfirmAction = () => {
-        if (pendingAction === 'save_draft') {
-            performSave();
-        } else if (pendingAction === 'publish') {
-            performPublish();
+    // Image Upload Handling
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        
+        if (file) {
+            console.log("File selected:", file.name);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Use functional update to ensure fresh state
+                setFormData(prev => ({ ...prev, image: reader.result }));
+            };
+            reader.readAsDataURL(file);
         }
+        // Reset input value to allow re-selecting the same file if needed
+        event.target.value = '';
     };
 
-    const handleSaveClick = () => {
-        setPendingAction('save_draft');
-        setDialongContent({
-            title: "Guardar Borrador",
-            message: "¿Deseas guardar el término como borrador?",
-            confirmText: "Guardar",
-            color: "primary"
-        });
-        handleOpenDialog();
+    const performSave = async () => {
+        const payload = {
+            wordShuar: formData.wordShuar,
+            wordSpanish: formData.wordSpanish,
+            category: formData.category,
+            examples: [formData.exampleShuar], 
+            image: formData.image,
+            imageDescription: formData.wordSpanish 
+        };
+
+        const endpoint = isEditMode ? 'api/dictionary/update' : 'api/dictionary/create';
+        const finalPayload = isEditMode ? { id: parseInt(id), ...payload } : payload;
+
+        try {
+            const response = await getFechData({
+                endPoint: endpoint,
+                method: 'POST',
+                additionalData: finalPayload
+            });
+
+            if (response.code === 'COD_OK') {
+                handleSetDataSnackbar({ 
+                    message: isEditMode ? 'Término actualizado exitosamente' : 'Término creado exitosamente', 
+                    type: 'success' 
+                });
+                navigate('/admin/diccionario');
+            } else {
+                 handleSetDataSnackbar({ message: response.message || 'Error al guardar', type: 'error' });
+            }
+        } catch (error) {
+             handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+        }
+        
+        handleCloseDialog();
     };
 
     const handlePublishClick = () => {
         setPendingAction('publish');
         setDialongContent({
-            title: "Publicar Término",
-            message: "¿Estás seguro de que deseas publicar este término? Será visible inmediatamente en el diccionario.",
-            confirmText: "Publicar Ahora",
+            title: isEditMode ? "Actualizar Palabra" : "Guardar Palabra",
+            message: isEditMode ? "¿Estás seguro de que deseas actualizar esta palabra?" : "¿Estás seguro de que deseas guardar esta palabra en el diccionario?",
+            confirmText: isEditMode ? "Actualizar" : "Guardar",
             color: "success"
         });
         handleOpenDialog();
     };
 
+    const handleConfirmAction = () => {
+         // Since we only have one main action now (Create/Save), we route to performSave directly
+         // Previously we had draft vs publish logic. Now simplify to just Save.
+         performSave();
+    };
+
+    const performPublish = () => {
+        // Re-use logic for now, publish might be same as save but with status field if API supported it
+        // The Create API provided uses standard creation. Status might not be controllable on creation.
+        performSave();
+    };
+
+    // Action Buttons
     const actions = (
         <>
             <Button
                 variant="outlined"
-                onClick={handleSaveClick}
-                startIcon={<SaveIcon />}
+                component="label"
+                startIcon={<CloudUploadIcon />}
                 sx={{
-                    borderRadius: 3, px: 4, py: 1, fontWeight: 700,
+                    borderRadius: 3, px: 2, py: 1, fontWeight: 700,
                     borderColor: 'text.primary', color: 'text.primary',
-                    borderWidth: 2,
+                    borderWidth: 2, mr: 2,
                     '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'transparent' }
                 }}
             >
-                Guardar Borrador
+                Subir Imagen
+                <input 
+                    type="file" 
+                    hidden 
+                    accept="image/*" 
+                    onChange={handleImageUpload} 
+                    ref={fileInputRef}
+                />
             </Button>
+
             <Button
                 variant="contained"
                 onClick={handlePublishClick}
                 startIcon={<PublishIcon />}
+                disabled={!formData.wordShuar || !formData.wordSpanish || !formData.category}
                 sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'secondary.main', color: 'white',
@@ -152,7 +214,7 @@ const AdminDictionaryEditor = () => {
                     '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' }
                 }}
             >
-                Publicar Término
+                Guardar Palabra
             </Button>
         </>
     );
@@ -184,7 +246,10 @@ const AdminDictionaryEditor = () => {
                         <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em', mb: 2, display: 'block' }}>
                             Imagen de Referencia (Opcional)
                         </Typography>
-                        <Box sx={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', mx: 'auto', '&:hover .overlay': { opacity: 1 } }}>
+                        <Box
+                          onClick={() => fileInputRef.current?.click()}
+                          sx={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', mx: 'auto', '&:hover .overlay': { opacity: 1 } }}
+                         >
                             {formData.image ? (
                                 <Box component="img" src={formData.image} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (

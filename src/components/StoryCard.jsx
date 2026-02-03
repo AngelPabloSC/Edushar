@@ -34,15 +34,25 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
             }}
         >
             {/* Cover Image & Badges */}
-            <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9' }}>
+            <Box sx={{ 
+                position: 'relative', 
+                width: '100%', 
+                aspectRatio: '16/9',
+                maxHeight: '225px',
+                overflow: 'hidden',
+                bgcolor: 'grey.200'
+            }}>
                 <Box
                     component="img"
                     src={story?.cover || 'https://via.placeholder.com/400x225'}
                     alt={story?.title?.es || 'Story cover'}
+                    loading="lazy"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/400x225'; }}
                     sx={{
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover'
+                        objectFit: 'cover',
+                        display: 'block'
                     }}
                 />
                 <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 1 }}>

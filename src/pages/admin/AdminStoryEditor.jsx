@@ -43,19 +43,7 @@ import { useDialong } from '../../hooks/ui/useDialog';
 import EditorHeader from '../../components/EditorHeader';
 import EditorFooter from '../../components/EditorFooter';
 import PageHeader from '../../components/PageHeader';
-
-// Mock data to simulate fetching an existing story
-const mockStories = [
-    {
-        id: 1,
-        title: { shuar: "Nunkui y la abundancia", es: "Nunkui y la abundancia" },
-        category: "Mito",
-        author: "Shuar Community",
-        status: "Publicado",
-        cover: "https://lh3.googleusercontent.com/aida-public/AB6AXuDQ_nSmxciuv3UgGKXptWVLyy5P8kf913fivx4_sn4EhyW7get1YB3STQmrUHfeWvStIMIlEXCDyMJH_qlgQ582G46HuXrxgkRtyMBUs-lmGiXRfTmEiq2hPW0kl-mZOKVuGdC2jkk7fBzDPGZJh8KJIWdHX1Ut6BdNp1sf7uFVFHx2dCAK2gq_hfhksrBp3dCI1llEL_YcXfiN5alsifMruHD6lHiW3dAYW_8zbgP6sAiV1v5-o-l1xibrmryWp4EpzQxWKEd9m_WM",
-        content: { shuar: "Shuar content placeholder...", es: "Spanish content placeholder..." }
-    }
-];
+import { useCrudAdminStory } from '../../hooks/api/useCrudAdminStory';
 
 const AdminStoryEditor = () => {
     const theme = useTheme();
@@ -67,6 +55,9 @@ const AdminStoryEditor = () => {
     const { handleSetDataSnackbar } = useSnackBarContext();
     const { isOpen: isDialogOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
     const isMobile = useTheme().breakpoints.down('md');
+
+    // Hook for CRUD operations
+    const { createStory, updateStory, fetchStoryById, createLoading, updateLoading, fetchLoading } = useCrudAdminStory();
 
     const [activeTab, setActiveTab] = useState(0); // 0: Shuar, 1: Español
     const [pendingAction, setPendingAction] = useState(null);
@@ -81,27 +72,42 @@ const AdminStoryEditor = () => {
         cover: null
     });
 
-    // Simulate fetching data
+    // Fetch data if in edit mode
     useEffect(() => {
-        if (isEditMode) {
-            const story = mockStories.find(s => s.id === parseInt(id));
-            if (story) {
-                setFormData({
-                    titleShuar: story.title?.shuar || '',
-                    titleEs: story.title?.es || '',
-                    category: story.category || 'Mito',
-                    author: story.author || '',
-                    difficulty: 'Básico',
-                    contentShuar: story.content?.shuar || '',
-                    contentEs: story.content?.es || '',
-                    cover: story.cover
-                });
-            }
+        if (isEditMode && id) {
+            const loadStory = async () => {
+                const story = await fetchStoryById(id);
+                if (story) {
+                    setFormData({
+                        titleShuar: story.title_shuar || '',
+                        titleEs: story.title_español || '',
+                        category: story.category || 'Mito',
+                        author: story.author || '',
+                        difficulty: 'Básico',
+                        contentShuar: story.contentShuar || '',
+                        contentEs: story.contentSpanish || '',
+                        cover: story.coverImage || null
+                    });
+                }
+            };
+            loadStory();
         }
-    }, [id, isEditMode]);
+    }, [id, isEditMode, fetchStoryById]);
 
     const handleChange = (field) => (event) => {
         setFormData({ ...formData, [field]: event.target.value });
+    };
+
+    // Handle image upload and convert to base64
+    const handleImageUpload = (event) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, cover: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleTabChange = (event, newValue) => {
@@ -112,14 +118,51 @@ const AdminStoryEditor = () => {
         navigate('/admin/cuentos');
     };
 
-    const performSave = () => {
-        handleSetDataSnackbar({ message: 'Borrador guardado exitosamente', type: 'success' });
+    const performSave = async () => {
+        try {
+            if (isEditMode) {
+                const result = await updateStory(id, formData);
+                if (result.success) {
+                    handleSetDataSnackbar({ message: 'Borrador guardado exitosamente', type: 'success' });
+                } else {
+                    handleSetDataSnackbar({ message: result.error || 'Error al guardar', type: 'error' });
+                }
+            } else {
+                const result = await createStory(formData);
+                if (result.success) {
+                    handleSetDataSnackbar({ message: 'Borrador guardado exitosamente', type: 'success' });
+                } else {
+                    handleSetDataSnackbar({ message: result.error || 'Error al guardar', type: 'error' });
+                }
+            }
+        } catch (error) {
+            handleSetDataSnackbar({ message: 'Error al guardar el borrador', type: 'error' });
+        }
         handleCloseDialog();
     };
 
-    const performPublish = () => {
-        handleSetDataSnackbar({ message: 'Cuento publicado correctamente', type: 'success' });
-        navigate('/admin/cuentos');
+    const performPublish = async () => {
+        try {
+            if (isEditMode) {
+                const result = await updateStory(id, formData);
+                if (result.success) {
+                    handleSetDataSnackbar({ message: 'Cuento publicado correctamente', type: 'success' });
+                    navigate('/admin/cuentos');
+                } else {
+                    handleSetDataSnackbar({ message: result.error || 'Error al publicar', type: 'error' });
+                }
+            } else {
+                const result = await createStory(formData);
+                if (result.success) {
+                    handleSetDataSnackbar({ message: 'Cuento publicado correctamente', type: 'success' });
+                    navigate('/admin/cuentos');
+                } else {
+                    handleSetDataSnackbar({ message: result.error || 'Error al publicar', type: 'error' });
+                }
+            }
+        } catch (error) {
+            handleSetDataSnackbar({ message: 'Error al publicar el cuento', type: 'error' });
+        }
         handleCloseDialog();
     };
 
@@ -158,6 +201,7 @@ const AdminStoryEditor = () => {
             <Button
                 variant="outlined"
                 onClick={handleSaveClick}
+                disabled={createLoading || updateLoading}
                 sx={{
                     borderRadius: 3, px: 4, py: 1, fontWeight: 700,
                     borderColor: 'text.primary', color: 'text.primary',
@@ -165,11 +209,12 @@ const AdminStoryEditor = () => {
                     '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'transparent' }
                 }}
             >
-                Guardar Borrador
+                {createLoading || updateLoading ? 'Guardando...' : 'Guardar Borrador'}
             </Button>
             <Button
                 variant="contained"
                 onClick={handlePublishClick}
+                disabled={createLoading || updateLoading}
                 startIcon={<PublishIcon />}
                 sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
@@ -178,7 +223,7 @@ const AdminStoryEditor = () => {
                     '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' }
                 }}
             >
-                Publicar Cuento
+                {createLoading || updateLoading ? 'Publicando...' : 'Publicar Cuento'}
             </Button>
         </>
     );
@@ -216,21 +261,30 @@ const AdminStoryEditor = () => {
                                 </Typography>
                             </Box>
                             <Box sx={{ p: 3 }}>
-                                <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', group: 'true', '&:hover .overlay': { opacity: 1 } }}>
-                                    {formData.cover ? (
-                                        <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    ) : (
-                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', color: 'text.disabled' }}>
-                                            <ImageOutlinedIcon sx={{ fontSize: 48, mb: 1 }} />
+                                <input
+                                    accept="image/*"
+                                    id="cover-image-upload"
+                                    type="file"
+                                    style={{ display: 'none' }}
+                                    onChange={handleImageUpload}
+                                />
+                                <label htmlFor="cover-image-upload">
+                                    <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', group: 'true', '&:hover .overlay': { opacity: 1 } }}>
+                                        {formData.cover ? (
+                                            <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', color: 'text.disabled' }}>
+                                                <ImageOutlinedIcon sx={{ fontSize: 48, mb: 1 }} />
+                                            </Box>
+                                        )}
+                                        {/* Overlay */}
+                                        <Box className="overlay" sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0,0,0,0.4)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Typography sx={{ color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <CloudUploadIcon /> Cambiar
+                                            </Typography>
                                         </Box>
-                                    )}
-                                    {/* Overlay */}
-                                    <Box className="overlay" sx={{ position: 'absolute', inset: 0, bgcolor: 'rgba(0,0,0,0.4)', opacity: 0, transition: 'opacity 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Typography sx={{ color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <CloudUploadIcon /> Cambiar
-                                        </Typography>
                                     </Box>
-                                </Box>
+                                </label>
                                 <Typography variant="caption" color="text.disabled" sx={{ display: 'block', textAlign: 'center', mt: 1, fontStyle: 'italic' }}>
                                     Formato recomendado: 1200x675px (JPG, PNG)
                                 </Typography>
@@ -298,9 +352,9 @@ const AdminStoryEditor = () => {
                                     >
                                         <MenuItem value="Mito">Mito</MenuItem>
                                         <MenuItem value="Leyenda">Leyenda</MenuItem>
-                                        <MenuItem value="Fábula">Fábula</MenuItem>
                                         <MenuItem value="Naturaleza">Naturaleza</MenuItem>
                                         <MenuItem value="Tradición">Tradición</MenuItem>
+                                        <MenuItem value="Fábula">Fábula</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Box>

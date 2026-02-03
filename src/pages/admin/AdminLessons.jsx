@@ -24,23 +24,17 @@ import {
   ListItemText,
   Grid,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import FilterListIcon from '@mui/icons-material/FilterList';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import SwapVertIcon from '@mui/icons-material/SwapVert';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import FamilyRestroomIcon from '@mui/icons-material/FamilyRestroom';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PendingIcon from '@mui/icons-material/Pending';
 import CloseIcon from '@mui/icons-material/Close';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import QuizIcon from '@mui/icons-material/Quiz';
@@ -48,40 +42,23 @@ import InfoIcon from '@mui/icons-material/Info';
 import ArticleIcon from '@mui/icons-material/Article';
 import TableMain from '../../components/TableMain';
 import { useAdminLessons } from '../../hooks/pages/useAdminLessons';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
 import { useDialong } from '../../hooks/ui/useDialog';
 import { useCrudAdminLesson } from '../../hooks/api/useCrudAdminLesson';
 
-const iconMap = {
-  menu_book: <MenuBookIcon />,
-  calculate: <CalculateIcon />,
-  family_history: <FamilyRestroomIcon />,
-  restaurant: <RestaurantIcon />,
-};
-
 const AdminLessons = () => {
   const theme = useTheme();
   
-  const {
-      activeTab,
-      handleTabChange,
-      searchQuery,
-      setSearchQuery,
-      stats,
-      data
-  } = useAdminLessons();
+  const { searchQuery, setSearchQuery } = useAdminLessons();
 
   // Fetch real lessons from API with optimized state
   const { 
     lessonData, 
     lessons, 
-    tableState, 
     loading, 
     deleteLoading,
     deleteLesson,
-    handlePageChange, 
-    handleReset,
     handleReloadLessons
   } = useCrudAdminLesson();
   
@@ -157,25 +134,26 @@ const AdminLessons = () => {
   };
 
   // Filter lessons based on search query and level
-  console.log("Filtering lessons. Total:", lessons.length, "Filter:", levelFilter);
-  const filteredLessons = lessons.filter(lesson => {
-    // Filter by search query
-    const matchesSearch = !searchQuery || 
-      lesson.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      lesson.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    // Filter by level
-    const matchesLevel = !levelFilter || lesson.level === levelFilter;
-    if (matchesLevel && levelFilter) console.log("Match found for filter:", levelFilter, "Lesson:", lesson.title, "Level:", lesson.level);
+  const normalizedQuery = (searchQuery ?? '').trim().toLowerCase();
+  const filteredLessons = useMemo(() => {
+    if (!lessons?.length) return [];
+    return lessons.filter((lesson) => {
+      const matchesSearch =
+        !normalizedQuery ||
+        lesson.title?.toLowerCase().includes(normalizedQuery) ||
+        lesson.description?.toLowerCase().includes(normalizedQuery);
 
-    return matchesSearch && matchesLevel;
-  });
+      const matchesLevel = !levelFilter || lesson.level === levelFilter;
+      return matchesSearch && matchesLevel;
+    });
+  }, [lessons, normalizedQuery, levelFilter]);
 
   // Calculate paginated lessons
-  const paginatedLessons = filteredLessons.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const paginatedLessons = useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    return filteredLessons.slice(startIndex, endIndex);
+  }, [filteredLessons, page, rowsPerPage]);
 
     // Custom Columns Definition for TableMain
   const columns = [
@@ -218,7 +196,7 @@ const AdminLessons = () => {
                             {value}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" fontWeight={500} sx={{ display: 'block' }}>
-                            {lessons[tableMeta.rowIndex]?.exercises?.length || 0} ejercicios
+                            {paginatedLessons[tableMeta.rowIndex]?.exercises?.length || 0} ejercicios
                         </Typography>
                     </Box>
                 </Box>
@@ -305,7 +283,7 @@ const AdminLessons = () => {
                      <Tooltip title="Ver detalles" arrow TransitionComponent={Fade}>
                         <IconButton 
                             size="small" 
-                            onClick={() => handleViewDetails(lessons[tableMeta.rowIndex])}
+                            onClick={() => handleViewDetails(paginatedLessons[tableMeta.rowIndex])}
                             sx={{ 
                             color: 'text.secondary', 
                             transition: 'all 0.2s',
@@ -318,7 +296,7 @@ const AdminLessons = () => {
                         <IconButton 
                             size="small" 
                             component={Link}
-                            to={`/admin/lecciones/editar/${lessons[tableMeta.rowIndex]?.id}`}
+                            to={`/admin/lecciones/editar/${paginatedLessons[tableMeta.rowIndex]?.id}`}
                             sx={{ 
                                 color: 'text.secondary', 
                                 transition: 'all 0.2s',
@@ -331,7 +309,7 @@ const AdminLessons = () => {
                     <Tooltip title="Eliminar" arrow TransitionComponent={Fade}>
                         <IconButton 
                             size="small" 
-                            onClick={() => handleDeleteClick(lessons[tableMeta.rowIndex]?.id)}
+                            onClick={() => handleDeleteClick(paginatedLessons[tableMeta.rowIndex]?.id)}
                             sx={{ 
                             color: 'text.secondary', 
                             transition: 'all 0.2s',
@@ -529,8 +507,9 @@ const AdminLessons = () => {
       {!loading && code === 'COD_OK' && (() => {
         const totalItems = filteredLessons.length;
         const totalPages = Math.ceil(totalItems / rowsPerPage);
-        const startItem = page * rowsPerPage + 1;
-        const endItem = Math.min((page + 1) * rowsPerPage, totalItems);
+        const hasItems = totalItems > 0;
+        const startItem = hasItems ? page * rowsPerPage + 1 : 0;
+        const endItem = hasItems ? Math.min((page + 1) * rowsPerPage, totalItems) : 0;
         
         return (
           <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: '0 0 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper', flexWrap: 'wrap', gap: 2, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
@@ -547,7 +526,7 @@ const AdminLessons = () => {
                     <Select
                         value={rowsPerPage}
                         onChange={(e) => {
-                            setRowsPerPage(e.target.value);
+                            setRowsPerPage(Number(e.target.value));
                             setPage(0);
                         }}
                         variant="standard"

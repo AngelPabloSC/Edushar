@@ -19,12 +19,14 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Chip
+    Chip,
+    CircularProgress
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate, Link
 import SearchIcon from '@mui/icons-material/Search';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
@@ -43,7 +45,9 @@ const AdminStories = () => {
         handleTabChange, 
         searchQuery, 
         setSearchQuery,
-        handleDelete 
+        handleDelete,
+        loading,
+        handleReloadStories
     } = useAdminStories();
 
     const { handleSetDataSnackbar } = useSnackBarContext();
@@ -96,6 +100,31 @@ const AdminStories = () => {
                         Administra el repositorio bilingüe de la comunidad Shuar. Crea y edita mitos, leyendas y fábulas.
                     </Typography>
                 </Box>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+                <Tooltip title="Recargar datos">
+                    <IconButton
+                        onClick={handleReloadStories}
+                        sx={{ 
+                            borderRadius: 3,
+                            width: 44,
+                            height: 44,
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            color: 'text.secondary',
+                            bgcolor: 'white',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
+                            '&:hover': { 
+                                bgcolor: 'text.primary', 
+                                color: 'white',
+                                borderColor: 'text.primary',
+                                transform: 'rotate(180deg)',
+                                transition: 'all 0.3s ease'
+                            }
+                        }}
+                    >
+                        <RefreshIcon />
+                    </IconButton>
+                </Tooltip>
                 <Button 
                     component={Link}
                     to="/admin/cuentos/crear"
@@ -119,6 +148,7 @@ const AdminStories = () => {
                     Agregar Cuento
                 </Button>
             </Box>
+        </Box>
 
              {/* Filters & Tabs - Enhanced with Don Norman's Principles */}
              <Box sx={{ mb: 6, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', pb: 0 }}>
@@ -211,25 +241,33 @@ const AdminStories = () => {
 
 
             {/* Content Grid */}
-            <Grid container spacing={3}>
-                {data.map((story) => (
-                    <Grid item xs={12} sm={6} lg={4} xl={3} key={story.id}>
-                        <StoryCard 
-                            story={story} 
-                            onEdit={handleEditClick} 
-                            onDelete={handleDeleteClick} 
-                        />
-                    </Grid>
-                ))}
-            </Grid>
-            
-            {data.length === 0 && (
-                <Box sx={{ py: 10, textAlign: 'center' }}>
-                     <PendingIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-                     <Typography color="text.secondary" fontWeight={500}>
-                         No se encontraron cuentos con estos criterios.
-                     </Typography>
+            {loading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 10 }}>
+                    <CircularProgress size={60} thickness={4} />
                 </Box>
+            ) : (
+                <>
+                    <Grid container spacing={3}>
+                        {data.map((story) => (
+                            <Grid item xs={12} sm={6} lg={4} xl={3} key={story.id}>
+                                <StoryCard 
+                                    story={story} 
+                                    onEdit={handleEditClick} 
+                                    onDelete={handleDeleteClick} 
+                                />
+                            </Grid>
+                        ))}
+                    </Grid>
+                    
+                    {data.length === 0 && (
+                        <Box sx={{ py: 10, textAlign: 'center' }}>
+                             <PendingIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+                             <Typography color="text.secondary" fontWeight={500}>
+                                 No se encontraron cuentos con estos criterios.
+                             </Typography>
+                        </Box>
+                    )}
+                </>
             )}
 
             {/* Delete Confirmation Dialog */}

@@ -8,9 +8,9 @@ import {
   InputAdornment,
   Paper,
   Pagination,
-  Skeleton,
+  CircularProgress,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '@mui/icons-material/Search';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
@@ -18,7 +18,7 @@ import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import ForestIcon from '@mui/icons-material/Forest';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import StoryCard from '../../components/StoryCard';
-import { storiesData } from '../../data/storiesData';
+import { useCrudAdminStory } from '../../hooks/api/useCrudAdminStory';
 
 /**
  * Página Pública de Biblioteca de Cuentos Shuar
@@ -29,20 +29,32 @@ const Stories = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  
+  // Fetch stories from API
+  const { stories: apiStories, loading } = useCrudAdminStory();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Transform API data to component format
+  const transformedStories = useMemo(() => {
+    return apiStories.map(story => ({
+      id: story.id,
+      title: {
+        shuar: story.title_shuar || '',
+        es: story.title_español || ''
+      },
+      category: story.category || 'Mito',
+      author: story.author || 'Desconocido',
+      status: 'Publicado',
+      cover: story.coverImage || ''
+    }));
+  }, [apiStories]);
 
   const categories = [
     { id: 'all', name: 'Todos los relatos', icon: <AutoAwesomeIcon /> },
-    { id: 'mitos', name: 'Mitos Ancestrales', icon: <HistoryEduIcon /> },
-    { id: 'leyendas', name: 'Leyendas de la Selva', icon: <ForestIcon /> },
-    { id: 'vida', name: 'Vida Cotidiana', icon: <Diversity3Icon /> },
+    { id: 'Mito', name: 'Mitos Ancestrales', icon: <HistoryEduIcon /> },
+    { id: 'Leyenda', name: 'Leyendas de la Selva', icon: <ForestIcon /> },
+    { id: 'Naturaleza', name: 'Naturaleza', icon: <ForestIcon /> },
+    { id: 'Tradición', name: 'Tradición', icon: <Diversity3Icon /> },
+    { id: 'Fábula', name: 'Fábulas', icon: <Diversity3Icon /> },
   ];
 
   return (
@@ -176,14 +188,13 @@ const Stories = () => {
 
           {/* Grid de Cards */}
           <Grid container spacing={3}>
-            {loading
-              ? [1, 2, 3, 4, 5, 6].map((n) => (
-                <Grid key={n} size={{ xs: 12, sm: 6, md: 4 }}>
-                  <StoryCard loading={true} />
-                </Grid>
-              ))
-              : storiesData
-                .filter(story => selectedCategory === 'all' || story.category?.toLowerCase().includes(selectedCategory))
+            {loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', py: 10 }}>
+                <CircularProgress size={60} thickness={4} />
+              </Box>
+            ) : (
+              transformedStories
+                .filter(story => selectedCategory === 'all' || story.category === selectedCategory)
                 .filter(story =>
                   story.title?.shuar?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                   story.title?.es?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -196,7 +207,7 @@ const Stories = () => {
                     />
                   </Grid>
                 ))
-            }
+            )}
           </Grid>
 
           {/* Paginación */}

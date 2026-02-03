@@ -49,30 +49,59 @@ const StudentContributions = () => {
   const [activeTab, setActiveTab] = useState('palabra');
   const [actionCallback, setActionCallback] = useState(null);
   const [errors, setErrors] = useState({});
+  
+  // Story editor tabs
+  const [storyLangTab, setStoryLangTab] = useState(0);
+
   const [formData, setFormData] = useState({
+    // Word fields
     palabraShuar: '',
     traduccionEspanol: '',
     categoria: '',
     ejemploUso: '',
+    
+    // Story fields
+    titleShuar: '',
+    titleEs: '',
+    categoryStory: 'Mito',
+    author: '',
+    contentShuar: '',
+    contentEs: '',
+    cover: null
   });
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear error when user types
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+  
+  const handleImageUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFormData(prev => ({ ...prev, cover: reader.result }));
+        };
+        reader.readAsDataURL(file);
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.palabraShuar) newErrors.palabraShuar = validationRules.required;
-    if (!formData.traduccionEspanol) newErrors.traduccionEspanol = validationRules.required;
-    if (!formData.categoria) newErrors.categoria = validationRules.required;
-
-    // Example usage of other rules if needed, e.g. length check
-    // if (formData.palabraShuar.length < 2) newErrors.palabraShuar = validationRules.minLength(2).message;
+    if (activeTab === 'palabra') {
+        if (!formData.palabraShuar) newErrors.palabraShuar = validationRules.required;
+        if (!formData.traduccionEspanol) newErrors.traduccionEspanol = validationRules.required;
+        if (!formData.categoria) newErrors.categoria = validationRules.required;
+    } else if (activeTab === 'cuento') {
+        if (!formData.titleShuar) newErrors.titleShuar = validationRules.required;
+        if (!formData.titleEs) newErrors.titleEs = validationRules.required;
+        if (!formData.author) newErrors.author = validationRules.required;
+        if (!formData.contentShuar) newErrors.contentShuar = validationRules.required;
+        if (!formData.contentEs) newErrors.contentEs = validationRules.required;
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -89,6 +118,13 @@ const StudentContributions = () => {
       traduccionEspanol: '',
       categoria: '',
       ejemploUso: '',
+      titleShuar: '',
+      titleEs: '',
+      categoryStory: 'Mito',
+      author: '',
+      contentShuar: '',
+      contentEs: '',
+      cover: null
     });
     handleCloseDialog();
   };
@@ -200,23 +236,6 @@ const StudentContributions = () => {
                 }}
               >
                 Enviar Cuento
-              </Button>
-              <Button
-                onClick={() => setActiveTab('correccion')}
-                sx={{
-                  pb: 2,
-                  borderBottom: activeTab === 'correccion' ? 3 : 0,
-                  borderColor: 'secondary.main',
-                  borderRadius: 0,
-                  color: activeTab === 'correccion' ? 'text.primary' : 'text.secondary',
-                  fontWeight: 'bold',
-                  '&:hover': {
-                    bgcolor: 'transparent',
-                    color: 'text.primary',
-                  },
-                }}
-              >
-                Informar Corrección
               </Button>
             </Box>
           </Box>
@@ -340,6 +359,162 @@ const StudentContributions = () => {
                   </Button>
                 </Grid>
               </Grid>
+            )}
+
+            {activeTab === 'cuento' && (
+                 <Grid container spacing={3}>
+                    {/* Cover Image */}
+                    <Grid size={{ xs: 12 }}>
+                        <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1 }}>
+                            Portada del Cuento
+                        </Typography>
+                         <Button
+                            component="label"
+                            fullWidth
+                            sx={{
+                                height: 200,
+                                bgcolor: 'grey.100',
+                                borderStyle: 'dashed',
+                                borderWidth: 2,
+                                borderColor: 'divider',
+                                borderRadius: 3,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                overflow: 'hidden',
+                                '&:hover': { bgcolor: 'grey.200' }
+                            }}
+                        >
+                             {formData.cover ? (
+                                <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                <>
+                                    <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#aaa' }}>image</span>
+                                    <Typography color="text.secondary">Subir portada</Typography>
+                                </>
+                            )}
+                            <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
+                        </Button>
+                    </Grid>
+
+                    {/* Meta Fields */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                         <TextField
+                            fullWidth
+                            label="Título en Shuar"
+                            placeholder="Ej: Nunkui"
+                            value={formData.titleShuar}
+                            onChange={(e) => handleInputChange('titleShuar', e.target.value)}
+                            error={!!errors.titleShuar}
+                            helperText={errors.titleShuar}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                            fullWidth
+                            label="Título en Español"
+                            placeholder="Ej: Nunkui y la abundancia"
+                            value={formData.titleEs}
+                            onChange={(e) => handleInputChange('titleEs', e.target.value)}
+                            error={!!errors.titleEs}
+                            helperText={errors.titleEs}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <TextField
+                            fullWidth
+                            label="Autor"
+                            placeholder="Nombre del autor"
+                            value={formData.author}
+                            onChange={(e) => handleInputChange('author', e.target.value)}
+                            error={!!errors.author}
+                            helperText={errors.author}
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, md: 6 }}>
+                         <FormControl fullWidth>
+                            <InputLabel>Categoría</InputLabel>
+                            <Select
+                                value={formData.categoryStory}
+                                label="Categoría"
+                                onChange={(e) => handleInputChange('categoryStory', e.target.value)}
+                            >
+                                <MenuItem value="Mito">Mito</MenuItem>
+                                <MenuItem value="Leyenda">Leyenda</MenuItem>
+                                <MenuItem value="Naturaleza">Naturaleza</MenuItem>
+                                <MenuItem value="Tradición">Tradición</MenuItem>
+                                <MenuItem value="Fábula">Fábula</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+                    {/* Content Editor */}
+                    <Grid size={{ xs: 12 }}>
+                        <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+                            Contenido del Historia
+                        </Typography>
+                        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
+                            <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
+                                <Button 
+                                    onClick={() => setStoryLangTab(0)}
+                                    sx={{ 
+                                        fontWeight: 'bold', 
+                                        color: storyLangTab === 0 ? 'secondary.main' : 'text.secondary',
+                                        borderBottom: storyLangTab === 0 ? 2 : 0,
+                                        borderRadius: 0,
+                                        borderColor: 'secondary.main',
+                                        px: 3
+                                    }}
+                                >
+                                    Shuar
+                                </Button>
+                                <Button 
+                                    onClick={() => setStoryLangTab(1)}
+                                    sx={{ 
+                                        fontWeight: 'bold', 
+                                        color: storyLangTab === 1 ? 'secondary.main' : 'text.secondary',
+                                        borderBottom: storyLangTab === 1 ? 2 : 0,
+                                        borderRadius: 0,
+                                        borderColor: 'secondary.main',
+                                        px: 3
+                                    }}
+                                >
+                                    Español
+                                </Button>
+                            </Box>
+                            <Box sx={{ p: 2, minHeight: 300, bgcolor: 'white' }}>
+                                {storyLangTab === 0 ? (
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        minRows={12}
+                                        variant="standard"
+                                        placeholder="Escribe la historia en Shuar..."
+                                        InputProps={{ disableUnderline: true }}
+                                        value={formData.contentShuar}
+                                        onChange={(e) => handleInputChange('contentShuar', e.target.value)}
+                                        error={!!errors.contentShuar}
+                                        helperText={errors.contentShuar}
+                                    />
+                                ) : (
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        minRows={12}
+                                        variant="standard"
+                                        placeholder="Escribe la historia en Español..."
+                                        InputProps={{ disableUnderline: true }}
+                                        value={formData.contentEs}
+                                        onChange={(e) => handleInputChange('contentEs', e.target.value)}
+                                        error={!!errors.contentEs}
+                                        helperText={errors.contentEs}
+                                    />
+                                )}
+                            </Box>
+                        </Box>
+                    </Grid>
+                 </Grid>
             )}
 
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>

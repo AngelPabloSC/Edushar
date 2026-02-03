@@ -8,6 +8,8 @@ import {
   InputAdornment,
   Paper,
   Pagination,
+  CircularProgress,
+  Skeleton
 } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +19,7 @@ import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import ForestIcon from '@mui/icons-material/Forest';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import StoryCard from '../../components/StoryCard';
-import { storiesData } from '../../data/storiesData';
+import { usePublicStories } from '../../hooks/pages/usePublicStories';
 
 /**
  * Página de Biblioteca de Cuentos Shuar
@@ -25,19 +27,24 @@ import { storiesData } from '../../data/storiesData';
  */
 const StudentStories = () => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
 
-  // Usar datos reales de cuentos
-  const stories = storiesData;
-
+  const { 
+    stories, 
+    loading, 
+    selectedCategory, 
+    setSelectedCategory, 
+    searchQuery, 
+    setSearchQuery 
+  } = usePublicStories();
 
   const categories = [
     { id: 'all', name: 'Todos los relatos', icon: <AutoAwesomeIcon /> },
-    { id: 'mitos', name: 'Mitos Ancestrales', icon: <HistoryEduIcon /> },
-    { id: 'leyendas', name: 'Leyendas de la Selva', icon: <ForestIcon /> },
-    { id: 'vida', name: 'Vida Cotidiana', icon: <Diversity3Icon /> },
+    { id: 'Mito', name: 'Mitos Ancestrales', icon: <HistoryEduIcon /> },
+    { id: 'Leyenda', name: 'Leyendas de la Selva', icon: <ForestIcon /> },
+    { id: 'Naturaleza', name: 'Naturaleza', icon: <ForestIcon /> },
+    { id: 'Tradición', name: 'Tradición', icon: <Diversity3Icon /> },
+    { id: 'Fábula', name: 'Fábulas', icon: <Diversity3Icon /> },
   ];
 
   return (
@@ -171,35 +178,65 @@ const StudentStories = () => {
 
           {/* Grid de Cards */}
           <Grid container spacing={3}>
-            {stories.map((story) => (
-              <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                <StoryCard
-                  story={story}
-                  onClick={() => navigate(`/estudiante/cuentos/${story.id}`)}
-                />
-              </Grid>
-            ))}
+            {loading ? (
+                 // Loading Skeletons
+                 Array.from(new Array(6)).map((_, index) => (
+                  <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                     <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
+                       <Skeleton variant="rectangular" height={200} />
+                       <Box sx={{ p: 2 }}>
+                         <Skeleton variant="text" height={32} width="80%" />
+                         <Skeleton variant="text" height={20} width="60%" />
+                       </Box>
+                     </Paper>
+                  </Grid>
+                ))
+            ) : stories.length === 0 ? (
+                <Grid size={{ xs: 12 }}>
+                    <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
+                        <AutoAwesomeIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
+                        <Typography variant="h5" color="text.secondary">
+                            No se encontraron historias
+                        </Typography>
+                         <Typography variant="body1" color="text.secondary">
+                            Intenta cambiar los filtros o la búsqueda
+                        </Typography>
+                    </Box>
+                </Grid>
+            ) : (
+                stories.map((story) => (
+                <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <StoryCard
+                    story={story}
+                    onClick={() => navigate(`/estudiante/cuentos/${story.id}`)}
+                    />
+                </Grid>
+                ))
+            )}
           </Grid>
 
           {/* Paginación */}
-          <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-            <Pagination
-              count={8}
-              page={page}
-              onChange={(e, value) => setPage(value)}
-              color="secondary"
-              size="large"
-              sx={{
-                '& .MuiPaginationItem-root': {
-                  fontWeight: 'bold',
-                },
-              }}
-            />
-          </Box>
+          {!loading && stories.length > 0 && (
+            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
+                <Pagination
+                count={Math.ceil(stories.length / 9)} // Client-side pagination logic since hook returns all
+                page={page}
+                onChange={(e, value) => setPage(value)}
+                color="secondary"
+                size="large"
+                sx={{
+                    '& .MuiPaginationItem-root': {
+                    fontWeight: 'bold',
+                    },
+                }}
+                />
+            </Box>
+          )}
         </Grid>
       </Grid>
     </Container>
   );
 };
+
 
 export default StudentStories;

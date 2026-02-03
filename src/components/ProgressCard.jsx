@@ -40,20 +40,6 @@ const ProgressCard = ({
         },
       }}
     >
-      {/* Badge de porcentaje prominente */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          zIndex: 2,
-        }}
-      >
-        <Tooltip title="Tu progreso en este módulo" arrow placement="left">
-          
-        </Tooltip>
-      </Box>
-
       <CardContent sx={{ p: 4 }}>
         {/* Título y nivel */}
         <Box sx={{ mb: 3, pr: 10 }}>
@@ -117,49 +103,75 @@ const ProgressCard = ({
 
         {/* Estadísticas adicionales */}
         {showDetails && (
-          <Stack 
-            direction="row" 
-            spacing={3}
+          <Box
             sx={{
-              pt: 2,
-              borderTop: '1px solid',
+              display: 'grid',
+              gridTemplateColumns: streak > 0 ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)',
+              gap: 2,
+              pt: 3,
+              borderTop: '1px dashed',
               borderColor: 'divider',
             }}
           >
             {/* Lecciones completadas */}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+            <Box 
+                sx={{ 
+                    p: 2, 
+                    borderRadius: 3, 
+                    bgcolor: 'grey.50', 
+                    textAlign: 'center',
+                    border: '1px solid',
+                    borderColor: 'divider'
+                }}
+            >
+              <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
                 LECCIONES
               </Typography>
-              <Typography variant="h6" fontWeight="bold">
-                {completedLessons}/{totalLessons}
+              <Typography variant="h6" fontWeight="900" color="text.primary">
+                {completedLessons} / {totalLessons}
               </Typography>
             </Box>
 
-            {/* Racha de días */}
-            {streak > 0 && (
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                  RACHA
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Typography variant="h6" fontWeight="bold">
-                    🏆 {streak} días
-                  </Typography>
-                </Box>
-              </Box>
-            )}
-
             {/* Lecciones restantes */}
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                RESTANTES
+            <Box 
+                sx={{ 
+                    p: 2, 
+                    borderRadius: 3, 
+                    bgcolor: 'grey.50', 
+                    textAlign: 'center',
+                    border: '1px solid',
+                    borderColor: 'divider'
+                }}
+            >
+              <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
+                POR COMPLETAR
               </Typography>
-              <Typography variant="h6" fontWeight="bold" color="secondary.main">
+              <Typography variant="h6" fontWeight="900" color="secondary.main">
                 {totalLessons - completedLessons}
               </Typography>
             </Box>
-          </Stack>
+
+             {/* Racha de días */}
+             {streak > 0 && (
+              <Box 
+                sx={{ 
+                    p: 2, 
+                    borderRadius: 3, 
+                    bgcolor: 'rgba(209, 154, 74, 0.1)', 
+                    textAlign: 'center',
+                    border: '1px solid',
+                    borderColor: 'rgba(209, 154, 74, 0.3)'
+                }}
+              >
+                <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
+                  RACHA
+                </Typography>
+                <Typography variant="h6" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                  🔥 {streak}
+                </Typography>
+              </Box>
+            )}
+          </Box>
         )}
       </CardContent>
     </Card>

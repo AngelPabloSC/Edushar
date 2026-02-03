@@ -189,7 +189,7 @@ const StudentDictionary = () => {
         >
           Base de Datos del Diccionario
         </Typography>
-        <Grid container spacing={6} justifyContent="center">
+        <Grid container spacing={4} justifyContent="center">
           <Grid size={{ xs: 4, md: 'auto' }}>
             <Typography variant="h3" fontWeight="900" color="secondary.main">
               {loading ? <Skeleton width={100} /> : stats.words}

@@ -200,6 +200,7 @@ export const useStudentLessons = () => {
     }, [rawLessons, searchQuery]);
 
     return {
+        rawLessons, // Expose flat list for finding active lesson
         lessonsByLevel: processedData,
         globalStats,
         loading,

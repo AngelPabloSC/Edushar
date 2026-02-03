@@ -4,9 +4,11 @@ import {
   Typography,
   Grid,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/context/LoginContext';
+import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -21,30 +23,65 @@ import ProgressCard from '../../components/ProgressCard';
 const StudentHome = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { rawLessons, loading } = useStudentLessons();
 
-  // Datos de ejemplo - En producción vendrían de una API o contexto
-  const currentProgress = {
-    moduleName: 'Nivel 1: Fundamentos',
-    lessonName: 'La Familia',
-    lessonId: 1, // ID de la lección en progreso
-    percentage: 60,
-    totalLessons: 8,
-    completedLessons: 2,
-    streak: 5, // Racha de días consecutivos
+  // Calcular el progreso real basado en las lecciones
+  const getProgressData = () => {
+    if (!rawLessons.length) return null;
+
+    // Buscar la primera lección en progreso o disponible (que no esté completada)
+    const activeLesson = rawLessons.find(l => l.status === 'in-progress') || 
+                         rawLessons.find(l => l.status === 'available' && !l.completed);
+    
+    // Si todo está completado, tomar la última
+    const targetLesson = activeLesson || rawLessons[rawLessons.length - 1];
+
+    if (!targetLesson) return null;
+
+    // Calcular estadísticas del nivel actual
+    const currentLevel = targetLesson.level || 'General';
+    // Normalizar la comparación de niveles para evitar errores por mayúsculas/espacios
+    const levelLessons = rawLessons.filter(l => (l.level || '').trim().toLowerCase() === currentLevel.trim().toLowerCase());
+    const completedInLevel = levelLessons.filter(l => l.completed).length;
+    const levelPercentage = levelLessons.length > 0 
+      ? Math.round((completedInLevel / levelLessons.length) * 100) 
+      : 0;
+
+    return {
+        moduleName: currentLevel,
+        lessonName: targetLesson.title,
+        lessonId: targetLesson.id,
+        percentage: levelPercentage,
+        totalLessons: levelLessons.length,
+        completedLessons: completedInLevel,
+        streak: user?.streak || 0, // Asumimos que el streak podría venir del user en el futuro
+        isCompleted: targetLesson.completed
+    };
   };
 
-  // Verificar si hay una lección en progreso
-  const hasLessonInProgress = currentProgress.lessonId !== null;
+  const currentProgress = getProgressData();
+  const hasLessonInProgress = !!currentProgress && !currentProgress.isCompleted;
 
   const handleContinueLearning = () => {
-    // Navegar a la última lección en progreso
-    navigate(`/leccion/${currentProgress.lessonId}`);
+    if (currentProgress?.lessonId) {
+      navigate(`/leccion/${currentProgress.lessonId}`);
+    } else {
+        navigate('/estudiante/lecciones');
+    }
   };
+
+  if (loading) {
+    return (
+        <Container maxWidth="lg" sx={{ py: 10, display: 'flex', justifyContent: 'center' }}>
+            <CircularProgress color="secondary" />
+        </Container>
+    );
+  }
 
   // Construir las action cards dinámicamente
   const actionCards = [];
 
-  // Solo mostrar "Continuar Lección" si hay una lección en progreso
+  // Solo mostrar "Continuar Lección" si hay una lección activa
   if (hasLessonInProgress) {
     actionCards.push({
       id: 1,
@@ -60,7 +97,7 @@ const StudentHome = () => {
       disabled: false,
     });
   } else {
-    // Si no hay lección en progreso, mostrar "Ir a Lecciones" como primera opción
+    // Si no hay lección en progreso (o todas completas), mostrar "Ir a Lecciones"
     actionCards.push({
       id: 1,
       title: 'Explorar Lecciones',
@@ -113,12 +150,7 @@ const StudentHome = () => {
             fontWeight: 900,
             letterSpacing: '-0.03em',
             fontSize: { xs: '2rem', md: '2.75rem' },
-            color: 'secondary.main', // Color directo en lugar de gradiente para mejor LCP
-            // Opcional: descomentar para gradiente (reduce performance)
-            // background: 'linear-gradient(135deg, #D19A4A 0%, #E0B76A 100%)',
-            // backgroundClip: 'text',
-            // WebkitBackgroundClip: 'text',
-            //WebkitTextFillColor: 'transparent',
+            color: 'secondary.main',
           }}
         >
           !Turasha, {user?.nombre || 'Estudiante'}!
@@ -136,7 +168,7 @@ const StudentHome = () => {
       </Box>
 
       {/* Tarjeta de Progreso Mejorada - Solo si hay progreso */}
-      {hasLessonInProgress && (
+      {currentProgress && (
         <Box sx={{ mb: 5 }}>
           <ProgressCard
             moduleName={currentProgress.moduleName}

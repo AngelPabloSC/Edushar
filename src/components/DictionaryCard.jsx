@@ -148,7 +148,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
       <CardMedia
         component="img"
         sx={{
-          width: { xs: '100%', md: 192 },
+          width: { xs: '100%', md: 280 },
           height: { xs: 192, md: 'auto' },
           objectFit: 'cover',
         }}
@@ -157,7 +157,7 @@ const DictionaryCard = ({ entry, loading = false }) => {
       />
       <CardContent sx={{ flex: 1, p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
+          <Box sx={{ flex: 1, pr: 1 }}>
             <Typography
               variant="h4"
               sx={{

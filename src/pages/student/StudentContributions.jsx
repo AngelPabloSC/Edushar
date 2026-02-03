@@ -35,138 +35,35 @@ import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
  * Página de Contribuciones del Estudiante
  * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
  */
-import { useDialong } from '../../hooks/ui/useDialog';
-import { useSnackBarContext } from '../../hooks/context/SnackbarContext';
-import validationRules from '../../utils/validationRules';
+import { useStudentContributions } from '../../hooks/pages/useStudentContributions';
+import { useRef } from 'react';
 
 /**
  * Página de Contribuciones del Estudiante
  * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
  */
 const StudentContributions = () => {
-  const { isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
-  const { handleSetDataSnackbar } = useSnackBarContext();
-  const [activeTab, setActiveTab] = useState('palabra');
-  const [actionCallback, setActionCallback] = useState(null);
-  const [errors, setErrors] = useState({});
-  
-  // Story editor tabs
-  const [storyLangTab, setStoryLangTab] = useState(0);
-
-  const [formData, setFormData] = useState({
-    // Word fields
-    palabraShuar: '',
-    traduccionEspanol: '',
-    categoria: '',
-    ejemploUso: '',
-    
-    // Story fields
-    titleShuar: '',
-    titleEs: '',
-    categoryStory: 'Mito',
-    author: '',
-    contentShuar: '',
-    contentEs: '',
-    cover: null
-  });
-
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
-    }
-  };
-  
-  const handleImageUpload = (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setFormData(prev => ({ ...prev, cover: reader.result }));
-        };
-        reader.readAsDataURL(file);
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (activeTab === 'palabra') {
-        if (!formData.palabraShuar) newErrors.palabraShuar = validationRules.required;
-        if (!formData.traduccionEspanol) newErrors.traduccionEspanol = validationRules.required;
-        if (!formData.categoria) newErrors.categoria = validationRules.required;
-    } else if (activeTab === 'cuento') {
-        if (!formData.titleShuar) newErrors.titleShuar = validationRules.required;
-        if (!formData.titleEs) newErrors.titleEs = validationRules.required;
-        if (!formData.author) newErrors.author = validationRules.required;
-        if (!formData.contentShuar) newErrors.contentShuar = validationRules.required;
-        if (!formData.contentEs) newErrors.contentEs = validationRules.required;
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleConfirmSubmit = () => {
-    // Aquí iría la lógica real para enviar la contribución a la API
-    console.log('Enviando contribución:', formData);
-    handleSetDataSnackbar({ message: '¡Gracias! Tu contribución ha sido enviada para revisión.', type: 'success' });
-
-    // Resetear formulario
-    setFormData({
-      palabraShuar: '',
-      traduccionEspanol: '',
-      categoria: '',
-      ejemploUso: '',
-      titleShuar: '',
-      titleEs: '',
-      categoryStory: 'Mito',
-      author: '',
-      contentShuar: '',
-      contentEs: '',
-      cover: null
-    });
-    handleCloseDialog();
-  };
-
-  const handleSubmit = () => {
-    if (!validateForm()) {
-      handleSetDataSnackbar({ message: 'Por favor corrige los errores antes de enviar', type: 'error' });
-      return;
-    }
-
-    setDialongContent({
-      title: '¿Confirmar envío?',
-      message: 'Tu contribución será revisada por un administrador antes de ser publicada. ¿Deseas continuar?'
-    });
-    setActionCallback(() => handleConfirmSubmit);
-    handleOpenDialog();
-  };
-
-  // Datos de ejemplo para el historial
-  const contributions = [
-    { id: 1, tipo: 'Palabra', contenido: 'Nántu (Luna)', fecha: '03/10/2023', estado: 'aprobado', timestamp: 'Ayer' },
-    { id: 2, tipo: 'Palabra', contenido: 'Yawá (Perro)', fecha: '02/10/2023', estado: 'pendiente', timestamp: '2 oct' },
-    { id: 3, tipo: 'Cuento', contenido: 'El origen del fuego', fecha: '28/09/2023', estado: 'revision', timestamp: '28 sep' },
-  ];
-
-  const getStatusColor = (estado) => {
-    switch (estado) {
-      case 'aprobado': return 'success';
-      case 'pendiente': return 'warning';
-      case 'revision': return 'warning';
-      default: return 'default';
-    }
-  };
-
-  const getStatusLabel = (estado) => {
-    switch (estado) {
-      case 'aprobado': return 'Aprobado';
-      case 'pendiente': return 'Pendiente';
-      case 'revision': return 'En Revisión';
-      default: return estado;
-    }
-  };
+  const tableRef = useRef(null);
+  const {
+    activeTab,
+    storyLangTab,
+    formData,
+    errors,
+    contributions,
+    recentContributions,
+    loading,
+    isOpen,
+    dialongContent,
+    actionCallback,
+    setActiveTab,
+    setStoryLangTab,
+    handleInputChange,
+    handleImageUpload,
+    handleSubmit,
+    handleCloseDialog,
+    getStatusColor,
+    getStatusLabel
+  } = useStudentContributions();
 
   return (
     <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
@@ -344,19 +241,39 @@ const StudentContributions = () => {
                       borderColor: 'divider',
                     }}
                   >
-                    <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
-                      <span className="material-symbols-outlined">add_photo_alternate</span>
-                    </Box>
-                    <Typography variant="body2" fontWeight="medium">
-                      Subir una imagen o foto (Opcional)
-                    </Typography>
+                    {formData.cover ? (
+                        <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    ) : (
+                        <>
+                            <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
+                              <span className="material-symbols-outlined">add_photo_alternate</span>
+                            </Box>
+                            <Typography variant="body2" fontWeight="medium">
+                              Subir una imagen o foto (Opcional)
+                            </Typography>
+                        </>
+                    )}
                     <input
                       type="file"
                       hidden
                       accept="image/*"
-                      onChange={(e) => console.log('File selected:', e.target.files[0])}
+                      onChange={handleImageUpload}
                     />
                   </Button>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Descripción de la imagen (Opcional)"
+                    placeholder="Describe brevemente la imagen..."
+                    value={formData.imageDescription}
+                    onChange={(e) => handleInputChange('imageDescription', e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
                 </Grid>
               </Grid>
             )}
@@ -396,6 +313,20 @@ const StudentContributions = () => {
                             )}
                             <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
                         </Button>
+                    </Grid>
+                    <Grid size={{ xs: 12 }}>
+                        <TextField
+                            fullWidth
+                            label="Descripción de la portada (Opcional)"
+                            placeholder="Describe brevemente la portada del cuento..."
+                            value={formData.imageDescription}
+                            onChange={(e) =>handleInputChange('imageDescription', e.target.value)}
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 2,
+                                },
+                            }}
+                        />
                     </Grid>
 
                     {/* Meta Fields */}
@@ -557,6 +488,7 @@ const StudentContributions = () => {
                 variant="body2"
                 color="secondary.main"
                 fontWeight="bold"
+                onClick={() => tableRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                 sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}
               >
                 Ver todas
@@ -564,7 +496,7 @@ const StudentContributions = () => {
             </Box>
 
             {/* Cards de historial */}
-            {contributions.map((contrib) => (
+            {recentContributions.map((contrib) => (
               <Card
                 key={contrib.id}
                 elevation={0}
@@ -664,6 +596,7 @@ const StudentContributions = () => {
           Resumen de Contribuciones
         </Typography>
         <TableContainer
+          ref={tableRef}
           component={Paper}
           elevation={0}
           sx={{

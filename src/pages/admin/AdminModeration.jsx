@@ -13,8 +13,12 @@ import {
   DialogContent,
   DialogActions,
   useTheme,
-  alpha
+  alpha,
+  CircularProgress,
+  Divider
 } from '@mui/material';
+import ReviewContributionDialog from '../../components/admin/ReviewContributionDialog';
+import HistoryDialog from '../../components/admin/HistoryDialog';
 import SearchIcon from '@mui/icons-material/Search';
 import PendingActionsIcon from '@mui/icons-material/PendingActions';
 import TaskAltIcon from '@mui/icons-material/TaskAlt';
@@ -40,8 +44,10 @@ const AdminModeration = () => {
     selectedContributionId,
     searchQuery,
     selectedContribution,
-    moderationStats,
+    stats,
     contributions,
+    history,
+    historyDialogOpen,
     
     // Dialog State
     isOpen,
@@ -51,6 +57,7 @@ const AdminModeration = () => {
     // Setters
     setSelectedContributionId,
     setSearchQuery,
+    setHistoryDialogOpen,
 
     // Handlers
     handleConfirmation,
@@ -163,6 +170,7 @@ const AdminModeration = () => {
                             transform: 'translateY(-2px)'
                         }
                     }}
+                    onClick={() => setHistoryDialogOpen(true)}
                 >
                     Historial
                 </Button>
@@ -173,27 +181,27 @@ const AdminModeration = () => {
                 <Box sx={{ flex: 1 }}>
                     <StatsCard 
                         title="Pendientes" 
-                        value={moderationStats.pending} 
+                        value={stats.pending.count} 
                         icon={<PendingActionsIcon />} 
                         color={theme.palette.info?.main || '#0288d1'}
-                        trend="+2 nuevas"
+                        trend={`+${stats.pending.new} nuevas`}
                         delay="0.1s"
                     />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                     <StatsCard 
                         title="Aprobados Hoy" 
-                        value={moderationStats.approvedToday} 
+                        value={stats.approvedToday.count} 
                         icon={<TaskAltIcon />} 
                         color={theme.palette.success.main}
-                        trend="+12%"
+                        trend={`${stats.approvedToday.percentage > 0 ? '+' : ''}${stats.approvedToday.percentage}%`}
                         delay="0.2s"
                     />
                 </Box>
                 <Box sx={{ flex: 1 }}>
                     <StatsCard 
                         title="Rechazados" 
-                        value={moderationStats.rejected} 
+                        value={stats.rejected.count} 
                         icon={<CancelIcon />} 
                         color={theme.palette.error.main} 
                         delay="0.3s"
@@ -306,32 +314,28 @@ const AdminModeration = () => {
             </Box>
         </Box>
 
-        {/* Split View Content */}
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, flexGrow: 1, overflow: { xs: 'visible', lg: 'hidden' }, px: { xs: 2, md: 4 }, pb: 4, gap: 3 }}>
-            
-            {/* List Panel */}
-            <Box sx={{ flex: 1, overflowY: { xs: 'visible', lg: 'auto' }, pr: { xs: 0, lg: 1 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* List Panel - Full Width */}
+            <Box sx={{ flex: 1, overflowY: 'auto', p: 0.5, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {contributions.map((contribution, index) => (
                     <Paper
                         key={contribution.id}
-                        elevation={selectedContributionId === contribution.id ? 4 : 0}
+                        elevation={0}
                         onClick={() => setSelectedContributionId(contribution.id)}
                         sx={{
                             p: 2.5,
                             borderRadius: 3,
                             border: '1px solid',
-                            borderColor: selectedContributionId === contribution.id ? 'secondary.main' : 'transparent',
-                            bgcolor: selectedContributionId === contribution.id ? 'background.paper' : alpha(theme.palette.background.paper, 0.6),
+                            borderColor: 'divider',
+                            bgcolor: 'background.paper',
                             cursor: 'pointer',
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transition: 'all 0.2s',
                             animation: 'fadeInUp 0.5s ease-out forwards',
-                            animationDelay: `${0.5 + (index * 0.1)}s`,
+                            animationDelay: `${0.1 + (index * 0.05)}s`,
                             opacity: 0,
                             ...fadeInUp,
                             '&:hover': {
-                                transform: 'translateY(-2px) translateX(4px)',
-                                borderColor: alpha(theme.palette.secondary.main, 0.5),
-                                bgcolor: 'background.paper',
+                                transform: 'translateY(-2px)',
+                                borderColor: 'secondary.main',
                                 boxShadow: theme.shadows[2]
                             }
                         }}
@@ -339,12 +343,7 @@ const AdminModeration = () => {
                         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                             <Avatar 
                                 src={contribution.user.avatar} 
-                                sx={{ 
-                                    width: 48, 
-                                    height: 48, 
-                                    border: `2px solid ${theme.palette.background.paper}`, 
-                                    boxShadow: theme.shadows[2] 
-                                }} 
+                                sx={{ width: 48, height: 48, border: `2px solid ${theme.palette.background.paper}`, boxShadow: theme.shadows[1] }} 
                             />
                             <Box sx={{ flexGrow: 1 }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
@@ -357,7 +356,7 @@ const AdminModeration = () => {
                                 </Box>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <Chip 
-                                        label={contribution.type} 
+                                        label={contribution.type === 'story' ? 'Cuento' : 'Diccionario'} 
                                         size="small" 
                                         sx={{ 
                                             height: 20, 
@@ -365,249 +364,33 @@ const AdminModeration = () => {
                                             fontWeight: '800', 
                                             textTransform: 'uppercase',
                                             borderRadius: 1,
-                                            border: '1px solid transparent',
-                                            bgcolor: 
-                                                contribution.type === 'Palabra Sugerida' ? alpha(theme.palette.primary.main, 0.15) :
-                                                contribution.type === 'Historia Corta' ? alpha(theme.palette.secondary.main, 0.15) :
-                                                alpha(theme.palette.warning.main, 0.15),
+                                            bgcolor: contribution.type === 'story' ? alpha(theme.palette.secondary.main, 0.15) : alpha(theme.palette.primary.main, 0.15),
                                             color: 'text.primary',
                                         }} 
                                     />
                                     <Typography variant="body2" fontWeight="500" color="text.secondary">
-                                        {contribution.content.title}
+                                        {contribution.type === 'story' ? contribution.data?.title_shuar : contribution.data?.wordShuar}
                                     </Typography>
                                 </Box>
                             </Box>
-                            {selectedContributionId === contribution.id && (
-                                <Box sx={{ 
-                                    width: 8, 
-                                    height: 8, 
-                                    borderRadius: '50%', 
-                                    bgcolor: 'secondary.main',
-                                    boxShadow: `0 0 0 4px ${alpha(theme.palette.secondary.main, 0.2)}`
-                                }} />
-                            )}
+                            <Button variant="outlined" size="small" sx={{ borderRadius: 2 }}>
+                                Revisar
+                            </Button>
                         </Box>
                     </Paper>
                 ))}
             </Box>
 
-            {/* Detail Drawer / Panel */}
-            {/* Detail Drawer / Panel */}
-            <Paper
-                elevation={6}
-                sx={{
-                    width: { xs: '100%', lg: 480 },
-                    height: { xs: 'auto', lg: '100%' },
-                    maxHeight: { xs: selectedContributionId ? '60vh' : 0, lg: '100%' },
-                    transition: 'max-height 0.3s ease-out',
-                    borderRadius: 4,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
-                    border: '1px solid',
-                    borderColor: alpha(theme.palette.divider, 0.1),
-                    bgcolor: 'background.paper',
-                    animation: 'fadeInUp 0.6s ease-out',
-                    animationDelay: '0.2s',
-                    opacity: 0,
-                    animationFillMode: 'forwards',
-                    ...fadeInUp
-                }}
-            >
-                {/* Header */}
-                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: alpha(theme.palette.background.default, 0.3) }}>
-                    <Box>
-                        <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
-                            Revisión
-                        </Typography>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                            <Typography variant="caption" color="text.secondary" fontWeight="bold" sx={{ textTransform: 'uppercase' }}>
-                                ID: #{selectedContribution?.id}
-                            </Typography>
-                             {selectedContribution?.content?.category && (
-                                <Chip 
-                                    label={selectedContribution.content.category} 
-                                    size="small" 
-                                    sx={{ height: 18, fontSize: '0.6rem', fontWeight: 'bold', bgcolor: alpha(theme.palette.text.primary, 0.05) }} 
-                                />
-                            )}
-                        </Box>
-                    </Box>
-                    <IconButton 
-                        size="small" 
-                        onClick={() => setSelectedContributionId(null)}
-                        sx={{ transition: 'transform 0.2s', '&:hover': { transform: 'rotate(90deg)', bgcolor: 'action.hover' } }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
-                </Box>
-
-                {/* Content */}
-                <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 3 }}>
-                    {selectedContribution ? (
-                        <>
-                            {/* Comparison Cards */}
-                            <Grid container spacing={2} sx={{ mb: 4 }}>
-                                <Grid item xs={6}>
-                                    <Paper elevation={0} sx={{ p: 2.5, bgcolor: alpha(theme.palette.primary.main, 0.08), borderRadius: 3, border: '1px dashed', borderColor: alpha(theme.palette.primary.main, 0.3), height: '100%' }}>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', display: 'block', mb: 1, opacity: 0.7 }}>
-                                            {selectedContribution.content.typeLabel}
-                                        </Typography>
-                                        <Typography variant="h5" fontWeight="900" color="primary.dark" sx={{ wordBreak: 'break-word', letterSpacing: -0.5 }}>
-                                            {selectedContribution.content.shuar || selectedContribution.content.title}
-                                        </Typography>
-                                    </Paper>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Paper elevation={0} sx={{ p: 2.5, bgcolor: alpha(theme.palette.secondary.main, 0.08), borderRadius: 3, border: '1px dashed', borderColor: alpha(theme.palette.secondary.main, 0.3), height: '100%' }}>
-                                        <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase', display: 'block', mb: 1, opacity: 0.7 }}>
-                                            {selectedContribution.content.translationLabel}
-                                        </Typography>
-                                        <Typography variant="h6" fontWeight="700" color="text.primary" sx={{ wordBreak: 'break-word' }}>
-                                            {selectedContribution.content.spanish || selectedContribution.content.details || 'Ver detalles'}
-                                        </Typography>
-                                    </Paper>
-                                </Grid>
-                            </Grid>
-
-                            {/* Image Visual Aid (Visibility) */}
-                            {selectedContribution.content.image && (
-                                <Box sx={{ mb: 4 }}>
-                                    <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>image</span>
-                                        Evidencia Visual
-                                    </Typography>
-                                    <Box 
-                                        component="img" 
-                                        src={selectedContribution.content.image} 
-                                        alt="Referencia visual"
-                                        sx={{ 
-                                            width: '100%', 
-                                            height: 220, 
-                                            objectFit: 'cover', 
-                                            borderRadius: 3, 
-                                            boxShadow: theme.shadows[3],
-                                            transition: 'transform 0.3s',
-                                            '&:hover': { transform: 'scale(1.02)' }
-                                        }} 
-                                    />
-                                </Box>
-                            )}
-
-                            {/* Detailed Context */}
-                            <Box sx={{ mb: 4 }}>
-                                <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-                                     <span className="material-symbols-outlined" style={{ fontSize: 18 }}>description</span>
-                                    Contexto / Uso
-                                </Typography>
-                                <Paper elevation={0} sx={{ p: 2, bgcolor: alpha(theme.palette.background.default, 0.5), border: '1px solid', borderColor: 'divider', borderRadius: 2 }}>
-                                    <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.primary', lineHeight: 1.6 }}>
-                                        "{selectedContribution.content.context || selectedContribution.content.description || "Sin descripción adicional."}"
-                                    </Typography>
-                                </Paper>
-                            </Box>
-
-                            {/* Feedback Input */}
-                            <Box>
-                                <Typography variant="subtitle2" fontWeight="bold" gutterBottom sx={{ color: 'text.secondary' }}>
-                                    Retroalimentación (Opcional)
-                                </Typography>
-                                <TextField
-                                    multiline
-                                    rows={3}
-                                    fullWidth
-                                    placeholder="¿Por qué se aprueba o rechaza? Comentarios para el estudiante..."
-                                    variant="outlined"
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': { 
-                                            borderRadius: 3, 
-                                            bgcolor: alpha(theme.palette.background.default, 0.5),
-                                            transition: 'all 0.2s',
-                                            '&:hover fieldset': { borderColor: 'secondary.main' },
-                                            '&.Mui-focused fieldset': { borderColor: 'secondary.main', borderWidth: 2 } 
-                                        }
-                                    }}
-                                />
-                            </Box>
-                        </>
-                    ) : (
-                        <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', opacity: 0.5 }}>
-                            <PendingActionsIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
-                            <Typography variant="body1" fontWeight="bold" color="text.disabled">Selecciona una contribución</Typography>
-                        </Box>
-                    )}
-                </Box>
-
-                {/* Actions (Affordance) */}
-                <Box sx={{ p: 3, bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        size="large"
-                        disabled={!selectedContribution || loading}
-                        onClick={() => handleConfirmation('approve')}
-                        startIcon={loading ? null : <DoneAllIcon />}
-                        sx={{ 
-                            borderRadius: 3, 
-                            fontWeight: 'bold', 
-                            py: 1.5,
-                            fontSize: '1rem',
-                            bgcolor: 'success.main', // Explicit for primary action
-                            color: 'white',
-                            boxShadow: '0 8px 16px rgba(46, 125, 50, 0.24)',
-                            transition: 'all 0.2s',
-                            '&:hover': { 
-                                bgcolor: 'success.dark', 
-                                boxShadow: '0 12px 20px rgba(46, 125, 50, 0.32)',
-                                transform: 'translateY(-2px)'
-                            },
-                            textTransform: 'none'
-                        }}
-                    >
-                        {loading ? 'Procesando...' : 'Aprobar Contribución'}
-                    </Button>
-                    <Box sx={{ display: 'flex', gap: 2 }}>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            disabled={!selectedContribution || loading}
-                            onClick={() => handleConfirmation('changes')}
-                            startIcon={<EditNoteIcon />}
-                            sx={{ 
-                                borderRadius: 3, 
-                                fontWeight: 'bold', 
-                                textTransform: 'none', 
-                                borderWidth: 2, 
-                                borderColor: 'text.secondary',
-                                color: 'text.primary',
-                                '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'action.hover' } 
-                            }}
-                        >
-                            Pedir Cambios
-                        </Button>
-                         <Button
-                            fullWidth
-                            variant="outlined"
-                            color="error"
-                            disabled={!selectedContribution || loading}
-                            onClick={() => handleConfirmation('reject')}
-                            startIcon={<DeleteIcon />}
-                            sx={{ 
-                                borderRadius: 3, 
-                                fontWeight: 'bold', 
-                                textTransform: 'none', 
-                                borderWidth: 2, 
-                                '&:hover': { borderWidth: 2, bgcolor: alpha(theme.palette.error.main, 0.08), transform: 'translateY(-1px)' } 
-                            }}
-                        >
-                            Rechazar
-                        </Button>
-                    </Box>
-                </Box>
-
-            </Paper>
         </Box>
+
+        {/* Review Modal */}
+        <ReviewContributionDialog 
+            open={!!selectedContribution}
+            contribution={selectedContribution}
+            onClose={() => setSelectedContributionId(null)}
+            onAction={handleConfirmation}
+            loading={loading}
+        />
 
 
 
@@ -640,8 +423,14 @@ const AdminModeration = () => {
             </DialogActions>
         </Dialog>
 
+        <HistoryDialog 
+            open={historyDialogOpen}
+            onClose={() => setHistoryDialogOpen(false)}
+            history={history}
+        />
+
     </Box>
-    </Box>
+
   );
 };
 

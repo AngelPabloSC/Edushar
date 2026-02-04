@@ -21,8 +21,24 @@ export const useAdminModeration = () => {
     });
     const [history, setHistory] = useState([]);
     const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+    const [filterType, setFilterType] = useState('all');
 
     // Derived state
+    const filteredContributions = contributions.filter(item => {
+        // Filter by search query
+        const matchesSearch = searchQuery.toLowerCase() === '' ||
+            (item.user?.name?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (item.data?.wordShuar?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            (item.data?.title_shuar?.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        // Filter by type
+        const matchesType = filterType === 'all' ||
+            (filterType === 'dictionary' && item.type === 'dictionary') ||
+            (filterType === 'story' && item.type === 'story');
+
+        return matchesSearch && matchesType;
+    });
+
     const selectedContribution = contributions.find(c => c.id === selectedContributionId);
 
     // Fetch Data
@@ -201,19 +217,22 @@ export const useAdminModeration = () => {
         searchQuery,
         selectedContribution,
         stats,
+        stats,
         contributions, // Now from API
+        filteredContributions,
+        filterType,
 
         // Dialog State
         isOpen,
         dialongContent,
         actionCallback,
-        stats,
         history,
         historyDialogOpen,
 
         // Setters
         setSelectedContributionId,
         setSearchQuery,
+        setFilterType,
         setHistoryDialogOpen,
 
         // Handlers

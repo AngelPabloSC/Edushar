@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { 
-    Box, 
-    Typography, 
-    Button, 
-    Paper, 
-    TextField, 
-    Select, 
-    MenuItem, 
-    IconButton, 
-    Tooltip, 
+import {
+    Box,
+    Typography,
+    Button,
+    Paper,
+    TextField,
+    Select,
+    MenuItem,
+    IconButton,
+    Tooltip,
     Fade,
     useTheme,
     alpha,
@@ -38,12 +38,12 @@ import StoryCard from '../../components/StoryCard';
 
 const AdminStories = () => {
     const theme = useTheme();
-    const navigate = useNavigate(); // Hook for navigation
-    const { 
-        data, 
-        activeTab, 
-        handleTabChange, 
-        searchQuery, 
+    const navigate = useNavigate();
+    const {
+        data,
+        activeTab,
+        handleTabChange,
+        searchQuery,
         setSearchQuery,
         handleDelete,
         loading,
@@ -52,7 +52,7 @@ const AdminStories = () => {
 
     const { handleSetDataSnackbar } = useSnackBarContext();
     const { isOpen, dialongContent, handleOpenDialog, handleCloseDialog, setDialongContent } = useDialong();
-    
+
     // Delete State
     const [deleteId, setDeleteId] = useState(null);
 
@@ -78,217 +78,314 @@ const AdminStories = () => {
     };
 
     return (
-        <Box sx={{ p: { xs: 2, md: 5 }, bgcolor: 'background.default', minHeight: '100vh' }}>
-             {/* Breadcrumbs - High Contrast */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
-                <Typography variant="body2" color="text.secondary" fontWeight={600} sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-                    Admin
-                </Typography>
-                <ChevronRightIcon sx={{ fontSize: 16, color: 'text.disabled' }} />
-                <Typography variant="body2" color="text.primary" fontWeight={700}>
-                    Gestión de Cuentos
-                </Typography>
-            </Box>
-
-            {/* Header */}
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'flex-start' }, justifyContent: 'space-between', gap: 2, mb: 6 }}>
+        <Box sx={{ p: { xs: 2, md: 5 }, minHeight: '100vh' }}>
+            {/* Header Section */}
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'flex-start' }, justifyContent: 'space-between', gap: 2, mb: 4 }}>
                 <Box>
-                    <Typography variant="h3" fontWeight={800} gutterBottom sx={{ color: '#111827', letterSpacing: '-0.03em' }}>
+                    <Typography variant="h3" fontWeight={900} gutterBottom sx={{ color: '#3E2723', letterSpacing: '-0.02em', fontSize: '2.5rem' }}>
                         Gestión de Cuentos
                     </Typography>
-                    <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, fontSize: '1.05rem', lineHeight: 1.6 }}>
+                    <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, fontSize: '1rem', lineHeight: 1.5 }}>
                         Administra el repositorio bilingüe de la comunidad Shuar. Crea y edita mitos, leyendas y fábulas.
                     </Typography>
                 </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-                <Tooltip title="Recargar datos">
-                    <IconButton
-                        onClick={handleReloadStories}
-                        sx={{ 
-                            borderRadius: 3,
-                            width: 44,
-                            height: 44,
-                            border: '1px solid',
-                            borderColor: 'divider',
-                            color: 'text.secondary',
-                            bgcolor: 'white',
-                            boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                            '&:hover': { 
-                                bgcolor: 'text.primary', 
-                                color: 'white',
-                                borderColor: 'text.primary',
-                                transform: 'rotate(180deg)',
-                                transition: 'all 0.3s ease'
-                            }
-                        }}
-                    >
-                        <RefreshIcon />
-                    </IconButton>
-                </Tooltip>
-                <Button 
-                    component={Link}
-                    to="/admin/cuentos/crear"
-                    variant="contained" 
-                    startIcon={<AddCircleIcon />}
-                    sx={{ 
-                        borderRadius: 3, 
-                        textTransform: 'none', 
-                        fontWeight: 800, 
-                        py: 1.5, px: 3,
-                        boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
-                        bgcolor: 'text.primary', // Dark brown from theme
-                        color: 'background.paper', // White
-                        '&:hover': { 
-                            bgcolor: 'text.secondary', 
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 6px 20px rgba(0,0,0,0.15)' 
-                        }
-                    }}
-                >
-                    Agregar Cuento
-                </Button>
-            </Box>
-        </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    {/* Refresh Button Grouped */}
+                    <Tooltip title="Recargar datos">
+                        <IconButton
+                            onClick={handleReloadStories}
+                            sx={{
+                                bgcolor: 'white',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                width: 44,
+                                height: 44,
+                                color: 'text.secondary',
+                                '&:hover': { bgcolor: 'action.hover', color: 'text.primary' }
+                            }}
+                        >
+                            <RefreshIcon />
+                        </IconButton>
+                    </Tooltip>
 
-             {/* Filters & Tabs - Enhanced with Don Norman's Principles */}
-             <Box sx={{ mb: 6, borderBottom: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', pb: 0 }}>
-                <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', flexWrap: 'wrap' }}>
-                    {['Todos', 'Mito', 'Leyenda', 'Naturaleza', 'Tradición', 'Fábula'].map((tab) => {
-                        const isActive = activeTab === tab;
-                        return (
-                             <Chip
-                                key={tab}
-                                label={tab}
-                                onClick={() => handleTabChange(tab)}
-                                sx={{ 
-                                    height: 36,
-                                    px: 1,
-                                    fontSize: '0.9rem',
-                                    fontWeight: isActive ? 800 : 600,
-                                    bgcolor: isActive ? 'text.primary' : 'transparent',
-                                    color: isActive ? 'background.paper' : 'text.secondary',
-                                    border: '2px solid',
-                                    borderColor: isActive ? 'text.primary' : 'divider',
-                                    borderRadius: 2,
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                    // Affordances - looks clickable
-                                    boxShadow: isActive ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
-                                    // Feedback - hover effects
-                                    '&:hover': { 
-                                        bgcolor: isActive ? 'text.secondary' : alpha(theme.palette.text.primary, 0.08),
-                                        borderColor: 'text.primary',
-                                        transform: 'translateY(-2px)',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.12)'
-                                    },
-                                    // Feedback - active state
-                                    '&:active': {
-                                        transform: 'translateY(0px)',
-                                        boxShadow: '0 1px 4px rgba(0,0,0,0.08)'
-                                    }
-                                }}
-                            />
-                        );
-                    })}
-                </Box>
-                {/* Visibility & Affordances - Clear filter button with tooltip */}
-                <Tooltip 
-                    title="Opciones de filtrado avanzado" 
-                    arrow 
-                    placement="left"
-                    TransitionComponent={Fade}
-                >
-                    <IconButton 
-                        sx={{ 
-                            display: { xs: 'none', md: 'flex' }, 
-                            mb: 0.5,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
-                            color: 'text.primary',
-                            border: '2px solid',
-                            borderColor: 'divider',
+                    <Button
+                        component={Link}
+                        to="/admin/cuentos/crear"
+                        variant="contained"
+                        startIcon={<AddCircleIcon />}
+                        sx={{
                             borderRadius: 2,
-                            transition: 'all 0.3s',
-                            // Feedback - hover effects
-                            '&:hover': { 
-                                bgcolor: 'text.primary',
-                                color: 'background.paper',
-                                borderColor: 'text.primary',
-                                transform: 'rotate(180deg)',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
-                            }
+                            textTransform: 'none',
+                            fontWeight: 700,
+                            height: 44,
+                            px: 3,
+                            bgcolor: '#3E2723', // Dark brown
+                            color: 'white',
+                            '&:hover': { bgcolor: '#2D1E1B' }
                         }}
-                        aria-label="Filtros avanzados"
                     >
-                        <FilterListIcon />
-                    </IconButton>
-                </Tooltip>
-             </Box>
+                        Agregar cuento
+                    </Button>
+                </Box>
+            </Box>
 
-             {/* Search Bar */}
-             <Paper elevation={0} sx={{ p: 0.5, mb: 4, display: 'flex', alignItems: 'center', width: { xs: '100%', md: 400 }, borderRadius: 3, border: '1px solid', borderColor: 'divider' }}>
-                <InputAdornment position="start" sx={{ pl: 2, mr: 1 }}>
-                    <SearchIcon color="action" />
-                </InputAdornment>
-                <TextField 
+            {/* Filters - Pill Style */}
+            <Box sx={{ mb: 4, display: 'flex', gap: 1.5, overflowX: 'auto', pb: 1 }}>
+                {['Todos', 'Mito', 'Leyenda', 'Naturaleza', 'Tradición', 'Fábula'].map((tab) => {
+                    const isActive = activeTab === tab;
+                    return (
+                        <Button
+                            key={tab}
+                            onClick={() => handleTabChange(tab)}
+                            variant={isActive ? "contained" : "outlined"}
+                            sx={{
+                                borderRadius: 3,
+                                textTransform: 'none',
+                                fontWeight: isActive ? 700 : 600,
+                                px: 3,
+                                py: 0.8,
+                                minWidth: 'auto',
+                                bgcolor: isActive ? '#3E2723' : 'white',
+                                color: isActive ? 'white' : 'text.secondary',
+                                border: isActive ? 'none' : '1px solid',
+                                borderColor: 'divider',
+                                boxShadow: isActive ? '0 4px 12px rgba(62, 39, 35, 0.2)' : 'none',
+                                '&:hover': {
+                                    bgcolor: isActive ? '#2D1E1B' : '#FAFAFA',
+                                    borderColor: 'text.primary',
+                                    color: isActive ? 'white' : 'text.primary'
+                                }
+                            }}
+                        >
+                            {tab}
+                        </Button>
+                    );
+                })}
+            </Box>
+
+            {/* Search Bar - Clean White */}
+            <Paper elevation={0} sx={{
+                p: '2px 4px',
+                display: 'flex',
+                alignItems: 'center',
+                width: { xs: '100%', md: 450 },
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                mb: 5,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+            }}>
+                <IconButton sx={{ p: '10px', color: 'text.secondary' }} aria-label="search">
+                    <SearchIcon />
+                </IconButton>
+                <TextField
                     fullWidth
                     placeholder="Buscar cuentos..."
                     variant="standard"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    InputProps={{ disableUnderline: true }}
+                    InputProps={{
+                        disableUnderline: true,
+                        sx: { fontSize: '0.95rem' }
+                    }}
                 />
-             </Paper>
+            </Paper>
 
 
-            {/* Content Grid */}
+            {/* Content Grid - Custom Cards */}
             {loading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 10 }}>
-                    <CircularProgress size={60} thickness={4} />
+                    <CircularProgress sx={{ color: '#3E2723' }} />
                 </Box>
             ) : (
                 <>
                     <Grid container spacing={3}>
                         {data.map((story) => (
-                            <Grid item xs={12} sm={6} lg={4} xl={3} key={story.id}>
-                                <StoryCard 
-                                    story={story} 
-                                    onEdit={handleEditClick} 
-                                    onDelete={handleDeleteClick} 
-                                />
+                            <Grid item xs={12} sm={6} lg={4} xl={3} key={story.id} sx={{ display: 'flex' }}>
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        borderRadius: 3,
+                                        overflow: 'hidden',
+                                        bgcolor: 'white',
+                                        transition: 'all 0.2s',
+                                        border: '1px solid',
+                                        borderColor: 'transparent',
+                                        height: '100%', // Enforce full height
+                                        display: 'flex', // Flex layout
+                                        flexDirection: 'column', // Column direction
+                                        '&:hover': {
+                                            transform: 'translateY(-4px)',
+                                            boxShadow: '0 12px 24px -10px rgba(0,0,0,0.1)',
+                                            borderColor: 'divider'
+                                        }
+                                    }}
+                                >
+                                    <Box sx={{
+                                        position: 'relative',
+                                        width: '100%',
+                                        height: 220, // Fixed height strictly enforced
+                                        bgcolor: '#EAEAEA', // Placeholder Gray
+                                        overflow: 'hidden',
+                                        flexShrink: 0 // Prevent shrinking
+                                    }}>
+                                        <Box
+                                            component="img"
+                                            src={story.cover}
+                                            alt={story.title?.es}
+                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                            sx={{
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                display: story.cover ? 'block' : 'none'
+                                            }}
+                                        />
+
+                                        {/* Status Badges Overlay */}
+                                        <Box sx={{ position: 'absolute', top: 16, left: 16, display: 'flex', gap: 1, zIndex: 1 }}>
+                                            <Chip
+                                                label={story.category.toUpperCase()}
+                                                size="small"
+                                                sx={{
+                                                    height: 24,
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: 800,
+                                                    bgcolor: '#D7CCC8', // Light Brown
+                                                    color: '#5D4037', // Dark Brown Text
+                                                    borderRadius: 1
+                                                }}
+                                            />
+                                            <Chip
+                                                label="PUBLICADO"
+                                                size="small"
+                                                sx={{
+                                                    height: 24,
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: 800,
+                                                    bgcolor: '#2ECC71', // Bright Green
+                                                    color: 'white',
+                                                    borderRadius: 1
+                                                }}
+                                            />
+                                        </Box>
+
+                                        {/* Options Menu Button (Mock) */}
+                                        <IconButton
+                                            size="small"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 12,
+                                                right: 12,
+                                                bgcolor: 'white',
+                                                width: 32,
+                                                height: 32,
+                                                '&:hover': { bgcolor: '#F5F5F5' }
+                                            }}
+                                        >
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                                                <Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: 'text.secondary' }} />
+                                                <Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: 'text.secondary' }} />
+                                                <Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: 'text.secondary' }} />
+                                            </Box>
+                                        </IconButton>
+                                    </Box>
+
+                                    {/* Card Content */}
+                                    <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                                        <Typography variant="h6" fontWeight={800} sx={{ lineHeight: 1.2, mb: 0.5, color: '#2D3436' }}>
+                                            {story.title?.es || 'Título en español'}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: '#00B894', fontWeight: 600, fontStyle: 'italic', mb: 2 }}>
+                                            Shuar / Español
+                                        </Typography>
+
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+                                            <Box sx={{ color: '#E67E22', display: 'flex' }}>
+                                                {/* Simple Person Icon */}
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                                </svg>
+                                            </Box>
+                                            <Typography variant="caption" color="text.secondary" fontWeight={500}>
+                                                {story.author || 'Nombre del autor'}
+                                            </Typography>
+                                        </Box>
+
+                                        {/* Card Actions - Pushed to Bottom */}
+                                        <Box sx={{ display: 'flex', gap: 1.5, mt: 'auto' }}>
+                                            <Button
+                                                fullWidth
+                                                variant="contained"
+                                                onClick={() => handleEditClick(story)}
+                                                startIcon={<Box component="span" sx={{ fontSize: 16 }}>✎</Box>}
+                                                sx={{
+                                                    bgcolor: '#3E2723',
+                                                    color: 'white',
+                                                    boxShadow: 'none',
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    borderRadius: 2,
+                                                    py: 1,
+                                                    '&:hover': { bgcolor: '#2D1E1B', boxShadow: 'none' }
+                                                }}
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                fullWidth
+                                                variant="contained"
+                                                onClick={() => handleDeleteClick(story.id)}
+                                                startIcon={<Box component="span" sx={{ fontSize: 16 }}>🗑️</Box>}
+                                                sx={{
+                                                    bgcolor: '#F5F5F5',
+                                                    color: 'text.secondary',
+                                                    boxShadow: 'none',
+                                                    textTransform: 'none',
+                                                    fontWeight: 700,
+                                                    borderRadius: 2,
+                                                    py: 1,
+                                                    '&:hover': { bgcolor: '#EEEEEE', boxShadow: 'none' }
+                                                }}
+                                            >
+                                                Borrar
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </Paper>
                             </Grid>
                         ))}
                     </Grid>
-                    
+
                     {data.length === 0 && (
                         <Box sx={{ py: 10, textAlign: 'center' }}>
-                             <PendingIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
-                             <Typography color="text.secondary" fontWeight={500}>
-                                 No se encontraron cuentos con estos criterios.
-                             </Typography>
+                            <Typography color="text.secondary" fontWeight={500}>
+                                No se encontraron cuentos con estos criterios.
+                            </Typography>
                         </Box>
                     )}
                 </>
             )}
 
             {/* Delete Confirmation Dialog */}
-            <Dialog 
-                open={isOpen} 
+            <Dialog
+                open={isOpen}
                 onClose={handleCloseDialog}
-                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+                PaperProps={{ sx: { borderRadius: 3, p: 2, maxWidth: 400 } }}
             >
-                <DialogTitle sx={{ fontWeight: 'bold' }}>{dialongContent.title}</DialogTitle>
+                <DialogTitle sx={{ fontWeight: '900', textAlign: 'center' }}>{dialongContent.title}</DialogTitle>
                 <DialogContent>
-                    <Typography color="text.secondary">
+                    <Typography color="text.secondary" textAlign="center">
                         {dialongContent.message}
                     </Typography>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                <DialogActions sx={{ justifyContent: 'center', pb: 2, gap: 2 }}>
+                    <Button onClick={handleCloseDialog} variant="outlined" sx={{ borderRadius: 2, fontWeight: 'bold', color: 'text.secondary', borderColor: 'divider' }}>
                         Cancelar
                     </Button>
-                    <Button 
-                        onClick={handleConfirmDelete} 
-                        variant="contained" 
+                    <Button
+                        onClick={handleConfirmDelete}
+                        variant="contained"
                         color={dialongContent.color || 'error'}
                         sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
                         autoFocus

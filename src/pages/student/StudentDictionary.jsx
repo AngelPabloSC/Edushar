@@ -21,8 +21,9 @@ import ForestIcon from '@mui/icons-material/Forest';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import PetsIcon from '@mui/icons-material/Pets';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
-import DictionaryCard from '../../components/DictionaryCard';
+import DictionaryGridCard from '../../components/DictionaryGridCard';
 import { usePublicDictionary } from '../../hooks/pages/usePublicDictionary';
+
 
 /**
  * Página del Diccionario Bilingüe Shuar-Español
@@ -217,14 +218,13 @@ const StudentDictionary = () => {
           <Grid container spacing={3}>
             {loading ? (
                  // Loading Skeletons
-                 Array.from(new Array(5)).map((_, index) => (
-                  <Grid key={index} size={{ xs: 12 }}>
-                     <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2, display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
-                       <Skeleton variant="rectangular" width="100%" height={200} sx={{ maxWidth: { md: 280 } }} />
-                       <Box sx={{ p: 3, flex: 1 }}>
-                         <Skeleton variant="text" height={40} width="60%" />
-                         <Skeleton variant="text" height={24} width="40%" />
-                         <Skeleton variant="rectangular" height={80} sx={{ mt: 2, borderRadius: 1 }} />
+                 Array.from(new Array(6)).map((_, index) => (
+                  <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                     <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
+                       <Skeleton variant="rectangular" height={200} />
+                       <Box sx={{ p: 2 }}>
+                         <Skeleton variant="text" height={32} width="80%" />
+                         <Skeleton variant="text" height={20} width="60%" />
                        </Box>
                      </Paper>
                   </Grid>
@@ -252,8 +252,8 @@ const StudentDictionary = () => {
                 </Grid>
             ) : (
                 paginatedEntries.map((entry) => (
-                <Grid key={entry.id} size={{ xs: 12 }}>
-                    <DictionaryCard entry={entry} />
+                <Grid key={entry.id} size={{ xs: 12, sm: 6, md: 4 }}>
+                    <DictionaryGridCard entry={entry} />
                 </Grid>
                 ))
             )}

@@ -163,6 +163,12 @@ export const useRegister = () => {
     const handleRegisterSubmit = useCallback(async (e) => {
         e.preventDefault();
 
+        // Prevenir múltiples envíos
+        if (isLoading) {
+            console.warn('⚠️ Registro ya en proceso, ignorando clic duplicado');
+            return;
+        }
+
         // Validate all fields
         const fieldsConfig = {
             firstName: {

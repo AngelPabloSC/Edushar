@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from '@mui/material';
 import { useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
@@ -52,6 +53,7 @@ const StudentContributions = () => {
     contributions,
     recentContributions,
     loading,
+    isSubmitting,
     isOpen,
     dialongContent,
     actionCallback,
@@ -452,7 +454,8 @@ const StudentContributions = () => {
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<SendIcon />}
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
                 onClick={handleSubmit}
                 sx={{
                   bgcolor: 'secondary.main',
@@ -467,10 +470,14 @@ const StudentContributions = () => {
                     transform: 'translateY(-2px)',
                     boxShadow: 4,
                   },
+                  '&:disabled': {
+                    bgcolor: 'action.disabledBackground',
+                    color: 'action.disabled',
+                  },
                   transition: 'all 0.3s',
                 }}
               >
-                Enviar Contribución
+                {isSubmitting ? 'Enviando...' : 'Enviar Contribución'}
               </Button>
             </Box>
           </Paper>

@@ -16,6 +16,7 @@ import {
     DialogContent,
     DialogActions,
     InputLabel,
+    CircularProgress,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import PublishIcon from '@mui/icons-material/Publish';
@@ -42,6 +43,8 @@ const AdminDictionaryEditor = () => {
     const { getFechData } = useFetchDataPromise();
     
     const fileInputRef = useRef(null);
+    const [isSaving, setIsSaving] = useState(false);
+    const isSavingRef = useRef(false);
 
     const [pendingAction, setPendingAction] = useState(null);
     const [formData, setFormData] = useState({
@@ -120,6 +123,15 @@ const AdminDictionaryEditor = () => {
     };
 
     const performSave = async () => {
+        // Prevenir múltiples envíos
+        if (isSavingRef.current) {
+            console.warn('⚠️ Guardado ya en proceso, ignorando clic duplicado');
+            return;
+        }
+
+        isSavingRef.current = true;
+        setIsSaving(true);
+
         const payload = {
             wordShuar: formData.wordShuar,
             wordSpanish: formData.wordSpanish,
@@ -150,6 +162,9 @@ const AdminDictionaryEditor = () => {
             }
         } catch (error) {
              handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+        } finally {
+            isSavingRef.current = false;
+            setIsSaving(false);
         }
         
         handleCloseDialog();
@@ -205,16 +220,20 @@ const AdminDictionaryEditor = () => {
             <Button
                 variant="contained"
                 onClick={handlePublishClick}
-                startIcon={<PublishIcon />}
-                disabled={!formData.wordShuar || !formData.wordSpanish || !formData.category}
+                disabled={!formData.wordShuar || !formData.wordSpanish || !formData.category || isSaving}
+                startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : <PublishIcon />}
                 sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'secondary.main', color: 'white',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' }
+                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' },
+                    '&:disabled': {
+                        bgcolor: 'action.disabledBackground',
+                        color: 'action.disabled',
+                    }
                 }}
             >
-                Guardar Palabra
+                {isSaving ? 'Guardando...' : 'Guardar Palabra'}
             </Button>
         </>
     );
@@ -389,12 +408,23 @@ const AdminDictionaryEditor = () => {
                     </Button>
                     <Button
                         onClick={handleConfirmAction}
+                        disabled={isSaving}
                         variant="contained"
                         color={dialongContent.color || 'primary'}
-                        sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
+                        startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : null}
+                        sx={{ 
+                            borderRadius: 2, 
+                            fontWeight: 'bold', 
+                            px: 3, 
+                            boxShadow: 'none',
+                            '&:disabled': {
+                                bgcolor: 'action.disabledBackground',
+                                color: 'action.disabled',
+                            }
+                        }}
                         autoFocus
                     >
-                        {dialongContent.confirmText || 'Confirmar'}
+                        {isSaving ? 'Guardando...' : (dialongContent.confirmText || 'Confirmar')}
                     </Button>
                 </DialogActions>
             </Dialog>

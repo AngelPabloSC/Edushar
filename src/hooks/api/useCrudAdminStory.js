@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useFetchDataPromise } from './useFetchDataPromise';
 
 /**
@@ -34,6 +34,10 @@ export const useCrudAdminStory = () => {
     const [createLoading, setCreateLoading] = useState(false);
     const [updateLoading, setUpdateLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
+
+    // Refs for duplicate prevention
+    const isCreatingRef = useRef(false);
+    const isUpdatingRef = useRef(false);
 
     // ========== FETCH ALL STORIES ==========
     const fetchStories = useCallback(async (page = 1, limit = 1000) => {
@@ -134,7 +138,14 @@ export const useCrudAdminStory = () => {
 
     // ========== CREATE STORY ==========
     const createStory = async (storyDataToCreate) => {
+        // Prevenir múltiples envíos
+        if (isCreatingRef.current) {
+            console.warn('⚠️ Creación de historia ya en proceso, ignorando clic duplicado');
+            return { success: false, error: 'Operación en proceso' };
+        }
+
         try {
+            isCreatingRef.current = true;
             setCreateLoading(true);
 
             if (!storyDataToCreate.titleShuar || !storyDataToCreate.titleEs || !storyDataToCreate.category) {
@@ -161,13 +172,21 @@ export const useCrudAdminStory = () => {
             console.error('Error creating story:', err);
             return { success: false, error: err.message };
         } finally {
+            isCreatingRef.current = false;
             setCreateLoading(false);
         }
     };
 
     // ========== UPDATE STORY ==========
     const updateStory = async (storyId, storyDataToUpdate) => {
+        // Prevenir múltiples envíos
+        if (isUpdatingRef.current) {
+            console.warn('⚠️ Actualización de historia ya en proceso, ignorando clic duplicado');
+            return { success: false, error: 'Operación en proceso' };
+        }
+
         try {
+            isUpdatingRef.current = true;
             setUpdateLoading(true);
 
             if (!storyId) {
@@ -210,6 +229,7 @@ export const useCrudAdminStory = () => {
                 error: err.message
             };
         } finally {
+            isUpdatingRef.current = false;
             setUpdateLoading(false);
         }
     };

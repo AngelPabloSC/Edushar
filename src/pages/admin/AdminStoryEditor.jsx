@@ -19,7 +19,8 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    CircularProgress,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
@@ -202,11 +203,16 @@ const AdminStoryEditor = () => {
                 variant="outlined"
                 onClick={handleSaveClick}
                 disabled={createLoading || updateLoading}
+                startIcon={createLoading || updateLoading ? <CircularProgress size={16} color="inherit" /> : <SaveIcon />}
                 sx={{
                     borderRadius: 3, px: 4, py: 1, fontWeight: 700,
                     borderColor: 'text.primary', color: 'text.primary',
                     borderWidth: 2,
-                    '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'transparent' }
+                    '&:hover': { borderWidth: 2, borderColor: 'text.primary', bgcolor: 'transparent' },
+                    '&:disabled': {
+                        borderColor: 'action.disabledBackground',
+                        color: 'action.disabled',
+                    }
                 }}
             >
                 {createLoading || updateLoading ? 'Guardando...' : 'Guardar Borrador'}
@@ -215,12 +221,16 @@ const AdminStoryEditor = () => {
                 variant="contained"
                 onClick={handlePublishClick}
                 disabled={createLoading || updateLoading}
-                startIcon={<PublishIcon />}
+                startIcon={createLoading || updateLoading ? <CircularProgress size={20} color="inherit" /> : <PublishIcon />}
                 sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'secondary.main', color: 'white',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' }
+                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' },
+                    '&:disabled': {
+                        bgcolor: 'action.disabledBackground',
+                        color: 'action.disabled',
+                    }
                 }}
             >
                 {createLoading || updateLoading ? 'Publicando...' : 'Publicar Cuento'}
@@ -456,12 +466,23 @@ const AdminStoryEditor = () => {
                     </Button>
                     <Button
                         onClick={handleConfirmAction}
+                        disabled={createLoading || updateLoading}
                         variant="contained"
                         color={dialongContent.color || 'primary'}
-                        sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
+                        startIcon={createLoading || updateLoading ? <CircularProgress size={20} color="inherit" /> : null}
+                        sx={{ 
+                            borderRadius: 2, 
+                            fontWeight: 'bold', 
+                            px: 3, 
+                            boxShadow: 'none',
+                            '&:disabled': {
+                                bgcolor: 'action.disabledBackground',
+                                color: 'action.disabled',
+                            }
+                        }}
                         autoFocus
                     >
-                        {dialongContent.confirmText || 'Confirmar'}
+                        {createLoading || updateLoading ? 'Procesando...' : (dialongContent.confirmText || 'Confirmar')}
                     </Button>
                 </DialogActions>
             </Dialog>

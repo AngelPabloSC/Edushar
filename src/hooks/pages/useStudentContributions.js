@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/LoginContext';
 import { useFetchDataPromise } from '../api/useFetchDataPromise';
 import { useDialong } from '../ui/useDialog';
@@ -18,6 +18,8 @@ export const useStudentContributions = () => {
     const [storyLangTab, setStoryLangTab] = useState(0);
     const [contributions, setContributions] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = useRef(false);
 
     const [formData, setFormData] = useState({
         // Word fields
@@ -142,11 +144,20 @@ export const useStudentContributions = () => {
     };
 
     const handleSubmitDictionary = async () => {
+        // Prevenir múltiples envíos
+        if (isSubmittingRef.current) {
+            console.warn('⚠️ Envío ya en proceso, ignorando clic duplicado');
+            return;
+        }
+
         if (!user) {
             handleSetDataSnackbar({ message: 'Error: Debes iniciar sesión para contribuir.', type: 'error' });
             handleCloseDialog();
             return;
         }
+
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
 
         try {
             const payload = {
@@ -193,17 +204,29 @@ export const useStudentContributions = () => {
         } catch (error) {
             console.error('Error submitting dictionary:', error);
             handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
         }
 
         handleCloseDialog();
     };
 
     const handleSubmitStory = async () => {
+        // Prevenir múltiples envíos
+        if (isSubmittingRef.current) {
+            console.warn('⚠️ Envío ya en proceso, ignorando clic duplicado');
+            return;
+        }
+
         if (!user) {
             handleSetDataSnackbar({ message: 'Error: Debes iniciar sesión para contribuir.', type: 'error' });
             handleCloseDialog();
             return;
         }
+
+        isSubmittingRef.current = true;
+        setIsSubmitting(true);
 
         try {
             const payload = {
@@ -252,6 +275,9 @@ export const useStudentContributions = () => {
         } catch (error) {
             console.error('Error submitting story:', error);
             handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+        } finally {
+            isSubmittingRef.current = false;
+            setIsSubmitting(false);
         }
 
         handleCloseDialog();
@@ -300,6 +326,7 @@ export const useStudentContributions = () => {
         contributions,
         recentContributions: contributions.slice(0, 5),
         loading,
+        isSubmitting,
         isOpen,
         dialongContent,
         actionCallback,

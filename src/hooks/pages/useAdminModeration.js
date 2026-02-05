@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useDialong } from '../ui/useDialog';
 import { useSnackBarContext } from '../context/SnackbarContext';
 import { useFetchDataPromise } from '../api/useFetchDataPromise';
@@ -11,6 +11,8 @@ export const useAdminModeration = () => {
     // State
     const [actionCallback, setActionCallback] = useState(null);
     const [loading, setLoading] = useState(true); // Start loading true
+    const [isProcessing, setIsProcessing] = useState(false);
+    const isProcessingRef = useRef(false);
     const [selectedContributionId, setSelectedContributionId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [contributions, setContributions] = useState([]);
@@ -143,7 +145,16 @@ export const useAdminModeration = () => {
 
     // Handlers
     const handleAction = async (actionType) => {
+        // Prevenir múltiples acciones simultáneas
+        if (isProcessingRef.current) {
+            console.warn('⚠️ Acción ya en proceso, ignorando clic duplicado');
+            return;
+        }
+
+        isProcessingRef.current = true;
+        setIsProcessing(true);
         setLoading(true);
+
         try {
             const endPoint = actionType === 'approve'
                 ? 'api/contributions/approve'
@@ -174,6 +185,8 @@ export const useAdminModeration = () => {
             handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
         } finally {
             setLoading(false);
+            isProcessingRef.current = false;
+            setIsProcessing(false);
         }
     };
 
@@ -213,6 +226,7 @@ export const useAdminModeration = () => {
     return {
         // State
         loading,
+        isProcessing,
         selectedContributionId,
         searchQuery,
         selectedContribution,

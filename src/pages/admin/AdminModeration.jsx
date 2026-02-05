@@ -41,6 +41,7 @@ const AdminModeration = () => {
     const {
         // State
         loading,
+        isProcessing,
         selectedContributionId,
         searchQuery,
         selectedContribution,
@@ -422,18 +423,24 @@ const AdminModeration = () => {
                     </Button>
                     <Button
                         onClick={actionCallback}
+                        disabled={isProcessing}
                         variant="contained"
                         color={dialongContent.color || 'primary'}
+                        startIcon={isProcessing ? <CircularProgress size={20} color="inherit" /> : null}
                         sx={{
                             borderRadius: 3,
                             fontWeight: 'bold',
                             px: 4,
                             boxShadow: 4,
-                            color: 'white'
+                            color: 'white',
+                            '&:disabled': {
+                                bgcolor: 'action.disabledBackground',
+                                color: 'action.disabled',
+                            }
                         }}
                         autoFocus
                     >
-                        {dialongContent.confirmText || 'Confirmar'}
+                        {isProcessing ? 'Procesando...' : (dialongContent.confirmText || 'Confirmar')}
                     </Button>
                 </DialogActions>
             </Dialog>

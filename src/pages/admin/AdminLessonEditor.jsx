@@ -21,7 +21,8 @@ import {
     Chip,
     Accordion,
     AccordionSummary,
-    AccordionDetails
+    AccordionDetails,
+    CircularProgress,
 } from '@mui/material';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
@@ -34,6 +35,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ErrorIcon from '@mui/icons-material/Error';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import PublishIcon from '@mui/icons-material/Publish';
 import EditorHeader from '../../components/EditorHeader';
 import EditorFooter from '../../components/EditorFooter';
 import PageHeader from '../../components/PageHeader';
@@ -180,10 +182,15 @@ const AdminLessonEditor = () => {
             <Button
                 variant="outlined"
                 onClick={handleBack}
+                disabled={createLoading || updateLoading}
                 sx={{
                     borderRadius: 3, px: 3, py: 1, fontWeight: 700,
                     color: 'text.secondary', borderColor: 'divider',
-                    '&:hover': { borderColor: 'text.secondary', bgcolor: 'transparent' }
+                    '&:hover': { borderColor: 'text.secondary', bgcolor: 'transparent' },
+                    '&:disabled': {
+                        borderColor: 'action.disabledBackground',
+                        color: 'action.disabled',
+                    }
                 }}
             >
                 Cancelar
@@ -191,14 +198,20 @@ const AdminLessonEditor = () => {
             <Button
                 variant="contained"
                 onClick={handlePublishClick}
+                disabled={createLoading || updateLoading}
+                startIcon={createLoading || updateLoading ? <CircularProgress size={20} color="inherit" /> : <PublishIcon />}
                 sx={{
                     borderRadius: 3, px: 5, py: 1, fontWeight: 800,
                     bgcolor: 'text.primary', color: 'white',
                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' }
+                    '&:hover': { bgcolor: 'secondary.dark', transform: 'translateY(-2px)' },
+                    '&:disabled': {
+                        bgcolor: 'action.disabledBackground',
+                        color: 'action.disabled',
+                    }
                 }}
             >
-                Publicar Lección
+                {createLoading || updateLoading ? (isEditMode ? 'Guardando...' : 'Publicando...') : 'Publicar Lección'}
             </Button>
         </Box>
     );
@@ -755,17 +768,32 @@ const AdminLessonEditor = () => {
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                    <Button 
+                        onClick={handleCloseDialog} 
+                        disabled={createLoading || updateLoading}
+                        sx={{ fontWeight: 'bold', color: 'text.secondary' }}
+                    >
                         Cancelar
                     </Button>
                     <Button
                         onClick={handleConfirmAction}
+                        disabled={createLoading || updateLoading}
                         variant="contained"
                         color={dialongContent.color || 'primary'}
-                        sx={{ borderRadius: 2, fontWeight: 'bold', px: 3, boxShadow: 'none' }}
+                        startIcon={createLoading || updateLoading ? <CircularProgress size={20} color="inherit" /> : null}
+                        sx={{ 
+                            borderRadius: 2, 
+                            fontWeight: 'bold', 
+                            px: 3, 
+                            boxShadow: 'none',
+                            '&:disabled': {
+                                bgcolor: 'action.disabledBackground',
+                                color: 'action.disabled',
+                            }
+                        }}
                         autoFocus
                     >
-                        {dialongContent.confirmText || 'Confirmar'}
+                        {createLoading || updateLoading ? 'Procesando...' : (dialongContent.confirmText || 'Confirmar')}
                     </Button>
                 </DialogActions>
             </Dialog>

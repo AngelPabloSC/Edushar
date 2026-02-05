@@ -1,540 +1,281 @@
-import { Box, Container, Typography, Grid, Card, CardContent, CardMedia, CardActionArea, Chip, Tooltip, TextField, InputAdornment, LinearProgress, Paper, Button, Skeleton } from '@mui/material';
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Grid, 
+  Card, 
+  CardContent, 
+  CardMedia, 
+  CardActionArea, 
+  Chip, 
+  Tooltip, 
+  TextField, 
+  FormControl,
+  Select,
+  MenuItem,
+  Button,
+  Stack,
+  Skeleton,
+  alpha,
+  useTheme
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
-import LockIcon from '@mui/icons-material/Lock';
-import SearchIcon from '@mui/icons-material/Search';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import { useState, useEffect } from 'react';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState, useMemo } from 'react';
+import LoadingLesson from '../../components/LoadingLesson';
 
 /**
- * Dashboard del estudiante - Muestra todas las lecciones disponibles
- * Sigue principios de Don Norman y design_guide.md
+ * Dashboard del estudiante - EduShar Lab
+ * Diseño mejorado con filtrado avanzado y estética "Lab"
  */
 const StudentDashboard = () => {
   const navigate = useNavigate();
-  // Use custom hook for data
+  const theme = useTheme();
+  
+  // Custom hook data
   const { 
-    lessonsByLevel, 
-    globalStats, 
+    lessonsByLevel, // Object: { 'Nivel 1...': [lessons], ... }
     loading, 
-    error,
     searchQuery, 
     setSearchQuery 
   } = useStudentLessons();
 
-  const handleLessonClick = (lessonId, isLocked) => {
-    if (!isLocked) {
-      navigate(`/leccion/${lessonId}`);
-    }
+  // Local state for UI filters & Loading Screen
+  const [selectedLevel, setSelectedLevel] = useState('all');
+  const [loadingCustom, setLoadingCustom] = useState(false);
+
+  // Allow access to ALL lessons (unlocked)
+  const handleLessonClick = (lessonId) => {
+    // Simulating loading screen before navigation (optional, or just for search?)
+    // User requested: "when the user searches the story... this new page loads"
+    // So we apply it on search action mainly.
+    // For navigation, let's keep it direct for now unless requested.
+    navigate(`/leccion/${lessonId}`);
   };
 
-  // Helper to get status string if needed (though we have booleans)
-  const getLessonStatus = (lesson) => {
-    return lesson.status; // 'locked', 'available', 'in-progress', 'completed'
+  const getLessonStatus = (lesson) => lesson.status;
+
+  // Filter logic: Filter the lessonsByLevel object based on selectedLevel
+  const filteredLessonsByLevel = useMemo(() => {
+    if (selectedLevel === 'all') return lessonsByLevel;
+
+    const filtered = {};
+    Object.entries(lessonsByLevel).forEach(([key, lessons]) => {
+      const lowerKey = key.toLowerCase();
+      if (selectedLevel === 'principiante' && (lowerKey.includes('nivel 1') || lowerKey.includes('principiante'))) {
+        filtered[key] = lessons;
+      } else if (selectedLevel === 'intermedio' && (lowerKey.includes('nivel 2') || lowerKey.includes('intermedio'))) {
+        filtered[key] = lessons;
+      } else if (selectedLevel === 'avanzado' && (lowerKey.includes('nivel 3') || lowerKey.includes('avanzado'))) {
+        filtered[key] = lessons;
+      }
+    });
+    return filtered;
+
+  }, [lessonsByLevel, selectedLevel]);
+
+  // Tags for quick search
+  const tags = [
+    { label: '🌿 Naturaleza', value: 'naturaleza' },
+    { label: '🏹 Caza', value: 'caza' },
+    { label: '🧶 Artesanía', value: 'artesanía' },
+    { label: '🏠 Hogar', value: 'hogar' }
+  ];
+
+  const handleTagClick = (val) => {
+    setSearchQuery(val);
+    handleSearchAction(); // Trigger loading on tag click too
   };
+
+  const handleSearchAction = () => {
+     setLoadingCustom(true);
+  };
+
+  if (loadingCustom) {
+      return (
+        <LoadingLesson 
+            onCancel={() => setLoadingCustom(false)} 
+            query={searchQuery}
+            setQuery={setSearchQuery}
+            lessonsByLevel={lessonsByLevel}
+        />
+      );
+  }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
-      {/* Header Section */}
-      <Box sx={{ mb: 6 }}>
-        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-end' }, gap: 3, mb: 4 }}>
-          <Box sx={{ maxWidth: 720, width: '100%' }}>
-            <Typography
-              variant="h2"
-              component="h1"
-              gutterBottom
-              sx={{
-                fontWeight: 900,
-                fontSize: { xs: '2rem', md: '2.75rem' },
-                color: 'text.primary',
-                letterSpacing: '-0.02em',
-              }}
-            >
-              Mis Lecciones
-            </Typography>
-            <Typography
-              variant="h6"
-              color="text.secondary"
-              sx={{
-                fontSize: { xs: '1rem', md: '1.125rem' },
-                fontWeight: 400,
-              }}
-            >
-              Continúa tu camino de aprendizaje del idioma Shuar. ¡Estás progresando muy bien!
-            </Typography>
-          </Box>
-
-          {/* Barra de Búsqueda */}
-          <Box sx={{ minWidth: { xs: '100%', md: 300 } }}>
-            <TextField
-              fullWidth
-              placeholder="Buscar lecciones..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ color: 'text.secondary' }} />
-                  </InputAdornment>
-                ),
-              }}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                  bgcolor: 'background.paper',
-                  boxShadow: 1,
-                  transition: 'all 0.3s',
-                  '&:hover': {
-                    boxShadow: 2,
-                  },
-                  '&.Mui-focused': {
-                    boxShadow: 3,
-                    '& fieldset': {
-                      borderColor: 'secondary.main',
-                      borderWidth: 2,
-                    },
-                  },
-                },
-              }}
+      
+      {/* --- HERO SECTION --- */}
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        textAlign: 'center', 
+        mb: 8, 
+        pt: 4 
+      }}>
+        {/* Floating Image */}
+        <Box sx={{ position: 'relative', width: 220, height: 220, mb: 4, '&:hover .main-img': { transform: 'scale(1.1)' } }}>
+            <Box sx={{ 
+                position: 'absolute', inset: 0, 
+                bgcolor: alpha(theme.palette.primary.main, 0.2), 
+                filter: 'blur(40px)', borderRadius: '50%', transform: 'scale(1.2)' 
+            }} />
+            <Box 
+                component="img" 
+                className="main-img"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAClquaYuHeJ2AgLFuWkxjioewQw0sDZlfNwKEuPCxsHoSgH_JpeIiQmiC63pncP9O4DBMjzuks41-HaGYXlfdmsXyKg5amlFFImvm5jRZfU805KYx3KmzJtmGR_rl7IPVXi0AYt0NABpARa2r6PU6CRrRyFII4aDNk052aM74Clet_eVGL9HRSY0cTFqNW9lbD0srj1VnXWcYftn8mwlIpJBX9vGD51mnfT0PBU3oA64-Y_TLzLloMYsrwja4OyPkPoFepfsRGTvn-"
+                alt="EduShar Lab Icon"
+                sx={{ 
+                    position: 'relative', zIndex: 1, width: '100%', height: '100%', objectFit: 'contain', 
+                    borderRadius: 8, transition: 'transform 0.5s ease', dropShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
+                }}
             />
-          </Box>
-        </Box>
-
-        {/* Widget de Progreso Global */}
-        {loading ? (
-          <Skeleton variant="rectangular" height={100} sx={{ borderRadius: 4 }} animation="wave" />
-        ) : (
-          <Paper
-            elevation={0}
-            sx={{
-              p: 3,
-              borderRadius: 2,
-              bgcolor: 'background.paper',
-              border: '1px solid',
-              borderColor: 'divider',
-              boxShadow: 1,
-            }}
-          >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 2 }}>
-              <Box>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
-                  Progreso General
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Has completado {globalStats.completed} de {globalStats.total} lecciones
-                </Typography>
-              </Box>
-              <Typography variant="h5" fontWeight="bold" color="secondary.main">
-                {globalStats.percentage}%
-              </Typography>
+             <Box sx={{ 
+                position: 'absolute', top: -10, right: -10, zIndex: 2, 
+                bgcolor: 'background.paper', p: 1, borderRadius: 3, boxShadow: 3,
+                border: '1px solid', borderColor: 'divider',
+                animation: 'float 3s ease-in-out infinite'
+            }}>
+                <AutoAwesomeIcon color="primary" />
             </Box>
-            <LinearProgress
-              variant="determinate"
-              value={globalStats.percentage}
-              sx={{
-                height: 12,
-                borderRadius: 10,
-                bgcolor: 'rgba(0, 0, 0, 0.05)',
-                '& .MuiLinearProgress-bar': {
-                  borderRadius: 10,
-                  bgcolor: 'secondary.main',
-                },
-              }}
-            />
-          </Paper>
-        )}
-      </Box>
-
-      {/* Mensaje si no hay resultados */}
-      {!loading && Object.keys(lessonsByLevel).length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h5" color="text.secondary" gutterBottom>
-            No se encontraron lecciones
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Intenta con otros términos de búsqueda
-          </Typography>
         </Box>
-      )}
 
-      {/* Lecciones por Nivel Skeleton Loading */}
-      {loading && (
-        <Box sx={{ mb: 8 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-            <Skeleton variant="rounded" width={40} height={40} animation="wave" />
-            <Skeleton variant="text" width={300} height={40} animation="wave" />
-          </Box>
-          <Grid container spacing={{ xs: 3, md: 4 }}>
-            {[1, 2, 3].map((item) => (
-              <Grid key={item} size={{ xs: 12, sm: 6, md: 4 }}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderRadius: 2,
-                    border: '1px solid',
-                    borderColor: 'divider'
-                  }}
-                >
-                  <Skeleton variant="rectangular" height={192} animation="wave" />
-                  <CardContent sx={{ p: 3 }}>
-                    <Skeleton variant="text" height={32} width="80%" sx={{ mb: 2 }} animation="wave" />
-                    <Skeleton variant="text" height={20} width="100%" animation="wave" />
-                    <Skeleton variant="text" height={20} width="60%" sx={{ mb: 3 }} animation="wave" />
-                    <Skeleton variant="rectangular" height={40} sx={{ borderRadius: 1 }} animation="wave" />
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
+        <Typography variant="h1" sx={{ 
+            fontSize: { xs: '3rem', md: '4.5rem' }, 
+            fontWeight: 900, 
+            mb: 3, 
+            letterSpacing: '-0.03em',
+            background: `linear-gradient(45deg, ${theme.palette.text.primary} 30%, ${theme.palette.primary.main} 90%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+        }}>
+            EduShar Lab
+        </Typography>
 
-      {/* Lecciones por Nivel Data */}
-      {!loading && Object.entries(lessonsByLevel).map(([levelName, lessons]) => (
-        <Box key={levelName} sx={{ mb: 8 }}>
-          {/* Título del Nivel */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
-            <Box
-              sx={{
-                bgcolor: 'rgba(209, 154, 74, 0.2)',
-                p: 1,
-                borderRadius: 2,
-                color: 'secondary.main',
-                display: 'flex',
-              }}
-            >
-              <Typography variant="h6" fontWeight="bold">
-                {levelName.includes('1') ? '1' : '2'}
-              </Typography>
-            </Box>
-            <Typography
-              variant="h4"
-              component="h2"
-              sx={{
-                fontWeight: 800,
-                color: 'text.primary',
-              }}
-            >
-              {levelName}
-            </Typography>
-          </Box>
+        <Typography variant="h5" sx={{ color: 'text.secondary', maxWidth: 600, mb: 6, lineHeight: 1.6 }}>
+            Aprende Shuar de forma inteligente. Descubre vocabulario, frases y sugerencias culturales personalizadas para cada ocasión.
+        </Typography>
 
-          {/* Grid de Lecciones */}
-          <Grid
-            container
-            spacing={{ xs: 3, md: 4 }}
-            justifyContent="flex-start"
-            alignItems="stretch"
-          >
-            {lessons.map((lesson) => {
-              const status = getLessonStatus(lesson);
-              const isLocked = status === 'locked';
-              const isCompleted = status === 'completed';
-              const isInProgress = status === 'in-progress';
 
-              return (
-                <Grid
-                  key={lesson.id}
-                  size={{ xs: 12, sm: 6, md: 4 }}
-                  sx={{ display: 'flex' }}
-                >
-                  <Card
-                    sx={{
-                      width: '100%',
-                      height: '100%',
-                      position: 'relative',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                      border: '2px solid',
-                      borderColor: isInProgress ? 'secondary.main' : isLocked ? 'divider' : 'rgba(209, 154, 74, 0.2)',
-                      opacity: isLocked ? 0.7 : 1,
-                      boxShadow: isInProgress ? 4 : isLocked ? 1 : 2,
-                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                      '&:hover': {
-                        transform: isLocked ? 'none' : 'translateY(-8px)',
-                        boxShadow: isInProgress ? 6 : isLocked ? 1 : 4,
-                      },
-                    }}
-                  >
-                    <CardActionArea
-                      onClick={() => handleLessonClick(lesson.id, isLocked)}
-                      disabled={isLocked}
-                      sx={{
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'stretch',
-                        cursor: isLocked ? 'not-allowed' : 'pointer',
-                      }}
-                    >
-                      {/* Imagen con overlay */}
-                      <Box sx={{ position: 'relative' }}>
-                        <CardMedia
-                          component="img"
-                          height="192"
-                          image={lesson.image}
-                          alt={lesson.title}
-                          sx={{
-                            objectFit: 'cover',
-                            filter: isLocked ? 'grayscale(100%)' : 'none',
-                            opacity: isLocked ? 0.6 : 1,
-                            transition: 'transform 0.5s ease',
-                            '.MuiCardActionArea-root:hover &': {
-                              transform: isLocked ? 'none' : 'scale(1.08)',
-                            },
-                          }}
-                        />
-
-                        {/* Badge de Estado */}
-                        {isCompleted && (
-                          <Chip
-                            icon={<CheckCircleIcon />}
-                            label="Completado"
-                            size="small"
+        {/* --- FILTERS CONTAINER --- */}
+        <Box sx={{ width: '100%', maxWidth: 700, display: 'flex', flexDirection: 'column', gap: 4 }}>
+            
+            {/* Grid for Inputs */}
+            <Grid container spacing={3}>
+                {/* Level Select */}
+                <Grid item xs={12} md={6} sx={{ textAlign: 'left' }}>
+                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', pl: 2, display: 'block', mb: 1 }}>
+                        Elige tu nivel
+                     </Typography>
+                     <FormControl fullWidth variant="filled" hiddenLabel>
+                        <Select
+                            value={selectedLevel}
+                            onChange={(e) => setSelectedLevel(e.target.value)}
+                            displayEmpty
+                            IconComponent={ExpandMoreIcon}
                             sx={{
-                              position: 'absolute',
-                              top: 12,
-                              right: 12,
-                              bgcolor: 'rgba(255, 255, 255, 0.95)',
-                              color: 'success.main',
-                              fontWeight: 'bold',
-                              fontSize: '0.75rem',
-                              boxShadow: 2,
-                              '& .MuiChip-icon': {
-                                color: 'success.main',
-                              },
+                                borderRadius: 50,
+                                bgcolor: 'background.paper', // Using paper instead of slate-100 logic for theme adaptability
+                                '& .MuiSelect-select': { py: 2, px: 3, borderRadius: 50, '&:focus': { borderRadius: 50 } },
+                                '&:before, &:after': { display: 'none' }, // Remove underlines
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                                '&:hover': { bgcolor: alpha(theme.palette.background.paper, 0.8) }
                             }}
-                          />
-                        )}
-
-                        {isInProgress && (
-                          <>
-                            <Chip
-                              icon={<PlayCircleIcon />}
-                              label="En Curso"
-                              size="small"
-                              sx={{
-                                position: 'absolute',
-                                top: 12,
-                                right: 12,
-                                bgcolor: 'secondary.main',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                fontSize: '0.75rem',
-                                boxShadow: 3,
-                              }}
-                            />
-                            {/* Mini progress bar en la imagen */}
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                height: 4,
-                                bgcolor: 'rgba(255, 255, 255, 0.3)',
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  height: '100%',
-                                  bgcolor: 'secondary.main',
-                                  width: `${lesson.progress || 60}%`,
-                                }}
-                              />
-                            </Box>
-                          </>
-                        )}
-
-                        {isLocked && (
-                          <Tooltip title="Completa las lecciones anteriores para desbloquear" arrow>
-                            <Box
-                              sx={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: 'rgba(0, 0, 0, 0.15)',
-                                backdropFilter: 'blur(2px)',
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                  borderRadius: '50%',
-                                  p: 2,
-                                  display: 'flex',
-                                  boxShadow: 4,
-                                }}
-                              >
-                                <LockIcon sx={{ fontSize: 32, color: 'text.secondary' }} />
-                              </Box>
-                            </Box>
-                          </Tooltip>
-                        )}
-                      </Box>
-
-                      {/* Contenido de la Card */}
-                      <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                            <Typography
-                              variant="h6"
-                              component="h3"
-                              sx={{
-                                fontWeight: 700,
-                                fontSize: '1.25rem',
-                                color: isLocked ? 'text.secondary' : 'text.primary',
-                                lineHeight: 1.2
-                              }}
-                            >
-                              {lesson.title}
-                            </Typography>
-                            {isCompleted && (
-                                <Typography variant="caption" fontWeight="bold" sx={{ color: 'success.main', whiteSpace: 'nowrap', ml: 1, bgcolor: 'rgba(76, 175, 80, 0.1)', px: 1, py: 0.5, borderRadius: 1 }}>
-                                    {lesson.score || 0} XP
-                                </Typography>
-                            )}
-                        </Box>
-
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          sx={{
-                            lineHeight: 1.6,
-                            flexGrow: 1,
-                            mb: isInProgress ? 2 : 3,
-                            opacity: isLocked ? 0.7 : 1,
-                          }}
+                            MenuProps={{
+                                PaperProps: { sx: { borderRadius: 3, mt: 1, boxShadow: 4 } }
+                            }}
                         >
-                          {lesson.description}
-                        </Typography>
-
-                        {/* Barra de progreso para lecciones en curso o completadas */}
-                        {(isInProgress || isCompleted) && (
-                          <Box sx={{ mb: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                              <Typography variant="caption" color="text.secondary" fontWeight="600">
-                                Progreso
-                              </Typography>
-                              <Typography 
-                                variant="caption" 
-                                color={isCompleted ? "success.main" : "text.secondary"} 
-                                fontWeight="600"
-                              >
-                                {isCompleted ? (lesson.progress || 100) : (lesson.progress || 60)}%
-                              </Typography>
-                            </Box>
-                            <LinearProgress
-                              variant="determinate"
-                              value={isCompleted ? (lesson.progress || 100) : (lesson.progress || 60)}
-                              color={isCompleted ? "success" : "secondary"}
-                              sx={{
-                                height: 8,
-                                borderRadius: 10,
-                                bgcolor: 'rgba(0, 0, 0, 0.05)',
-                                '& .MuiLinearProgress-bar': {
-                                  borderRadius: 10,
-                                },
-                              }}
-                            />
-                          </Box>
-                        )}
-                      </CardContent>
-                    </CardActionArea>
-
-                    <Box sx={{ p: 2, pt: 0 }}>
-                        {/* Botón de acción */}
-                        {isCompleted && (
-                          <Button
-                            variant="outlined"
-                            fullWidth
-                            onClick={() => handleLessonClick(lesson.id, isLocked)}
-                            sx={{
-                              py: 1.5,
-                              borderWidth: 2,
-                              borderColor: 'secondary.main',
-                              color: 'secondary.main',
-                              fontWeight: 'bold',
-                              '&:hover': {
-                                borderWidth: 2,
-                                bgcolor: 'secondary.main',
-                                color: 'white',
-                              },
-                            }}
-                          >
-                            Repasar
-                          </Button>
-                        )}
-
-                        {isInProgress && (
-                          <Button
-                            variant="contained"
-                            fullWidth
-                            onClick={() => handleLessonClick(lesson.id, isLocked)}
-                            sx={{
-                              py: 1.5,
-                              bgcolor: 'secondary.main',
-                              color: 'white',
-                              fontWeight: 'bold',
-                              boxShadow: 3,
-                              '&:hover': {
-                                bgcolor: 'secondary.dark',
-                                transform: 'translateY(-2px)',
-                                boxShadow: 4,
-                              },
-                            }}
-                          >
-                            Continuar
-                          </Button>
-                        )}
-
-                        {isLocked && (
-                          <Button
-                            variant="contained"
-                            fullWidth
-                            disabled
-                            sx={{
-                              py: 1.5,
-                              bgcolor: 'rgba(0, 0, 0, 0.08)',
-                              color: 'text.disabled',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            Bloqueado
-                          </Button>
-                        )}
-
-                        {!isLocked && !isCompleted && !isInProgress && (
-                           <Button
-                           variant="text"
-                           fullWidth
-                           onClick={() => handleLessonClick(lesson.id, isLocked)}
-                           sx={{
-                             py: 1.5,
-                             color: 'secondary.main',
-                             fontWeight: 600,
-                             justifyContent: 'flex-start',
-                             '&:hover': {
-                               bgcolor: 'rgba(209, 154, 74, 0.1)',
-                             }
-                           }}
-                         >
-                           Comenzar lección →
-                         </Button>
-                        )}
-                    </Box>
-                  </Card>
+                            <MenuItem value="all">Todos los niveles</MenuItem>
+                            <MenuItem value="principiante">Principiante (Yamaram)</MenuItem>
+                            <MenuItem value="intermedio">Intermedio (Nankaram)</MenuItem>
+                            <MenuItem value="avanzado">Avanzado (Untsurí)</MenuItem>
+                        </Select>
+                     </FormControl>
                 </Grid>
-              );
-            })}
-          </Grid>
+
+                {/* Search Input */}
+                <Grid item xs={12} md={6} sx={{ textAlign: 'left' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', pl: 2, display: 'block', mb: 1 }}>
+                        ¿Qué quieres aprender?
+                     </Typography>
+                    <TextField
+                        fullWidth
+                        placeholder="p. ej. Naturaleza, Caza..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        variant="standard"
+                        InputProps={{
+                            disableUnderline: true,
+                            sx: {
+                                bgcolor: 'background.paper',
+                                borderRadius: 50,
+                                py: 1, px: 3,
+                                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
+                                transition: 'all 0.2s',
+                                '&:hover': { boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' },
+                                '&.Mui-focused': { boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.2)}` }
+                            }
+                        }}
+                    />
+                </Grid>
+            </Grid>
+
+            {/* Tags */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center' }}>
+                {tags.map((tag) => (
+                    <Chip
+                        key={tag.value}
+                        label={tag.label}
+                        onClick={() => handleTagClick(tag.value)}
+                        variant="outlined"
+                        sx={{
+                            borderRadius: 50,
+                            borderColor: 'divider',
+                            color: 'text.secondary',
+                            fontWeight: 600,
+                            bgcolor: 'background.paper',
+                            '&:hover': {
+                                borderColor: 'primary.main',
+                                color: 'primary.main',
+                                bgcolor: 'white'
+                            }
+                        }}
+                    />
+                ))}
+            </Box>
+
+            {/* Action Button */}
+            <Box sx={{ pt: 2 }}>
+                 <Button
+                    onClick={handleSearchAction}
+                    variant="contained"
+                    size="large"
+                    sx={{
+                        borderRadius: 50,
+                        px: 6, py: 1.5,
+                        fontSize: '1.125rem',
+                        fontWeight: 700,
+                        boxShadow: `0 20px 25px -5px ${alpha(theme.palette.primary.main, 0.3)}`,
+                        textTransform: 'none',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 20px 25px -5px ${alpha(theme.palette.primary.main, 0.5)}`,
+                        }
+                    }}
+                 >
+                    Buscar Lección 
+                    <AutoAwesomeIcon sx={{ ml: 1.5, fontSize: 20 }} />
+                 </Button>
+            </Box>
+
         </Box>
-      ))}
+      </Box> {/* End Hero */}
+
+
+      {/* Results Section Removed as per request - Interaction is now Search-Only */}
     </Container>
   );
 };

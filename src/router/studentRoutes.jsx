@@ -4,6 +4,9 @@ import PrivateLayout from '../layouts/PrivateLayout';
 import LoadingFallback from '../components/LoadingFallback';
 
 // Lazy load page components
+import StudentLayout from '../layouts/StudentLayout';
+
+// Lazy load page components
 const LessonDetail = lazy(() => import('../pages/student/LessonDetail'));
 const StudentHome = lazy(() => import('../pages/student/StudentHome'));
 const StudentDashboard = lazy(() => import('../pages/student/StudentDashboard'));
@@ -15,16 +18,17 @@ const StudentProfile = lazy(() => import('../pages/student/StudentProfile'));
 
 // Rutas para estudiantes autenticados - Protegidas con ProtectRoute
 const studentRoutes = [
+  // Rutas con Layout de Estudiante (Header Only)
   {
     path: '/estudiante',
     element: (
       <ProtectRoute requiredRole="ESTUDIANTE">
-        <PrivateLayout />
+        <StudentLayout />
       </ProtectRoute>
     ),
     children: [
       {
-        path: 'inicio',
+        path: 'inicio', // /estudiante/inicio
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <StudentHome />

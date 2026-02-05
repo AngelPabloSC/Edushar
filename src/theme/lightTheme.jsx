@@ -4,89 +4,87 @@ const lightTheme = createTheme({
     palette: {
         mode: 'light',
         primary: {
-            main: '#F7E8C7',
-            light: '#FFFBF0',
-            dark: '#E5D6B5',
-            contrastText: '#442A2A',
+            main: '#1A3C34', // Jungle
+            light: '#2C5E52',
+            dark: '#0D2620', // Dark Jungle
+            contrastText: '#F5F2ED', // Cream
         },
         secondary: {
-            main: '#D19A4A',
-            light: '#E0B76A',
-            dark: '#B8823A',
-            contrastText: '#FFFFFF',
-        },
-        accent: {
-            main: '#FED7AE',
-            light: '#FFECD6',
-            dark: '#F5C89E',
-        },
-        text: {
-            primary: '#442A2A',
-            secondary: '#6B4E4E',
-            disabled: '#9E8080',
-        },
-        background: {
-            default: '#F7E8C7',
-            paper: '#FFFFFF',
+            main: '#F39C12', // Turmeric
+            light: '#F5B041',
+            dark: '#D68910',
+            contrastText: '#0D2620', // Dark Jungle
         },
         error: {
-            main: '#C84B31',
+            main: '#C0392B', // Achuete
         },
-        success: {
-            main: '#4CAF50',
+        background: {
+            default: '#F5F2ED', // Cream
+            paper: '#FFFFFF',
         },
-        warning: {
-            main: '#FF9800',
+        text: {
+            primary: '#1A3C34', // Jungle
+            secondary: '#0D2620', // Dark Jungle
         },
     },
     typography: {
-        fontFamily: "'Roboto', 'Arial', sans-serif",
+        fontFamily: "'Google Sans', 'Outfit', sans-serif",
         h1: {
-            fontSize: '2.5rem',
-            fontWeight: 500,
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 900,
+        },
+        h2: {
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
+        },
+        h3: {
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
         },
         h4: {
-            fontSize: '2rem',
-            fontWeight: 500,
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
         },
         h5: {
-            fontSize: '1.5rem',
+            fontFamily: "'Google Sans', sans-serif",
+            fontWeight: 700,
+        },
+        h6: {
+            fontFamily: "'Google Sans', sans-serif",
             fontWeight: 500,
         },
-        body1: {
-            fontSize: '1rem',
-            lineHeight: 1.5,
-        },
-        body2: {
-            fontSize: '0.875rem',
+        button: {
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 700,
+            textTransform: 'none',
         },
     },
     shape: {
-        borderRadius: 8,
+        borderRadius: 16, // More rounded like the design
     },
     components: {
         MuiButton: {
             styleOverrides: {
                 root: {
-                    textTransform: 'none',
-                    fontWeight: 600,
+                    borderRadius: '12px',
+                    padding: '10px 24px',
                 },
                 contained: {
-                    boxShadow: 'none',
+                    boxShadow: '0 4px 14px 0 rgba(26, 60, 52, 0.3)', // Jungle shadow
                     '&:hover': {
-                        boxShadow: '0 4px 12px rgba(209, 154, 74, 0.2)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 6px 20px 0 rgba(26, 60, 52, 0.4)',
                     },
                 },
             },
         },
-        MuiTextField: {
+        MuiPaper: {
             styleOverrides: {
-                root: {
-                    '& .MuiOutlinedInput-root': {
-                        '&:hover fieldset': {
-                            borderColor: '#D19A4A',
-                        },
-                    },
+                rounded: {
+                    borderRadius: '16px',
+                },
+                elevation1: {
+                    boxShadow: '0 4px 20px -2px rgba(26, 60, 52, 0.1)', // Subtle jungle shadow
                 },
             },
         },

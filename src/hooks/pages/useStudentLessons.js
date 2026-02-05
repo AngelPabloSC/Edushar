@@ -134,7 +134,35 @@ export const useStudentLessons = () => {
                     const completed = mergedLessons.filter(l => l.completed).length;
                     const total = mergedLessons.length;
                     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-                    setGlobalStats({ completed, total, percentage });
+
+                    // Determine "Current Level" Text
+                    // Logic: Find the first lesson that is 'available' or 'in-progress'. The level of that lesson is the current user level.
+                    // If all are completed, show the highest level.
+                    // If none, default to 'Básico'.
+                    const activeLesson = mergedLessons.find(l => l.status === 'in-progress' || l.status === 'available');
+                    const lastCompleted = [...mergedLessons].reverse().find(l => l.status === 'completed');
+
+                    let levelLabel = 'Nivel 1 • Fundamentos'; // default
+
+                    const targetLesson = activeLesson || lastCompleted;
+
+                    if (targetLesson) {
+                        const rawLevel = targetLesson.level || 'Básico';
+                        // Parse level to friendly string
+                        if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
+                        else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
+                        else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
+                        else levelLabel = `${rawLevel}`;
+                    } else if (mergedLessons.length > 0) {
+                        // Edge case: nothing started? Default to first lesson's level
+                        const first = mergedLessons[0];
+                        const rawLevel = first.level || 'Básico';
+                        if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
+                        else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
+                        else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
+                    }
+
+                    setGlobalStats({ completed, total, percentage, levelLabel });
 
                 } else {
                     setError('Error al cargar las lecciones');

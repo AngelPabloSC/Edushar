@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Google+Sans:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #F5F2ED;
+    /* Shuar Cream */
+    font-family: 'Google Sans', 'Outfit', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar Styling for Webkit */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #F5F2ED;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1A3C34;
+    /* Jungle */
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0D2620;
+    /* Dark Jungle */
+}
+
+/* Landing Page Animations */
+@keyframes float {
+    0% {
+        transform: translateY(0px) rotate(var(--tw-rotate, 0deg));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(calc(var(--tw-rotate, 0deg) + 2deg));
+    }
+
+    100% {
+        transform: translateY(0px) rotate(var(--tw-rotate, 0deg));
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: float 7s ease-in-out infinite 1s;
+}
+
+.animate-float-slow {
+    animation: float 8s ease-in-out infinite 2s;
+}
+
+.gloss-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.gloss-effect::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 60% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 40%);
+    pointer-events: none;
+    transform: rotate(-15deg);
+}

@@ -63,35 +63,30 @@ export const LoginProvider = ({ children }) => {
       createdAt
     };
 
-    // Guardamos el usuario y el token en localStorage
     localStorage.setItem("user", JSON.stringify(newUser));
     localStorage.setItem("access_token", accessToken);
     localStorage.setItem("iduser", id);
 
-    // Actualizamos el estado con el nuevo usuario y token
     setUser(newUser);
     setToken(accessToken);
 
-    // Filtrar las rutas según el rol del usuario
     const { routes } = filterRouter(role);
     if (routes && routes.length > 0) {
-      navigate(routes[0]); // Redirigir a la primera ruta según el rol
+      navigate(routes[0]);
     } else {
       navigate("/");
     }
   };
 
   const logout = () => {
+    navigate("/");
+    
     localStorage.removeItem("user");
     localStorage.removeItem("access_token");
     localStorage.removeItem("iduser");
 
-    // Limpiar los estados
     setUser(null);
     setToken(null);
-
-    // Redirigir a la página de inicio
-    navigate("/");
   };
 
   const values = {

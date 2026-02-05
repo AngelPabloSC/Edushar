@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { useFetchDataPromise } from '../api/useFetchDataPromise';
-import { useDialong } from '../ui/useDialog';
 import { useLoginContext } from '../context/LoginContext';
 import { useGoogleLogin } from './useGoogleLogin';
 import { useToggle } from '../ui/useToggle';
@@ -8,26 +7,16 @@ import { useFormValidation } from '../ui/useFormValidation';
 import validationRules from '../../utils/validationRules';
 
 export const useLogin = () => {
-    // API hooks
     const { getFechData } = useFetchDataPromise();
-    const {
-        isOpen,
-        dialongContent,
-        handleOpenDialog,
-        handleCloseDialog,
-        setDialongContent,
-    } = useDialong();
     const { login } = useLoginContext();
     const { handleGoogleLogin } = useGoogleLogin();
 
-    // UI States - using useToggle for boolean states
     const [tabValue, setTabValue] = useState(0);
     const [showPassword, toggleShowPassword] = useToggle(false);
     const [showConfirmPassword, toggleShowConfirmPassword] = useToggle(false);
     const [isLoading, setIsLoading] = useState(false);
     const [authError, setAuthError] = useState('');
 
-    // Form validation hook
     const {
         data: loginData,
         errors: loginErrors,
@@ -42,18 +31,15 @@ export const useLogin = () => {
         validationRules
     );
 
-    // Tab Change Handler - memoized
     const handleTabChange = useCallback((event, newValue) => {
         setTabValue(newValue);
         setLoginErrors({});
         setAuthError('');
     }, [setLoginErrors]);
 
-    // Login Form Change Handler - memoized with proper event typing
     const handleLoginChange = useCallback((e) => {
         const { name, value } = e.target;
 
-        // Determine validation rules based on field
         let fieldRules = null;
         if (name === 'email') {
             fieldRules = {
@@ -67,7 +53,19 @@ export const useLogin = () => {
         baseHandleChange(e, fieldRules);
     }, [baseHandleChange]);
 
-    // Login API Call - memoized
+    const translateErrorMessage = (message) => {
+        const errorMessages = {
+            'INVALID_LOGIN_CREDENTIALS': 'Credenciales inválidas. Por favor, verifica tu correo y contraseña.',
+            'USER_NOT_FOUND': 'Usuario no encontrado.',
+            'INCORRECT_PASSWORD': 'Contraseña incorrecta.',
+            'EMAIL_NOT_VERIFIED': 'Por favor, verifica tu correo electrónico.',
+            'ACCOUNT_DISABLED': 'Esta cuenta ha sido deshabilitada.',
+            'TOO_MANY_ATTEMPTS': 'Demasiados intentos fallidos. Por favor, intenta más tarde.',
+        };
+
+        return errorMessages[message] || message || 'Error al iniciar sesión';
+    };
+
     const handleLoginAPI = useCallback(async (data) => {
         try {
             const response = await getFechData({
@@ -79,29 +77,20 @@ export const useLogin = () => {
             if (response.code === "COD_OK") {
                 login(response.data);
             } else {
-                const { message } = response;
-                handleOpenDialog();
-                setDialongContent({
-                    title: "Error",
-                    message: message || "Error al iniciar sesión"
-                });
+                const { message, error } = response;
+                const errorMessage = translateErrorMessage(message || error);
+                setAuthError(errorMessage);
             }
         } catch (error) {
             console.error("Error en login:", error);
-            handleOpenDialog();
-            setDialongContent({
-                title: "Error",
-                message: "Error al momento de enviar los datos"
-            });
+            setAuthError("Error al momento de enviar los datos");
         }
-    }, [getFechData, login, handleOpenDialog, setDialongContent]);
+    }, [getFechData, login]);
 
-    // Login Form Submit - memoized
     const handleLoginSubmit = useCallback(async (e) => {
         e.preventDefault();
         setAuthError('');
 
-        // Validate all fields
         const isValid = validateAll({
             email: {
                 required: true,
@@ -128,7 +117,6 @@ export const useLogin = () => {
         }
     }, [loginData, validateAll, handleLoginAPI]);
 
-    // Google Sign In - memoized
     const handleGoogleSignIn = useCallback(async () => {
         setIsLoading(true);
         setAuthError('');
@@ -143,7 +131,6 @@ export const useLogin = () => {
     }, [handleGoogleLogin]);
 
     return {
-        // States
         tabValue,
         showPassword,
         showConfirmPassword,
@@ -151,19 +138,11 @@ export const useLogin = () => {
         loginErrors,
         isLoading,
         authError,
-        isOpen,
-        dialongContent,
-
-        // Setters - now using toggle functions
         setShowPassword: toggleShowPassword,
         setShowConfirmPassword: toggleShowConfirmPassword,
-
-        // Handlers - all memoized with useCallback
         handleTabChange,
         handleLoginChange,
         handleLoginSubmit,
         handleGoogleSignIn,
-        handleOpenDialog,
-        handleCloseDialog,
     };
 };

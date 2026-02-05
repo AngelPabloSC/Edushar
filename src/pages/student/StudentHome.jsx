@@ -2,251 +2,152 @@ import {
   Box,
   Container,
   Typography,
-  Grid,
-  Divider,
-  CircularProgress,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/context/LoginContext';
 import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
-import SchoolIcon from '@mui/icons-material/School';
-import ActionCard from '../../components/ActionCard';
-import ProgressCard from '../../components/ProgressCard';
+import DashboardCard from '../../components/DashboardCard';
 
 /**
  * Dashboard principal del estudiante - Página de inicio mejorada
- * Sigue principios de Don Norman: visibilidad, affordances, feedback, mapping, constraints, y consistencia
+ * Diseño "Hub" con layout dividido: Sticky Sidebar + Scrollable Cards
+ * Full Screen Mode (Sin PrivateLayout)
  */
 const StudentHome = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { rawLessons, loading } = useStudentLessons();
+  const { globalStats } = useStudentLessons();
+  
+  // Safe access to stats
+  const completedCount = globalStats?.completed || 0;
+  const totalLessons = globalStats?.total || 0;
 
-  // Calcular el progreso real basado en las lecciones
-  const getProgressData = () => {
-    if (!rawLessons.length) return null;
-
-    // Buscar la primera lección en progreso o disponible (que no esté completada)
-    const activeLesson = rawLessons.find(l => l.status === 'in-progress') || 
-                         rawLessons.find(l => l.status === 'available' && !l.completed);
-    
-    // Si todo está completado, tomar la última
-    const targetLesson = activeLesson || rawLessons[rawLessons.length - 1];
-
-    if (!targetLesson) return null;
-
-    // Calcular estadísticas del nivel actual
-    const currentLevel = targetLesson.level || 'General';
-    // Normalizar la comparación de niveles para evitar errores por mayúsculas/espacios
-    const levelLessons = rawLessons.filter(l => (l.level || '').trim().toLowerCase() === currentLevel.trim().toLowerCase());
-    const completedInLevel = levelLessons.filter(l => l.completed).length;
-    const levelPercentage = levelLessons.length > 0 
-      ? Math.round((completedInLevel / levelLessons.length) * 100) 
-      : 0;
-
-    return {
-        moduleName: currentLevel,
-        lessonName: targetLesson.title,
-        lessonId: targetLesson.id,
-        percentage: levelPercentage,
-        totalLessons: levelLessons.length,
-        completedLessons: completedInLevel,
-        streak: user?.streak || 0, // Asumimos que el streak podría venir del user en el futuro
-        isCompleted: targetLesson.completed
-    };
-  };
-
-  const currentProgress = getProgressData();
-  const hasLessonInProgress = !!currentProgress && !currentProgress.isCompleted;
-
-  const handleContinueLearning = () => {
-    if (currentProgress?.lessonId) {
-      navigate(`/leccion/${currentProgress.lessonId}`);
-    } else {
-        navigate('/estudiante/lecciones');
-    }
-  };
-
-  if (loading) {
-    return (
-        <Container maxWidth="lg" sx={{ py: 10, display: 'flex', justifyContent: 'center' }}>
-            <CircularProgress color="secondary" />
-        </Container>
-    );
-  }
-
-  // Construir las action cards dinámicamente
-  const actionCards = [];
-
-  // Solo mostrar "Continuar Lección" si hay una lección activa
-  if (hasLessonInProgress) {
-    actionCards.push({
-      id: 1,
-      title: 'Continuar Lección',
-      description: 'Resume donde lo dejaste: ',
-      highlight: `"${currentProgress.lessonName}"`,
-      icon: AutoStoriesIcon,
-      color: 'secondary.main', // Usar color del tema
-      bgColor: 'rgba(209, 154, 74, 0.1)',
-      action: handleContinueLearning,
-      buttonText: 'Ir a la lección',
-      recommended: true, // Marcar como recomendado
-      disabled: false,
-    });
-  } else {
-    // Si no hay lección en progreso (o todas completas), mostrar "Ir a Lecciones"
-    actionCards.push({
-      id: 1,
-      title: 'Explorar Lecciones',
-      description: 'Comienza tu camino de aprendizaje con nuestras lecciones interactivas.',
-      icon: SchoolIcon,
-      color: 'secondary.main',
-      bgColor: 'rgba(209, 154, 74, 0.1)',
-      action: () => navigate('/estudiante/lecciones'),
-      buttonText: 'Ver lecciones',
-      recommended: true,
-      disabled: false,
-    });
-  }
-
-  // Agregar las demás cards
-  actionCards.push(
+  // Datos para las tarjetas de navegación
+  const dashboardItems = [
     {
-      id: 2,
-      title: 'Explorar Diccionario',
-      description: 'Busca más de 5,000 palabras y frases Shuar con contexto cultural.',
-      icon: MenuBookIcon,
-      color: '#D84315',
-      bgColor: 'rgba(216, 67, 21, 0.1)',
-      action: () => navigate('/estudiante/diccionario'),
-      buttonText: 'Buscar palabras',
-      disabled: false,
+      id: 'lecciones',
+      subtitle: globalStats?.levelLabel || 'Nivel 1 • Fundamentos',
+      title: 'Lecciones Shuar',
+      description: 'Descubre vocabulario, frases y gramática esencial a través de lecciones interactivas.',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnJTDrkt500fndZP9vKtTNr1zSwj-2GerGg4bqdQdx0WZCMLwaoM6VhZgS7G_z4Nle8OkYoQBPDJ-SD-KRUcJHbuc_eYvds4JxTGRBxE6sFBwtZbnjmgh5UOKQOsIrjHIzpBfogBkKNq5WH6u_PLjaMWVGlGk4nERhUvlWUjIonuReGcRD9PTTar9vorEPtZCCwuV-BZyxlFhLRvuwxeedfzAVQBO8WTjLIKdOg6A2o51ad73hgndpGFQwYrtho6RSEUNjHnB8bs1r',
+      color: 'primary',
+      onClick: () => navigate('/estudiante/lecciones'),
+      buttonText: 'Empezar'
     },
     {
-      id: 3,
-      title: 'Leer un Cuento',
-      description: 'Descubre mitos ancestrales y narrativas contemporáneas Shuar.',
-      icon: HistoryEduIcon,
-      color: '#5D4037',
-      bgColor: 'rgba(93, 64, 55, 0.1)',
-      action: () => navigate('/estudiante/cuentos'),
-      buttonText: 'Ver biblioteca',
-      disabled: false,
+      id: 'stories',
+      subtitle: 'Cultura • Narrativa',
+      title: 'Cuentos y Mitos',
+      description: 'Sumérgete en la cosmovisión Shuar a través de historias tradicionales animadas.',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-2SgvvJMUxaWi64AgnZ52AMSrBoWNY5HJekhl3I5HpZAdV4Im6rLnddmQkWxP-RuX44U8Q_meiy3a436vNJ5gI6iDpnYIDPHcRu0OE9YOLqRozskc8wsGlaFCA_46Ub7WBKe5er7juJNpv1a59onOBYfIfVnF5nqb5jvVnCsl5pyNonNRtQBJ7lNcPmOxbcEt64vvDiwrufijMLFqYFauWjFYRLVZKAuMY-zyAWLSmCZKromOhQ7Qi3_uOHA1Pba2_SzTjON7VVO0',
+      color: 'secondary',
+      onClick: () => navigate('/estudiante/cuentos'),
+      buttonText: 'Leer ahora'
+    },
+    {
+      id: 'dictionary',
+      subtitle: 'Vocabulario • Consulta',
+      title: 'Diccionario',
+      description: 'Explora más de 5,000 términos con ejemplos de uso y pronunciación.',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhmlOon5LaA0nr9rlhgvEp7mZsaQiqfO2wyKGV8VlP2lfNsaeNNd0vE0d1DPM4pJQ79GaG1PEKL7pxuPPEbtMqnkuMRwAXLHsUyES40j5tthdd8eQamrJUMby0jmuy-an1R6ll99fF91tEPanjGNPsY5-5OCS_V4GPV6RnL-MYmRTlfo8ddgh4ivADkO8pUQCvYQ8dkZ7nZFer-5N5tzbActkW0QG6bYCpX6ktPUciiLCixpJzAsIECAXPHT8Cs7V0XbbQ_F1zT8yY',
+      color: 'primary',
+      onClick: () => navigate('/estudiante/diccionario'),
+      buttonText: 'Buscar'
+    },
+    {
+      id: 'contributions',
+      subtitle: 'Comunidad • Colaboración',
+      title: 'Contribuciones',
+      description: 'Ayuda a expandir el conocimiento compartiendo nuevas palabras o historias.',
+      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvyybVkV1n8WSPH4_vgGMcwOi1dqGWNfAk7VD_fW2TeW5wskU0qBThQWD3rGKO9xS7Z2_PpZkcsNA8usSY7xDo3oUl7xIPARjZLwCEq2ZH1qwsrNxiUQ_D4Ur7QDBc1HWF_nPS5_IlXh-43aUpno6WnKfvq9dpiQ6-G6cbISSvbq6ipPAc2pEQ2DXXdWMT-5RLzibf2PHjJ7metQhxBkl-wW-LYoR0iSkUYwESUjBmx-M2L5pJ0gneWsBnBcS8RNlte02_MgnsNOBn',
+      color: 'secondary',
+      onClick: () => navigate('/estudiante/contribuciones'),
+      buttonText: 'Colaborar'
     }
-  );
+  ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
-      {/* Saludo personalizado - Optimizado para LCP */}
-      <Box sx={{ mb: 5 }}>
-        <Typography
-          variant="h2"
-          component="h1"
-          gutterBottom
-          sx={{
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-            fontSize: { xs: '2rem', md: '2.75rem' },
-            color: 'secondary.main',
-          }}
-        >
-          !Turasha, {user?.nombre || 'Estudiante'}!
-        </Typography>
-        <Typography
-          variant="h5"
-          color="text.secondary"
-          sx={{
-            fontWeight: 500,
-            fontSize: { xs: '1.125rem', md: '1.5rem' },
-          }}
-        >
-          Tu camino para preservar la cultura Shuar continúa hoy.
-        </Typography>
-      </Box>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', pb: 10, position: 'relative' }}>
+        
+      <Container maxWidth="xl" sx={{ px: { xs: 3, md: 6 }, py: { xs: 4, md: 8 }, pt: { xs: 4, lg: 4 } }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: { xs: 6, lg: 12 } }}>
+                
+                {/* Left Column - Sticky Info */}
+                <Box 
+                    sx={{ 
+                        width: { xs: '100%', lg: '40%', xl: '35%' }, 
+                        position: { lg: 'sticky' }, 
+                        top: { lg: 120 }, 
+                        height: { lg: 'calc(100vh - 200px)' },
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: { xs: 'center', lg: 'flex-start' },
+                        textAlign: { xs: 'center', lg: 'left' }
+                    }}
+                >
+                    <Box sx={{ mb: 2, display: 'inline-block' }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '4.5rem', color: '#1A3C34' }}>language</span>
+                    </Box>
+                    
+                    <Typography 
+                        variant="h1" 
+                        sx={{ 
+                            fontSize: { xs: '3rem', md: '4rem', xl: '5rem' }, 
+                            fontWeight: 900, 
+                            lineHeight: 0.9, 
+                            letterSpacing: '-0.04em',
+                            color: 'text.primary',
+                            mb: 3
+                        }}
+                    >
+                        EduShar<br/>
+                        <Box component="span" sx={{ color: 'secondary.main' }}>Dashboard</Box>
+                    </Typography>
 
-      {/* Tarjeta de Progreso Mejorada - Solo si hay progreso */}
-      {currentProgress && (
-        <Box sx={{ mb: 5 }}>
-          <ProgressCard
-            moduleName={currentProgress.moduleName}
-            percentage={currentProgress.percentage}
-            completedLessons={currentProgress.completedLessons}
-            totalLessons={currentProgress.totalLessons}
-            streak={currentProgress.streak}
-            showDetails={true}
-          />
-        </Box>
-      )}
+                    <Typography 
+                        variant="h5" 
+                        sx={{ 
+                            color: 'text.secondary', 
+                            fontWeight: 400, 
+                            mb: 4, 
+                            maxWidth: 400,
+                            lineHeight: 1.6
+                        }}
+                    >
+                        Bienvenido de nuevo, <strong>{user?.nombre || 'Estudiante'}</strong>. Continúa tu aprendizaje hoy.
+                    </Typography>
 
-      {/* Divider con texto */}
-      <Divider sx={{ mb: 5 }}>
-        <Typography
-          variant="overline"
-          sx={{
-            color: 'text.secondary',
-            fontWeight: 700,
-            letterSpacing: 2,
-            fontSize: '0.875rem',
-          }}
-        >
-          {hasLessonInProgress ? 'Continúa Tu Aprendizaje' : 'Comienza Tu Aprendizaje'}
-        </Typography>
-      </Divider>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: 'background.paper', py: 1, px: 2, borderRadius: 10, boxShadow: 1 }}>
+                        <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: 'success.main', boxShadow: '0 0 0 2px rgba(76, 175, 80, 0.2)' }} />
+                        <Typography variant="subtitle2" fontWeight="700" color="text.primary">
+                            {completedCount} de {totalLessons} lecciones completadas
+                        </Typography>
+                    </Box>
+                </Box>
 
-      {/* Grid de Acciones Rápidas */}
-      <Grid
-        container
-        spacing={{ xs: 3, md: 4 }}
-        justifyContent="center"
-        alignItems="stretch"
-      >
-        {actionCards.map((card) => (
-          <Grid
-            key={card.id}
-            size={{ xs: 12, sm: 6, md: 4 }}
-            sx={{ display: 'flex' }}
-          >
-            <Box sx={{ width: '100%' }}>
-              <ActionCard
-                title={card.title}
-                description={card.description}
-                highlight={card.highlight}
-                icon={card.icon}
-                color={card.color}
-                bgColor={card.bgColor}
-                buttonText={card.buttonText}
-                onClick={card.action}
-                disabled={card.disabled}
-                recommended={card.recommended}
-                badge={card.badge}
-              />
+                {/* Right Column - Scrolling Cards */}
+                <Box sx={{ width: { xs: '100%', lg: '60%', xl: '65%' } }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 3, md: 5 } }}>
+                        {dashboardItems.map((item, index) => (
+                            <DashboardCard
+                                key={item.id}
+                                {...item}
+                                delay={index * 0.15}
+                            />
+                        ))}
+                    </Box>
+                </Box>
+
             </Box>
-          </Grid>
-        ))}
-      </Grid>
+        </Container>
 
-      {/* Sección de ayuda/tips - Solo si hay racha */}
-      {currentProgress.streak > 0 && (
-        <Box
-          sx={{
-            mt: 6,
-            p: 3,
-            borderRadius: 3,
-            bgcolor: 'rgba(209, 154, 74, 0.05)',
-            border: '1px solid',
-            borderColor: 'rgba(209, 154, 74, 0.2)',
-          }}
-        >
-          <Typography variant="body2" color="text.secondary" align="center">
-            💡 <strong>Consejo:</strong> Mantén tu racha de aprendizaje completando al menos una lección por día.
-            ¡Ya llevas {currentProgress.streak} días consecutivos!
-          </Typography>
+        {/* Background Ambient Blurs */}
+        <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
+            <Box sx={{ position: 'absolute', top: '10%', left: '5%', width: 500, height: 500, bgcolor: 'primary.light', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.1 }} />
+            <Box sx={{ position: 'absolute', bottom: '10%', right: '5%', width: 600, height: 600, bgcolor: 'secondary.light', borderRadius: '50%', filter: 'blur(140px)', opacity: 0.1 }} />
         </Box>
-      )}
-    </Container>
+    </Box>
   );
 };
 

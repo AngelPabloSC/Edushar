@@ -28,7 +28,6 @@ import { useRegister } from '../../hooks/auth/useRegister';
 const Auth = () => {
   const theme = useTheme();
   
-  // Login hook
   const {
     tabValue,
     showPassword,
@@ -45,7 +44,6 @@ const Auth = () => {
     handleGoogleSignIn,
   } = useLogin();
 
-  // Register hook
   const {
     registerData,
     registerErrors,
@@ -54,7 +52,6 @@ const Auth = () => {
     handleRegisterSubmit,
   } = useRegister();
 
-  // Combined loading and error states
   const isLoading = loginLoading || registerLoading;
   const authError = loginError;
 

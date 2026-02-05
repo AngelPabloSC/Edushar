@@ -1,260 +1,326 @@
-import { Box, Container, Typography, Button,Grid} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import FeatureCard from "../../components/FeatureCard";
-import { featuresData } from "../../data/featuresData";
+import { Box, Typography, Button, Container } from '@mui/material';
+import { useLogin } from '../../hooks/auth/useLogin';
+import { useNavigate } from 'react-router-dom';
 
 const Landing = () => {
+  const { handleGoogleSignIn } = useLogin();
   const navigate = useNavigate();
 
   return (
-    <Box>
-      {/* Hero Section */}
-      <Box
-        sx={{
-          position: "relative",
-          minHeight: "520px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundImage:
-            "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "white",
-          textAlign: "center",
-          py: { xs: 8, md: 12 },
-          overflow: "hidden",
+    <Box 
+      sx={{ 
+        bgcolor: 'background.default',
+        color: 'primary.main',
+        minHeight: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column',
+        fontFamily: 'Google Sans, sans-serif',
+        overflowX: 'hidden',
+        '&::selection': {
+            bgcolor: 'secondary.main',
+            color: 'primary.main'
+        }
+      }}
+    >
+      {/* Navbar */}
+      <Box 
+        component="nav" 
+        sx={{ 
+            width: '100%', 
+            px: 3, 
+            py: 3, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'flex-end', 
+            zIndex: 50, 
+            position: 'relative' 
         }}
       >
-        <Container maxWidth="md" sx={{ position: "relative", zIndex: 10 }}>
-          <Typography
-            variant="h1"
-            component="h1"
-            fontWeight="black"
-            gutterBottom
-            sx={{
-              fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4.5rem" },
-              mb: 2,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            Aprende Shuar con{" "}
-            <Box component="span" sx={{ color: "secondary.main" }}>
-              EduShar
-            </Box>
-          </Typography>
-
-          <Typography
-            variant="h2"
-            component="p"
-            sx={{
-              mb: 5,
-              opacity: 0.95,
-              fontSize: { xs: "1.1rem", md: "1.4rem" },
-              fontWeight: 400,
-              lineHeight: 1.5,
-            }}
-          >
-            Sumérgete en la lengua y cultura de la Amazonía ecuatoriana a través de una
-            experiencia educativa única.
-          </Typography>
-
-          <Box sx={{ display: "flex", gap: 2, justifyContent: "center", flexWrap: "wrap" }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              aria-label="Comenzar a aprender Shuar ahora"
-              size="large"
-              onClick={() => navigate("/register")}
-              sx={{
-                px: 5,
-                py: 1.8,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-                boxShadow: 4,
-                "&:hover": {
-                  transform: "scale(1.05)",
-                  boxShadow: 6,
-                },
-                transition: "all 0.3s",
-              }}
-            >
-              Comenzar ahora
-            </Button>
-
-            <Button
-              variant="outlined"
-              aria-label="Saber más sobre EduShar"
-              size="large"
-              sx={{
-                px: 5,
-                py: 1.8,
-                fontSize: "1.1rem",
-                fontWeight: "bold",
-                borderColor: "white",
-                borderWidth: 2,
-                color: "white",
-                bgcolor: "rgba(255, 255, 255, 0.1)",
-                backdropFilter: "blur(10px)",
-                "&:hover": {
-                  borderWidth: 2,
-                  borderColor: "white",
-                  bgcolor: "rgba(255, 255, 255, 0.2)",
-                },
-              }}
-            >
-              Saber más
-            </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.875rem', fontWeight: 500, color: 'primary.main', opacity: 0.8 }}>
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, cursor: 'pointer', '&:hover': { color: 'error.main' }, transition: 'color 0.3s' }}>
+            <span>Idioma: <Box component="span" fontWeight="bold">Español</Box></span>
+            <span className="material-symbols-outlined" style={{ fontSize: '0.875rem' }}>expand_more</span>
           </Box>
-        </Container>
+          <Box component="button" sx={{ p: 1, borderRadius: '50%', '&:hover': { color: 'error.main', bgcolor: 'rgba(26,60,52,0.05)' }, transition: 'all 0.3s', border: 'none', background: 'none' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>flag</span>
+          </Box>
+          <Box 
+            component="button" 
+            onClick={() => navigate('/login')}
+            sx={{ 
+              p: 1, 
+              borderRadius: '50%', 
+              '&:hover': { color: 'error.main', bgcolor: 'rgba(26,60,52,0.05)' }, 
+              transition: 'all 0.3s', 
+              border: 'none', 
+              background: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>info</span>
+          </Box>
+        </Box>
+      </Box>
 
-        {/* Decorative terracotta element */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 8,
-            bgcolor: "#E2725B",
+      {/* Main Content */}
+      <Box 
+        component="main" 
+        sx={{ 
+            flexGrow: 1, 
+            position: 'relative', 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            py: 10, 
+            px: 2, 
+            width: '100%', 
+            maxWidth: '1600px', 
+            mx: 'auto',
+            overflow: 'hidden' 
+        }}
+      >
+        {/* Toucan Sticker */}
+        <Box 
+          className="animate-float"
+          sx={{ 
+            position: 'absolute', 
+            top: 40, 
+            left: { xs: '5%', md: '8%' }, 
+            width: { xs: 128, md: 176 }, 
+            height: { xs: 128, md: 176 }, 
+            zIndex: 10, 
+            display: { xs: 'none', sm: 'block' },
+            '--tw-rotate': '-12deg',
+            transform: 'rotate(-12deg)'
           }}
-        />
-      </Box>
-
-      {/* Features Section */}
-      <Box sx={{ py: { xs: 6, md: 10 }, bgcolor: "background.paper" }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 } }}>
-            <Typography
-              variant="h2"
-              component="h2"
-              fontWeight={900}
-              sx={{ fontSize: { xs: "1.9rem", md: "2.6rem" } }}
-            >
-              Características Principales
-            </Typography>
-
-            <Typography color="text.secondary" sx={{ mt: 1, maxWidth: 720, mx: "auto" }}>
-              Diseñado para preservar y difundir el conocimiento ancestral con herramientas
-              modernas.
-            </Typography>
-          </Box>
-
-          <Grid
-            container
-            spacing={{ xs: 3, md: 4 }}
-            justifyContent="center"
-            alignItems="stretch"
-          >
-            {featuresData.map((feature) => (
-              <Grid
-                key={feature.id}
-                size={{ xs: 12, sm: 6, md: 4 }} // ✅ Grid2 (MUI v7)
-                sx={{ display: "flex" }}
-              >
-                <Box sx={{ width: "100%" }}>
-                  <FeatureCard
-                    title={feature.title}
-                    description={feature.description}
-                    image={feature.image}
-                    icon={feature.icon}
-                    iconColor={feature.iconColor}
-                    // onClick={() => navigate(feature.href ?? "/register")}
-                  />
-                </Box>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* CTA Section */}
-      <Box sx={{ py: { xs: 10, md: 14 }, bgcolor: "background.default" }}>
-        <Container maxWidth="md">
-          <Box
-            sx={{
-              bgcolor: "rgba(209, 154, 74, 0.08)",
-              borderRadius: 4,
-              border: "2px solid",
-              borderColor: "rgba(209, 154, 74, 0.2)",
-              p: { xs: 5, md: 10 },
-              textAlign: "center",
+        >
+          <Box 
+            className="gloss-effect"
+            sx={{ 
+                width: '100%', 
+                height: '100%', 
+                bgcolor: 'white', 
+                p: 0.5, 
+                borderRadius: '2.5rem', 
+                boxShadow: '0 25px 40px -10px rgba(26, 60, 52, 0.2), 0 10px 10px -5px rgba(26, 60, 52, 0.1)', // Sticker shadow
+                transition: 'transform 0.5s',
+                '&:hover': { transform: 'scale(1.1)' }
             }}
           >
-            <Typography
-              variant="h2"
-              component="h2"
-              fontWeight="black"
-              gutterBottom
-              color="text.primary"
-              sx={{
-                fontSize: { xs: "2rem", md: "3.5rem" },
-                letterSpacing: "-0.02em",
-              }}
-            >
-              ¿Listo para empezar tu viaje?
-            </Typography>
-
-            <Typography
-              variant="h3"
-              component="p"
-              color="text.secondary"
-              sx={{
-                mb: 5,
-                maxWidth: 600,
-                mx: "auto",
-                fontSize: { xs: "1.1rem", md: "1.3rem" },
-                fontWeight: 400,
-              }}
-            >
-              Sé parte de la nueva generación que protege y celebra la riqueza de la lengua
-              Shuar. Registro totalmente gratuito.
-            </Typography>
-
-            <Box sx={{ display: "flex", gap: 3, justifyContent: "center", flexWrap: "wrap" }}>
-              <Button
-                variant="contained"
-                color="secondary"
-                aria-label="Registrarse gratis en EduShar"
-                size="large"
-                onClick={() => navigate("/register")}
-                sx={{
-                  px: 6,
-                  py: 2.5,
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  boxShadow: 6,
-                  minWidth: 220,
-                }}
-              >
-                Regístrate gratis
-              </Button>
-
-              <Button
-                variant="outlined"
-                color="secondary"
-                aria-label="Ver demostración de EduShar"
-                size="large"
-                sx={{
-                  px: 6,
-                  py: 2.5,
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                  borderWidth: 2,
-                  minWidth: 220,
-                  "&:hover": {
-                    borderWidth: 2,
-                    bgcolor: "secondary.main",
-                    color: "white",
-                  },
-                }}
-              >
-                Ver demo
-              </Button>
-            </Box>
+            <Box 
+                component="img"
+                alt="3D high-gloss sticker of a tropical toucan" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHw6YmkrQoK6KLIfjhkpL3p6Is3w5E8i_WDUE0pxtsXzBRkw5ymC5j8pY3KvwLTwyVDpAF77jGJw2ITIh2Fg76ePKzVwRhUW1DIenX2ftJiawLn0jsI5VywTTE_tHQZT8gg-PHu5OKJkdrp_jwid8U4A8rF_JzVqNDH_UxEzCNm4oLZz9s9oTtS6SfeJ2v3M7Q_ZyxT9Vzob6yS0M12G1OAoaEGnZQlcHnWWP1UY4aB9Z4MkXYnpIODcsIdn04NAQNooFd7d3nxylp"
+                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
+            />
           </Box>
-        </Container>
+        </Box>
+
+        {/* Crown Sticker */}
+        <Box 
+          className="animate-float-delayed"
+          sx={{ 
+            position: 'absolute', 
+            top: '18%', 
+            right: { xs: '8%', md: '8%' }, 
+            width: { xs: 144, md: 192 }, 
+            height: { xs: 144, md: 192 }, 
+            zIndex: 20,
+            '--tw-rotate': '15deg',
+            transform: 'rotate(15deg)'
+          }}
+        >
+          <Box 
+            className="gloss-effect"
+            sx={{ 
+                width: '100%', 
+                height: '100%', 
+                bgcolor: 'white', 
+                p: 0.5, 
+                borderRadius: '9999px', // Full
+                boxShadow: '0 25px 40px -10px rgba(26, 60, 52, 0.2), 0 10px 10px -5px rgba(26, 60, 52, 0.1)',
+                transition: 'transform 0.5s',
+                '&:hover': { transform: 'scale(1.1)' }
+            }}
+          >
+            <Box 
+                component="img"
+                alt="3D high-gloss sticker of a traditional Tawasa feather crown" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6AALHXazM1zfP6JMr6OCAOvKDnK3huNie_QdhcHhYrqUk2fS4PYn4nAJioNB1nTaPbNxP4900WDqJ4uOLGskFLeIBl2H5tVk1PIPQWp_GJaVSChVgARBJh8A91pAI0iBuHVQg_9S9mbCHBgQhn4H_u17M8jN0zbLDTfFKp-iPKN7pIVueJs77ucj4eWhSK6yVGQVKLdr86VTdFxQRliwMJw28zccafTddl0zr6DJwbaWxl0oufLLyyuJEMOjZqH66w4Ye0IH0eqHy"
+                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '9999px' }}
+            />
+          </Box>
+        </Box>
+
+        {/* Basket Sticker */}
+        <Box 
+          className="animate-float-slow"
+          sx={{ 
+            position: 'absolute', 
+            bottom: '20%', 
+            left: { xs: '8%', md: '12%' }, 
+            width: { xs: 128, md: 160 }, 
+            height: { xs: 128, md: 160 }, 
+            zIndex: 10,
+            display: { xs: 'none', sm: 'block' },
+            '--tw-rotate': '-6deg',
+            transform: 'rotate(-6deg)'
+          }}
+        >
+          <Box 
+            className="gloss-effect"
+            sx={{ 
+                width: '100%', 
+                height: '100%', 
+                bgcolor: 'white', 
+                p: 0.5, 
+                borderRadius: '2rem', 
+                boxShadow: '0 25px 40px -10px rgba(26, 60, 52, 0.2), 0 10px 10px -5px rgba(26, 60, 52, 0.1)',
+                transition: 'transform 0.5s',
+                '&:hover': { transform: 'scale(1.1)' }
+            }}
+          >
+            <Box 
+                component="img"
+                alt="3D high-gloss sticker of a woven Maki basket" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoKo86xXXX1GRLUOyvb5PKoXFjfOm-sUUbFeZDC4OWUnsu1TdwvQPrMKnytA6AJZ0g2qOkWadstHPIhez7LBhpfIFokq5cTt_pI4e04Lbk9QjRgLYj5QMKiEla-HliFfK7ufz87kAGguNDiCejpStT--vdbetHHslB3nYGodj2Ojz4mdZdgQYV4FmS0o55N8VJ7g5NbgwHJodCIWa1sMhJxoexH3vngB-Slx0MYZeU7_oQ55UPQz9UJV5uzHKteBR2WsqFgOgp7kXz"
+                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1.7rem' }}
+            />
+          </Box>
+        </Box>
+
+        {/* Vessel Sticker */}
+        <Box 
+          className="animate-float"
+          sx={{ 
+            position: 'absolute', 
+            bottom: '25%', 
+            right: { xs: '5%', md: '15%' }, 
+            width: { xs: 112, md: 160 }, 
+            height: { xs: 112, md: 160 }, 
+            zIndex: 10,
+            display: { xs: 'none', sm: 'block' },
+            '--tw-rotate': '10deg',
+            transform: 'rotate(10deg)'
+          }}
+        >
+          <Box 
+            className="gloss-effect"
+            sx={{ 
+                width: '100%', 
+                height: '100%', 
+                bgcolor: 'white', 
+                p: 0.5, 
+                borderRadius: '2.5rem', 
+                boxShadow: '0 25px 40px -10px rgba(26, 60, 52, 0.2), 0 10px 10px -5px rgba(26, 60, 52, 0.1)',
+                transition: 'transform 0.5s',
+                '&:hover': { transform: 'scale(1.1)' }
+            }}
+          >
+            <Box 
+                component="img"
+                alt="3D high-gloss sticker of a small Chicha vessel" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVIs80xDa6iz4L35XIjk_KHKYo4lOnmitiWqkays6y42m3F28DIz_6aKKfNj7sVFjdUcI5tDvVDC33F9ga5ahnWYpPdORgF6-gm1TKa-yxHz3qNlyrDpqsiAQGglV5U5aYFKJBj2LYxhjAHzamArmiY9VAQy5pRAQi7autNQYuMH-rhjPQ0q6stPDssbCsSXG7qWfj4e3zOQrXurm3jERQLPf4_U8bwSWUocoFRjTXaOR3FzkX-5zrOP5qLNJsnOfHPsHT1QYY4gtg"
+                sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
+            />
+          </Box>
+        </Box>
+
+        {/* Centered Content */}
+        <Box sx={{ position: 'relative', zIndex: 30, textAlign: 'center', maxWidth: '1024px', mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography 
+            variant="h1" 
+            sx={{ 
+                fontFamily: 'Outfit, sans-serif', 
+                fontWeight: 900, 
+                fontSize: { xs: '13vw', md: '8.5rem' }, 
+                lineHeight: 0.85, 
+                letterSpacing: '-0.05em', 
+                color: 'primary.main', 
+                mb: { xs: 4, md: 6 }, 
+                userSelect: 'none', 
+                filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' 
+            }}
+          >
+            <Box component="span" display="block">Pequeñas</Box>
+            <Box component="span" display="block">Lecciones</Box>
+            <Box component="span" display="block" sx={{ color: 'error.main', mixBlendMode: 'multiply', position: 'relative' }}>
+                de Shuar
+            </Box>
+          </Typography>
+          
+          <Typography 
+            variant="h5" 
+            sx={{ 
+                fontFamily: 'Google Sans, sans-serif', 
+                color: 'primary.main', 
+                opacity: 0.8, 
+                fontWeight: 500, 
+                maxWidth: '42rem', 
+                mx: 'auto', 
+                mb: { xs: 6, md: 8 }, 
+                lineHeight: 1.625, 
+                fontSize: { xs: '1.25rem', md: '1.5rem' } 
+            }}
+          >
+              Una serie de mini experimentos 
+              <Box component="br" sx={{ display: { xs: 'none', md: 'block' } }}/>
+              para aprender Shuar con stickers interactivos.
+          </Typography>
+
+          <Button
+            onClick={handleGoogleSignIn}
+            disableRipple
+            sx={{
+                position: 'relative',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                px: 6,
+                py: 2.5,
+                fontSize: { xs: '1.1rem', md: '1.25rem' },
+                fontWeight: 700,
+                color: 'background.default',
+                bgcolor: 'primary.main',
+                borderRadius: '1rem',
+                transition: 'all 0.15s ease-out',
+                transform: 'translateY(0)',
+                borderBottom: '6px solid',
+                borderColor: 'primary.dark',
+                boxShadow: '0 10px 20px -5px rgba(26, 60, 52, 0.25)', // button-3d shadow
+                '&:hover': {
+                    filter: 'brightness(1.1)',
+                    transform: 'translateY(-4px)',
+                    borderBottomWidth: '8px',
+                    '& .arrow-icon': {
+                        transform: 'rotate(12deg)'
+                    }
+                },
+                '&:active': {
+                    borderBottomWidth: '0px',
+                    transform: 'translateY(6px)',
+                    boxShadow: 'none'
+                },
+                '&:focus-visible': {
+                    outline: 'none',
+                    boxShadow: '0 0 0 4px rgba(243, 156, 18, 0.5)' // ring-shuar-turmeric/50
+                },
+                textTransform: 'none'
+            }}
+          >
+            <Box component="span" sx={{ position: 'relative', zIndex: 10 }}>Empezar a aprender</Box>
+            <span 
+                className="material-symbols-outlined arrow-icon" 
+                style={{ marginLeft: '0.5rem', position: 'relative', zIndex: 10, transition: 'transform 0.3s' }}
+            >
+                arrow_forward
+            </span>
+          </Button>
+        </Box>
       </Box>
+
+      <Box sx={{ height: 40, width: '100%' }}></Box>
     </Box>
   );
 };

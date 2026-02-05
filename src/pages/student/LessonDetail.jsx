@@ -486,130 +486,41 @@ const LessonDetail = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Header - Enhanced with progress and timer */}
-      <Paper
-        elevation={0}
-        sx={{
-          borderBottom: '1px solid',
-          borderColor: 'divider',
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          bgcolor: 'background.paper',
-          boxShadow: 1,
-        }}
-      >
-        <Container maxWidth="xl" sx={{ px: { xs: 3, sm: 4, md: 6 } }}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              py: 2,
-              flexWrap: 'wrap',
-              gap: 2,
-            }}
-          >
-            {/* Logo and Title */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box
-                sx={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  bgcolor: 'secondary.main',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 2,
-                }}
-              >
-                <SchoolIcon sx={{ color: 'white', fontSize: 28 }} />
-              </Box>
-              <Box>
-                <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary' }}>
-                  {lessonData.title}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" fontWeight={500}>
-                  Lección {lessonId} • Pregunta {currentQuestion + 1} de {totalQuestions}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Timer and Progress */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              {/* Timer */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  bgcolor: alpha(theme.palette.secondary.main, 0.1),
-                  borderRadius: 2,
-                  py: 0.75,
-                  px: 2,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                }}
-              >
-                <TimerIcon sx={{ color: 'secondary.main', fontSize: 20 }} />
-                <Typography variant="body2" fontWeight="bold" sx={{ letterSpacing: 0.5, color: 'text.primary' }}>
-                  {formatTime(timer)}
-                </Typography>
-              </Box>
-
-              {/* Progress Badge */}
-              <Chip
-                icon={<CheckCircleIcon />}
-                label={`${progressPercentage}% Completado`}
-                sx={{
-                  bgcolor: progressPercentage === 100 ? 'success.main' : alpha(theme.palette.secondary.main, 0.1),
-                  color: progressPercentage === 100 ? 'white' : 'secondary.main',
-                  fontWeight: 700,
-                  '& .MuiChip-icon': {
-                    color: progressPercentage === 100 ? 'white' : 'secondary.main',
-                  },
-                }}
-              />
-
-              {/* Close Button */}
-              <Tooltip title="Salir de la lección" arrow>
-                <IconButton
-                  onClick={() => navigate('/estudiante/lecciones')}
-                  aria-label="Salir de la lección"
-                  sx={{
-                    color: 'text.secondary',
-                    transition: 'all 0.3s',
-                    '&:hover': {
-                      color: 'error.main',
-                      bgcolor: alpha(theme.palette.error.main, 0.1),
-                    },
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
-
-          {/* Progress Bar */}
-          <LinearProgress
-            variant="determinate"
-            value={progressPercentage}
-            sx={{
-              height: 4,
-              bgcolor: alpha(theme.palette.secondary.main, 0.1),
-              '& .MuiLinearProgress-bar': {
-                bgcolor: 'secondary.main',
-                transition: 'transform 0.4s ease',
-              },
-            }}
-          />
-        </Container>
-      </Paper>
-
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
+        
+        {/* Header Replacement - Clean Title Area */}
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box>
+                <Typography variant="h4" fontWeight="900" sx={{ color: 'text.primary', mb: 1 }}>
+                    {lessonData.title}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Chip 
+                        label={`Lección ${lessonId}`} 
+                        size="small" 
+                        color="secondary" 
+                        sx={{ fontWeight: 'bold', borderRadius: 1 }} 
+                    />
+                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                        Pregunta {currentQuestion + 1} de {totalQuestions}
+                    </Typography>
+                </Box>
+            </Box>
+            
+            <Tooltip title="Salir de la lección">
+                <IconButton 
+                    onClick={() => navigate('/estudiante/lecciones')}
+                    sx={{ 
+                        bgcolor: 'background.paper', 
+                        boxShadow: 1,
+                        '&:hover': { bgcolor: 'error.main', color: 'white' }
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </Tooltip>
+        </Box>
         <Paper
           elevation={0}
           sx={{
@@ -858,6 +769,14 @@ const LessonDetail = () => {
             >
               Progreso
             </Typography>
+
+            {/* Timer moved here */}
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3, bgcolor: alpha(theme.palette.secondary.main, 0.1), py: 1, borderRadius: 2 }}>
+                <TimerIcon fontSize="small" color="secondary" />
+                <Typography variant="subtitle2" fontWeight="bold" color="text.primary">
+                    {formatTime(timer)}
+                </Typography>
+            </Box>
 
             {/* Progress percentage */}
             <Box sx={{ mb: 3, textAlign: 'center' }}>

@@ -111,21 +111,7 @@ const StudentLayout = () => {
             {/* Right: Actions & User */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 3 } }}>
                 
-                {/* Language Selector (Visual) */}
-                <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, fontSize: '0.875rem', fontWeight: 600, color: 'text.secondary' }}>
-                    <span>Idioma del sitio: <Typography component="span" fontWeight="bold" color="primary" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Español</Typography></span>
-                    <ExpandMoreIcon fontSize="small" />
-                </Box>
-
-                {/* Icons */}
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                     <IconButton size="small" sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
-                        <OutlinedFlagIcon />
-                     </IconButton>
-                     <IconButton size="small" sx={{ display: { xs: 'none', sm: 'inline-flex' } }}>
-                        <InfoOutlinedIcon />
-                     </IconButton>
-                </Box>
+                
                 
                 {/* User Avatar & Menu Trigger */}
                 <Tooltip title="Cuenta">

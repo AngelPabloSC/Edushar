@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Box,
   Container,
@@ -11,9 +12,9 @@ import {
   Alert,
 } from '@mui/material';
 import { useUserProfile } from '../../hooks/auth/useUserProfile';
-import { studentProfileData } from '../../data/profileData';
+import { useStudentLessons } from '../../hooks/pages/useStudentLessons'; // Import hook
+import { studentProfileData } from '../../data/profileData'; // Keep for medals/fallbacks if needed
 import SettingsIcon from '@mui/icons-material/Settings';
-import ShareIcon from '@mui/icons-material/Share';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
@@ -24,23 +25,48 @@ import Diversity3Icon from '@mui/icons-material/Diversity3';
 import CheckIcon from '@mui/icons-material/Check';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import StarIcon from '@mui/icons-material/Star';
+import EditProfileDialog from '../../components/dialogs/EditProfileDialog';
 
 /**
  * Página de Perfil del Estudiante
  * Muestra estadísticas, medallas y actividad reciente
  */
 const StudentProfile = () => {
-  const { user: apiUser, loading, error } = useUserProfile();
-  const { stats, medals, activities } = studentProfileData;
+  const { user: apiUser, loading: loadingUser, error: errorUser, updateUser } = useUserProfile();
+  const { globalStats, recentActivity, loading: loadingLessons } = useStudentLessons();
+  const { medals } = studentProfileData; // Keep medals static for now or fetch if available
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const loading = loadingUser || loadingLessons;
+  const error = errorUser;
 
   // Format user data from API
   const user = apiUser ? {
+    ...apiUser, // Keep all original data for editing
     name: `${apiUser.firstName} ${apiUser.lastName}`,
     avatar: apiUser.photoProfile,
     email: apiUser.email,
-    level: 'Nivel Intermedio', // This could come from stats later
-    streak: 7, // This could come from stats later
+    level: globalStats.levelLabel || 'Nivel Intermedio', // Use calculated level
+    streak: globalStats.streak || 0, // Real streak
   } : null;
+
+  // Real stats
+  const stats = {
+      lessonsCompleted: globalStats.completed,
+      totalLessons: globalStats.total,
+      lessonsProgress: globalStats.percentage,
+      wordsLearned: globalStats.completed * 5, // Estimate: 5 words per lesson
+  };
+
+  const activities = recentActivity; // Use real recent activity
+
+  const handleUpdateProfile = async (data) => {
+      const result = await updateUser(data);
+      if (result.success) {
+          setIsEditDialogOpen(false);
+      }
+      return result; // Pass result back to dialog for error handling
+  };
 
   const getMedalIcon = (type) => {
     switch (type) {
@@ -149,6 +175,7 @@ const StudentProfile = () => {
             <Button
               variant="outlined"
               startIcon={<SettingsIcon />}
+              onClick={() => setIsEditDialogOpen(true)}
               sx={{
                 flex: { xs: 1, md: 'none' },
                 fontWeight: 'bold',
@@ -170,28 +197,6 @@ const StudentProfile = () => {
             >
               Editar Perfil
             </Button>
-            <Button
-              variant="contained"
-              startIcon={<ShareIcon />}
-              sx={{
-                flex: { xs: 1, md: 'none' },
-                bgcolor: 'secondary.main',
-                color: 'white',
-                fontWeight: 'bold',
-                py: 1.5,
-                px: 3,
-                fontSize: '0.95rem',
-                boxShadow: 2,
-                '&:hover': {
-                  bgcolor: 'secondary.dark',
-                  transform: 'translateY(-2px)',
-                  boxShadow: 4,
-                },
-                transition: 'all 0.2s',
-              }}
-            >
-              Compartir
-            </Button>
           </Box>
         </Box>
       </Paper>
@@ -205,20 +210,6 @@ const StudentProfile = () => {
               <Typography variant="h5" fontWeight="bold">
                 Estadísticas
               </Typography>
-              <Button
-                size="small"
-                sx={{
-                  color: 'secondary.main',
-                  fontWeight: 'bold',
-                  textTransform: 'none',
-                  '&:hover': {
-                    bgcolor: 'rgba(209, 154, 74, 0.08)',
-                    textDecoration: 'underline',
-                  },
-                }}
-              >
-                Ver detalles →
-              </Button>
             </Box>
             <Grid container spacing={3}>
               {/* Lecciones */}
@@ -284,12 +275,6 @@ const StudentProfile = () => {
                     <Typography variant="h4" fontWeight="bold">
                       {stats.lessonsCompleted} / {stats.totalLessons}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                      <TrendingUpIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
-                      <Typography variant="body2" color="secondary.main" fontWeight="600">
-                        +2 esta semana
-                      </Typography>
-                    </Box>
                   </Box>
                 </Paper>
               </Grid>
@@ -358,12 +343,6 @@ const StudentProfile = () => {
                     <Typography variant="h4" fontWeight="bold">
                       Aprendidas
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                      <TrendingUpIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
-                      <Typography variant="body2" color="secondary.main" fontWeight="600">
-                        +15% vs mes anterior
-                      </Typography>
-                    </Box>
                   </Box>
                 </Paper>
               </Grid>
@@ -474,79 +453,78 @@ const StudentProfile = () => {
 
               {/* Activities */}
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                {activities.map((activity) => (
-                  <Box key={activity.id} sx={{ position: 'relative', pl: 5 }}>
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        left: 0,
-                        top: 4,
-                        width: 32,
-                        height: 32,
-                        borderRadius: '50%',
-                        bgcolor: getActivityColor(activity.type),
-                        border: '4px solid',
-                        borderColor: 'background.paper',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        zIndex: 1,
-                      }}
-                    >
-                      {getActivityIcon(activity.type)}
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight="bold">
-                        {activity.title}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
-                        {activity.time}
-                      </Typography>
-                      {activity.exp && (
-                        <Chip
-                          label={`+${activity.exp} EXP`}
-                          size="small"
-                          sx={{
-                            bgcolor: 'rgba(209, 154, 74, 0.1)',
-                            color: 'secondary.main',
-                            fontWeight: 'bold',
-                            fontSize: '0.7rem',
-                            height: 20,
-                          }}
-                        />
-                      )}
-                      {activity.score && (
-                        <Typography variant="caption" fontWeight="600">
-                          Puntaje: {activity.score}
+                {activities.length > 0 ? (
+                    activities.map((activity) => (
+                    <Box key={activity.id} sx={{ position: 'relative', pl: 5 }}>
+                        <Box
+                        sx={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 4,
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            bgcolor: getActivityColor(activity.type),
+                            border: '4px solid',
+                            borderColor: 'background.paper',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            zIndex: 1,
+                        }}
+                        >
+                        {getActivityIcon(activity.type)}
+                        </Box>
+                        <Box>
+                        <Typography variant="body2" fontWeight="bold">
+                            {activity.title}
                         </Typography>
-                      )}
+                        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                            {activity.time}
+                        </Typography>
+                        {activity.exp && (
+                            <Chip
+                            label={`+${activity.exp} EXP`}
+                            size="small"
+                            sx={{
+                                bgcolor: 'rgba(209, 154, 74, 0.1)',
+                                color: 'secondary.main',
+                                fontWeight: 'bold',
+                                fontSize: '0.7rem',
+                                height: 20,
+                            }}
+                            />
+                        )}
+                        {activity.score && (
+                            <Typography variant="caption" fontWeight="600" sx={{ ml: 1 }}>
+                            Puntaje: {activity.score}
+                            </Typography>
+                        )}
+                        </Box>
                     </Box>
-                  </Box>
-                ))}
+                    ))
+                ) : (
+                    <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+                        Aún no tienes actividad reciente. ¡Comienza una lección!
+                    </Typography>
+                )}
               </Box>
 
-              <Button
-                fullWidth
-                sx={{
-                  mt: 4,
-                  pt: 3,
-                  borderTop: '1px solid',
-                  borderColor: 'divider',
-                  color: 'text.secondary',
-                  fontWeight: 'bold',
-                  '&:hover': {
-                    color: 'secondary.main',
-                  },
-                }}
-              >
-                Ver todo el historial
-              </Button>
             </Box>
           </Paper>
         </Grid>
       </Grid>
         </>
+      )}
+      {/* Edit Profile Dialog */}
+      {user && (
+          <EditProfileDialog
+            open={isEditDialogOpen}
+            onClose={() => setIsEditDialogOpen(false)}
+            user={user}
+            onUpdate={handleUpdateProfile}
+          />
       )}
     </Container>
   );

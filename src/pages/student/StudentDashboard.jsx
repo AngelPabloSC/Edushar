@@ -23,7 +23,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import LoadingLesson from '../../components/LoadingLesson';
 
 /**
@@ -46,12 +46,24 @@ const StudentDashboard = () => {
   const [selectedLevel, setSelectedLevel] = useState('all');
   const [loadingCustom, setLoadingCustom] = useState(false);
 
+  // Restore state from sessionStorage on mount
+  const [isRestored, setIsRestored] = useState(false);
+
+  useEffect(() => {
+    const savedState = sessionStorage.getItem('studentDashboardState');
+    if (savedState) {
+        const { query, level, showingResults } = JSON.parse(savedState);
+        if (query) setSearchQuery(query);
+        if (level) setSelectedLevel(level);
+        if (showingResults) {
+            setLoadingCustom(true);
+            setIsRestored(true);
+        }
+    }
+  }, []); // Run only once on mount
+
   // Allow access to ALL lessons (unlocked)
   const handleLessonClick = (lessonId) => {
-    // Simulating loading screen before navigation (optional, or just for search?)
-    // User requested: "when the user searches the story... this new page loads"
-    // So we apply it on search action mainly.
-    // For navigation, let's keep it direct for now unless requested.
     navigate(`/leccion/${lessonId}`);
   };
 
@@ -84,22 +96,42 @@ const StudentDashboard = () => {
     { label: '🏠 Hogar', value: 'hogar' }
   ];
 
+  const persistState = (query, level, showingResults) => {
+      sessionStorage.setItem('studentDashboardState', JSON.stringify({ query, level, showingResults }));
+  };
+
   const handleTagClick = (val) => {
     setSearchQuery(val);
-    handleSearchAction(); // Trigger loading on tag click too
+    setSelectedLevel('all'); // Reset level on tag click? Or keep? Let's keep for now but usually tags override.
+    setLoadingCustom(true);
+    setIsRestored(false); // New search, show animation
+    persistState(val, 'all', true);
   };
 
   const handleSearchAction = () => {
      setLoadingCustom(true);
+     setIsRestored(false); // New search, show animation
+     persistState(searchQuery, selectedLevel, true);
+  };
+
+  const handleCancelSearch = () => {
+      setLoadingCustom(false);
+      setSearchQuery('');
+      setIsRestored(false);
+      sessionStorage.removeItem('studentDashboardState');
   };
 
   if (loadingCustom) {
       return (
         <LoadingLesson 
-            onCancel={() => setLoadingCustom(false)} 
+            onCancel={handleCancelSearch} 
             query={searchQuery}
-            setQuery={setSearchQuery}
+            setQuery={(val) => {
+                setSearchQuery(val);
+                persistState(val, selectedLevel, true);
+            }}
             lessonsByLevel={lessonsByLevel}
+            skipIntro={isRestored}
         />
       );
   }

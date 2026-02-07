@@ -1,23 +1,12 @@
 import { Box, Typography, Button, keyframes, alpha, Skeleton, useTheme, IconButton, Container, Grid, TextField } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import SchoolIcon from '@mui/icons-material/School';
 import CloseIcon from '@mui/icons-material/Close';
 import SpaIcon from '@mui/icons-material/Spa';
-import HomeIcon from '@mui/icons-material/Home';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import OutlinedFlagIcon from '@mui/icons-material/OutlinedFlag';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import EventNoteIcon from '@mui/icons-material/EventNote';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import LightModeIcon from '@mui/icons-material/LightMode';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
-import LockIcon from '@mui/icons-material/Lock';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,21 +26,25 @@ const pulseSlow = keyframes`
   50% { opacity: 0.5; }
 `;
 
-const LoadingLesson = ({ onCancel, query, setQuery, lessonsByLevel }) => {
+const LoadingLesson = ({ onCancel, query, setQuery, lessonsByLevel, skipIntro = false }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!skipIntro);
   const [isEditing, setIsEditing] = useState(false);
   const [tempQuery, setTempQuery] = useState(query);
 
   useEffect(() => {
+    if (skipIntro) {
+        setLoading(false);
+        return;
+    }
     // Reset loading whenever query changes effectively or on mount
     setLoading(true);
     const timer = setTimeout(() => {
         setLoading(false);
     }, 3000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [skipIntro]);
 
   const handleRefresh = () => {
     setLoading(true);
@@ -216,12 +209,6 @@ const LoadingLesson = ({ onCancel, query, setQuery, lessonsByLevel }) => {
                  {/* Reusing these as visual indicators or we can map levels here? Let's use them as types of content */}
                  <Button startIcon={<EventNoteIcon />} variant="contained" sx={{ borderRadius: 50, px: 3, py: 1.5, fontWeight: 600, boxShadow: 0, '&:hover': { boxShadow: 0 }, whiteSpace: 'nowrap' }}>
                     Lecciones
-                 </Button>
-                 <Button startIcon={<ChatBubbleOutlineIcon />} color="inherit" sx={{ borderRadius: 50, px: 3, py: 1.5, color: 'text.secondary', fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                    Frases
-                 </Button>
-                 <Button startIcon={<MenuBookIcon />} color="inherit" sx={{ borderRadius: 50, px: 3, py: 1.5, color: 'text.secondary', fontWeight: 600, bgcolor: 'action.hover', whiteSpace: 'nowrap' }}>
-                    Sugerencias
                  </Button>
              </Box>
 

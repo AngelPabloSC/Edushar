@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/context/LoginContext';
 import { useStudentLessons } from '../../hooks/pages/useStudentLessons';
 import DashboardCard from '../../components/DashboardCard';
+import { useUserProfile } from '../../hooks/auth/useUserProfile';
 
 /**
  * Dashboard principal del estudiante - Página de inicio mejorada
@@ -16,6 +17,7 @@ import DashboardCard from '../../components/DashboardCard';
 const StudentHome = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { user: profileUser } = useUserProfile();
   const { globalStats } = useStudentLessons();
   
   // Safe access to stats
@@ -45,12 +47,22 @@ const StudentHome = () => {
       buttonText: 'Leer ahora'
     },
     {
+      id: 'translator',
+      subtitle: 'Herramienta • Traducción',
+      title: 'Traductor Shuar',
+      description: 'Traduce frases y textos del español al Shuar con justificación lingüística.',
+      image: '/translator.png', 
+      color: 'primary',
+      onClick: () => navigate('/estudiante/traductor'),
+      buttonText: 'Traducir'
+    },
+    {
       id: 'dictionary',
       subtitle: 'Vocabulario • Consulta',
       title: 'Diccionario',
       description: 'Explora más de 5,000 términos con ejemplos de uso y pronunciación.',
       image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhmlOon5LaA0nr9rlhgvEp7mZsaQiqfO2wyKGV8VlP2lfNsaeNNd0vE0d1DPM4pJQ79GaG1PEKL7pxuPPEbtMqnkuMRwAXLHsUyES40j5tthdd8eQamrJUMby0jmuy-an1R6ll99fF91tEPanjGNPsY5-5OCS_V4GPV6RnL-MYmRTlfo8ddgh4ivADkO8pUQCvYQ8dkZ7nZFer-5N5tzbActkW0QG6bYCpX6ktPUciiLCixpJzAsIECAXPHT8Cs7V0XbbQ_F1zT8yY',
-      color: 'primary',
+      color: 'secondary',
       onClick: () => navigate('/estudiante/diccionario'),
       buttonText: 'Buscar'
     },
@@ -60,7 +72,7 @@ const StudentHome = () => {
       title: 'Contribuciones',
       description: 'Ayuda a expandir el conocimiento compartiendo nuevas palabras o historias.',
       image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvyybVkV1n8WSPH4_vgGMcwOi1dqGWNfAk7VD_fW2TeW5wskU0qBThQWD3rGKO9xS7Z2_PpZkcsNA8usSY7xDo3oUl7xIPARjZLwCEq2ZH1qwsrNxiUQ_D4Ur7QDBc1HWF_nPS5_IlXh-43aUpno6WnKfvq9dpiQ6-G6cbISSvbq6ipPAc2pEQ2DXXdWMT-5RLzibf2PHjJ7metQhxBkl-wW-LYoR0iSkUYwESUjBmx-M2L5pJ0gneWsBnBcS8RNlte02_MgnsNOBn',
-      color: 'secondary',
+      color: 'primary',
       onClick: () => navigate('/estudiante/contribuciones'),
       buttonText: 'Colaborar'
     }
@@ -115,7 +127,7 @@ const StudentHome = () => {
                             lineHeight: 1.6
                         }}
                     >
-                        Bienvenido de nuevo, <strong>{user?.nombre || 'Estudiante'}</strong>. Continúa tu aprendizaje hoy.
+                        Bienvenido de nuevo, <strong>{profileUser?.firstName || 'Estudiante'}</strong>. Continúa tu aprendizaje hoy.
                     </Typography>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: 'background.paper', py: 1, px: 2, borderRadius: 10, boxShadow: 1 }}>

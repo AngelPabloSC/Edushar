@@ -37,13 +37,6 @@ const Landing = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: '0.875rem', fontWeight: 500, color: 'primary.main', opacity: 0.8 }}>
-          <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 0.5, cursor: 'pointer', '&:hover': { color: 'error.main' }, transition: 'color 0.3s' }}>
-            <span>Idioma: <Box component="span" fontWeight="bold">Español</Box></span>
-            <span className="material-symbols-outlined" style={{ fontSize: '0.875rem' }}>expand_more</span>
-          </Box>
-          <Box component="button" sx={{ p: 1, borderRadius: '50%', '&:hover': { color: 'error.main', bgcolor: 'rgba(26,60,52,0.05)' }, transition: 'all 0.3s', border: 'none', background: 'none' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '1.25rem' }}>flag</span>
-          </Box>
           <Box 
             component="button" 
             onClick={() => navigate('/login')}

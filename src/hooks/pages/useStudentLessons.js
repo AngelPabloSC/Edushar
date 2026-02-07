@@ -6,9 +6,10 @@ export const useStudentLessons = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lessonsByLevel, setLessonsByLevel] = useState({});
-    const [globalStats, setGlobalStats] = useState({ completed: 0, total: 0, percentage: 0 });
+    const [globalStats, setGlobalStats] = useState({ completed: 0, total: 0, percentage: 0, streak: 0 });
     const [searchQuery, setSearchQuery] = useState('');
     const [rawLessons, setRawLessons] = useState([]);
+    const [recentActivity, setRecentActivity] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -162,7 +163,75 @@ export const useStudentLessons = () => {
                         else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
                     }
 
-                    setGlobalStats({ completed, total, percentage, levelLabel });
+                    // Calculate Streak
+                    // Logic: Count consecutive days where at least one lesson was updated/completed.
+                    // 1. Extract unique dates (YYYY-MM-DD) from progressItems
+                    const dates = [...new Set(progressItems
+                        .filter(p => p.updatedAt)
+                        .map(p => new Date(p.updatedAt).toISOString().split('T')[0])
+                    )].sort((a, b) => new Date(b) - new Date(a)); // Descending
+
+                    let streak = 0;
+                    if (dates.length > 0) {
+                        const today = new Date().toISOString().split('T')[0];
+                        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+                        // Check if streak is active (today or yesterday present)
+                        let currentDate = dates[0] === today ? today : (dates[0] === yesterday ? yesterday : null);
+
+                        if (currentDate) {
+                            streak = 1;
+                            let checkDate = new Date(currentDate);
+
+                            // Check previous days
+                            for (let i = 1; i < dates.length; i++) {
+                                checkDate.setDate(checkDate.getDate() - 1); // Go back 1 day
+                                const expectedDate = checkDate.toISOString().split('T')[0];
+
+                                if (dates[i] === expectedDate) {
+                                    streak++;
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    setGlobalStats({ completed, total, percentage, levelLabel, streak });
+
+                    // Process Recent Activity (History)
+                    const activityList = progressItems
+                        .filter(p => p.updatedAt) // Ensure we have a date
+                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+                        .slice(0, 5) // Last 5 items
+                        .map(item => {
+                            const lesson = lessons.find(l => l.id === item.lessonId);
+                            if (!lesson) return null;
+
+                            // Format relative time (e.g., "Hace 2 horas")
+                            const date = new Date(item.updatedAt);
+                            const now = new Date();
+                            const diffInSeconds = Math.floor((now - date) / 1000);
+                            let timeLabel = '';
+
+                            if (diffInSeconds < 60) timeLabel = 'Hace unos segundos';
+                            else if (diffInSeconds < 3600) timeLabel = `Hace ${Math.floor(diffInSeconds / 60)} min`;
+                            else if (diffInSeconds < 86400) timeLabel = `Hace ${Math.floor(diffInSeconds / 3600)} h`;
+                            else timeLabel = `Hace ${Math.floor(diffInSeconds / 86400)} días`;
+
+                            return {
+                                id: item.id || item._id || `${item.lessonId}-${Date.now()}`,
+                                type: 'lesson',
+                                title: `Lección: ${lesson.title}`,
+                                time: timeLabel,
+                                score: item.score,
+                                exp: item.score, // Assuming Score = XP for now
+                                percentage: item.percentage
+                            };
+                        })
+                        .filter(Boolean);
+
+                    setRecentActivity(activityList);
 
                 } else {
                     setError('Error al cargar las lecciones');
@@ -231,6 +300,7 @@ export const useStudentLessons = () => {
         rawLessons, // Expose flat list for finding active lesson
         lessonsByLevel: processedData,
         globalStats,
+        recentActivity,
         loading,
         error,
         searchQuery,

@@ -71,6 +71,15 @@ const LessonDetail = () => {
     return () => clearInterval(interval);
   }, [isFinished, showConfirmation]);
 
+  /* Navigation Handler */
+  const handleExit = () => {
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate('/estudiante/lecciones');
+    }
+  };
+
   if (loading) {
      return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -89,8 +98,8 @@ const LessonDetail = () => {
         <Typography variant="body1" color="text.secondary" paragraph>
             No pudimos cargar la información de esta lección.
         </Typography>
-        <Button onClick={() => navigate('/estudiante/lecciones')} variant="contained" color="secondary">
-          Volver a Lecciones
+        <Button onClick={handleExit} variant="contained" color="secondary">
+          Volver
         </Button>
       </Box>
     );
@@ -161,10 +170,6 @@ const LessonDetail = () => {
     }, 200);
   };
 
-  const handleGoToDashboard = () => {
-    navigate('/estudiante/lecciones');
-  };
-
   if (loading) {
      return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -183,7 +188,7 @@ const LessonDetail = () => {
         <Typography variant="body1" color="text.secondary" paragraph>
             No pudimos cargar la información de esta lección.
         </Typography>
-        <Button onClick={() => navigate('/estudiante/lecciones')} variant="contained" color="secondary">
+        <Button onClick={handleExit} variant="contained" color="secondary">
           Volver a Lecciones
         </Button>
       </Box>
@@ -422,7 +427,7 @@ const LessonDetail = () => {
                  <Button
                     variant="contained"
                     size="large"
-                    onClick={handleGoToDashboard}
+                    onClick={handleExit}
                     startIcon={<SchoolIcon />}
                     sx={{
                         borderRadius: 50,
@@ -438,7 +443,7 @@ const LessonDetail = () => {
                         }
                     }}
                 >
-                    Ir al Dashboard
+                    Continuar
                 </Button>
             </Box>
         </Paper>
@@ -510,7 +515,7 @@ const LessonDetail = () => {
             
             <Tooltip title="Salir de la lección">
                 <IconButton 
-                    onClick={() => navigate('/estudiante/lecciones')}
+                    onClick={handleExit}
                     sx={{ 
                         bgcolor: 'background.paper', 
                         boxShadow: 1,

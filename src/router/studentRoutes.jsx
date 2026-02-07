@@ -15,6 +15,7 @@ const StudentStories = lazy(() => import('../pages/student/StudentStories'));
 const StoryReader = lazy(() => import('../pages/student/StoryReader'));
 const StudentDictionary = lazy(() => import('../pages/student/StudentDictionary'));
 const StudentProfile = lazy(() => import('../pages/student/StudentProfile'));
+const StudentTranslator = lazy(() => import('../pages/student/StudentTranslator'));
 
 // Rutas para estudiantes autenticados - Protegidas con ProtectRoute
 const studentRoutes = [
@@ -48,6 +49,14 @@ const studentRoutes = [
         element: (
           <Suspense fallback={<LoadingFallback />}>
             <StudentDictionary />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'traductor',
+        element: (
+          <Suspense fallback={<LoadingFallback />}>
+            <StudentTranslator />
           </Suspense>
         ),
       },

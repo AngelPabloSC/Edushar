@@ -45,6 +45,30 @@ export const useUserProfile = () => {
         }
     };
 
+    const updateUser = async (userData) => {
+        try {
+            setLoading(true);
+
+            const response = await getFechData({
+                endPoint: 'api/users/update',
+                method: 'POST',
+                additionalData: userData
+            });
+
+            if (response.code === 'COD_OK') {
+                // Refresh user data
+                await fetchUserProfile();
+                return { success: true, message: response.message || 'Perfil actualizado correctamente' };
+            } else {
+                return { success: false, message: response.message || 'Error al actualizar el perfil' };
+            }
+        } catch (err) {
+            return { success: false, message: err.message || 'Error de conexión' };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchUserProfile();
     }, []);
@@ -53,6 +77,7 @@ export const useUserProfile = () => {
         user,
         loading,
         error,
-        refetch: fetchUserProfile
+        refetch: fetchUserProfile,
+        updateUser
     };
 };

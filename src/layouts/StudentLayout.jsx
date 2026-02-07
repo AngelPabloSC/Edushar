@@ -108,12 +108,12 @@ const StudentLayout = () => {
                 </Typography>
             </Box>
 
-            {/* Right: Actions & User */}
+    
             <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, md: 3 } }}>
                 
                 
                 
-                {/* User Avatar & Menu Trigger */}
+           
                 <Tooltip title="Cuenta">
                     <IconButton
                         onClick={handleMenuOpen}

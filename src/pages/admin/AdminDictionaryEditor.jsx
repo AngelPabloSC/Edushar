@@ -69,7 +69,9 @@ const AdminDictionaryEditor = () => {
 
                     if (response.code === 'COD_OK') {
                         const items = response.data?.items || [];
-                        const term = items.find(t => t.id === parseInt(id));
+                        // Find term by ID (comparing as strings/numbers loosely or strictly depending on source)
+                        // API seems to return string IDs based on user input example "BnMDwgfLjPqsIvvUG4l3"
+                        const term = items.find(t => String(t.id) === String(id));
                         
                         if (term) {
                             setFormData({
@@ -142,7 +144,8 @@ const AdminDictionaryEditor = () => {
         };
 
         const endpoint = isEditMode ? 'api/dictionary/update' : 'api/dictionary/create';
-        const finalPayload = isEditMode ? { id: parseInt(id), ...payload } : payload;
+        // Use ID as is, without parsing integer
+        const finalPayload = isEditMode ? { id: id, ...payload } : payload;
 
         try {
             const response = await getFechData({

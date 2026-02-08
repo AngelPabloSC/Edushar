@@ -62,16 +62,16 @@ const AdminDictionaryEditor = () => {
              const fetchEntry = async () => {
                 try {
                     const response = await getFechData({
-                        endPoint: 'api/dictionary/list',
+                        endPoint: 'api/dictionary/get',
                         method: 'POST',
-                        additionalData: {} 
+                        additionalData: { id } 
                     });
 
                     if (response.code === 'COD_OK') {
-                        const items = response.data?.items || [];
-                        // Find term by ID (comparing as strings/numbers loosely or strictly depending on source)
-                        // API seems to return string IDs based on user input example "BnMDwgfLjPqsIvvUG4l3"
-                        const term = items.find(t => String(t.id) === String(id));
+                        const data = response.data;
+                        // Some endpoints might wrap the term details in a 'word' object, others might return it flat.
+                        // Check for 'wordShuar' at root, if not found or empty, try data.word
+                        const term = (data.wordShuar) ? data : (data.word || data);
                         
                         if (term) {
                             setFormData({
@@ -79,7 +79,7 @@ const AdminDictionaryEditor = () => {
                                 wordSpanish: term.wordSpanish || '',
                                 category: term.category || '',
                                 exampleShuar: Array.isArray(term.examples) ? term.examples[0] : (term.examples || ''),
-                                exampleSpanish: '', // Backend support for this field pending
+                                exampleSpanish: term.exampleSpanish || '', 
                                 image: term.image || null,
                             });
                         } else {
@@ -337,6 +337,10 @@ const AdminDictionaryEditor = () => {
                                         <MenuItem value="Adjetivo">Adjetivo</MenuItem>
                                         <MenuItem value="Adverbio">Adverbio</MenuItem>
                                         <MenuItem value="Expresión">Expresión</MenuItem>
+                                        <MenuItem value="Animales">Animales</MenuItem>
+                                        <MenuItem value="Plantas">Plantas</MenuItem>
+                                        <MenuItem value="Naturaleza">Naturaleza</MenuItem>
+                                        <MenuItem value="Otro">Otro</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>

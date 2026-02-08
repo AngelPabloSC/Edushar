@@ -6,8 +6,8 @@ export const useAdminDictionary = () => {
     const [entries, setEntries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [categoryFilter, setCategoryFilter] = useState('Todos');
+    const [searchTerm, setSearchTerm] = useState(() => sessionStorage.getItem('adminDictionarySearch') || '');
+    const [categoryFilter, setCategoryFilter] = useState(() => sessionStorage.getItem('adminDictionaryCategory') || 'Todos');
     const [statusFilter, setStatusFilter] = useState('Todos');
     const [isFetch, setIsFetch] = useState(true);
 
@@ -53,6 +53,15 @@ export const useAdminDictionary = () => {
         fetchDictionary();
         setIsFetch(false);
     }, [isFetch, fetchDictionary]);
+
+    // Save filters to session storage
+    useEffect(() => {
+        sessionStorage.setItem('adminDictionarySearch', searchTerm);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        sessionStorage.setItem('adminDictionaryCategory', categoryFilter);
+    }, [categoryFilter]);
 
     // Filtrar entradas
     const filteredEntries = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     Box,
@@ -78,14 +78,35 @@ const AdminDictionary = () => {
         setSelectedEntry(null);
     };
     
-    // Pagination State
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    // Pagination State (Persisted)
+    const [page, setPage] = useState(() => {
+        const savedPage = sessionStorage.getItem('adminDictionaryPage');
+        return savedPage ? Number(savedPage) : 0;
+    });
+    const [rowsPerPage, setRowsPerPage] = useState(() => {
+        const savedRows = sessionStorage.getItem('adminDictionaryRowsPerPage');
+        return savedRows ? Number(savedRows) : 10;
+    });
+
+    const isFirstRun = useRef(true);
 
     // Reset page when filters change
     useEffect(() => {
+        if (isFirstRun.current) {
+            isFirstRun.current = false;
+            return;
+        }
         setPage(0);
     }, [searchTerm, categoryFilter]);
+
+    // Save pagination state
+    useEffect(() => {
+        sessionStorage.setItem('adminDictionaryPage', page);
+    }, [page]);
+
+    useEffect(() => {
+        sessionStorage.setItem('adminDictionaryRowsPerPage', rowsPerPage);
+    }, [rowsPerPage]);
 
     // Categorías con iconos y colores (Mapping + Visibility)
     const categoryConfig = {
@@ -243,7 +264,7 @@ const AdminDictionary = () => {
                 filter: false,
                 sort: false,
                 customBodyRender: (value, tableMeta) => {
-                    const entry = entries[tableMeta.rowIndex];
+                    const entry = paginatedEntries[tableMeta.rowIndex];
                      // Verify entry exists to avoid crashes on pagination edge cases if data changes
                     if (!entry) return null;
 

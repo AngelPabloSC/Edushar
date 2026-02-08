@@ -91,8 +91,8 @@ const Landing = () => {
           <Box 
             className="gloss-effect"
             sx={{ 
-                width: '100%', 
-                height: '100%', 
+                width: '130%', 
+                height: '130%', 
                 bgcolor: 'white', 
                 p: 0.5, 
                 borderRadius: '2.5rem', 
@@ -104,7 +104,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a tropical toucan" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHw6YmkrQoK6KLIfjhkpL3p6Is3w5E8i_WDUE0pxtsXzBRkw5ymC5j8pY3KvwLTwyVDpAF77jGJw2ITIh2Fg76ePKzVwRhUW1DIenX2ftJiawLn0jsI5VywTTE_tHQZT8gg-PHu5OKJkdrp_jwid8U4A8rF_JzVqNDH_UxEzCNm4oLZz9s9oTtS6SfeJ2v3M7Q_ZyxT9Vzob6yS0M12G1OAoaEGnZQlcHnWWP1UY4aB9Z4MkXYnpIODcsIdn04NAQNooFd7d3nxylp"
+                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_12.46.42_yrdqnv.jpg"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>
@@ -127,8 +127,8 @@ const Landing = () => {
           <Box 
             className="gloss-effect"
             sx={{ 
-                width: '100%', 
-                height: '100%', 
+                width: '130%', 
+                height: '130%', 
                 bgcolor: 'white', 
                 p: 0.5, 
                 borderRadius: '9999px', // Full
@@ -140,7 +140,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a traditional Tawasa feather crown" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6AALHXazM1zfP6JMr6OCAOvKDnK3huNie_QdhcHhYrqUk2fS4PYn4nAJioNB1nTaPbNxP4900WDqJ4uOLGskFLeIBl2H5tVk1PIPQWp_GJaVSChVgARBJh8A91pAI0iBuHVQg_9S9mbCHBgQhn4H_u17M8jN0zbLDTfFKp-iPKN7pIVueJs77ucj4eWhSK6yVGQVKLdr86VTdFxQRliwMJw28zccafTddl0zr6DJwbaWxl0oufLLyyuJEMOjZqH66w4Ye0IH0eqHy"
+                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_11.58.24_ppkgxn.jpg"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '9999px' }}
             />
           </Box>
@@ -164,8 +164,8 @@ const Landing = () => {
           <Box 
             className="gloss-effect"
             sx={{ 
-                width: '100%', 
-                height: '100%', 
+                width: '130%', 
+                height: '130%', 
                 bgcolor: 'white', 
                 p: 0.5, 
                 borderRadius: '2rem', 
@@ -177,7 +177,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a woven Maki basket" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoKo86xXXX1GRLUOyvb5PKoXFjfOm-sUUbFeZDC4OWUnsu1TdwvQPrMKnytA6AJZ0g2qOkWadstHPIhez7LBhpfIFokq5cTt_pI4e04Lbk9QjRgLYj5QMKiEla-HliFfK7ufz87kAGguNDiCejpStT--vdbetHHslB3nYGodj2Ojz4mdZdgQYV4FmS0o55N8VJ7g5NbgwHJodCIWa1sMhJxoexH3vngB-Slx0MYZeU7_oQ55UPQz9UJV5uzHKteBR2WsqFgOgp7kXz"
+                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_11.55.19_eluclf.jpg"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1.7rem' }}
             />
           </Box>
@@ -201,8 +201,8 @@ const Landing = () => {
           <Box 
             className="gloss-effect"
             sx={{ 
-                width: '100%', 
-                height: '100%', 
+                width: '130%', 
+                height: '130%', 
                 bgcolor: 'white', 
                 p: 0.5, 
                 borderRadius: '2.5rem', 
@@ -214,7 +214,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a small Chicha vessel" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVIs80xDa6iz4L35XIjk_KHKYo4lOnmitiWqkays6y42m3F28DIz_6aKKfNj7sVFjdUcI5tDvVDC33F9ga5ahnWYpPdORgF6-gm1TKa-yxHz3qNlyrDpqsiAQGglV5U5aYFKJBj2LYxhjAHzamArmiY9VAQy5pRAQi7autNQYuMH-rhjPQ0q6stPDssbCsSXG7qWfj4e3zOQrXurm3jERQLPf4_U8bwSWUocoFRjTXaOR3FzkX-5zrOP5qLNJsnOfHPsHT1QYY4gtg"
+                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_12.17.27_jrxpr3.jpg"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>

@@ -104,13 +104,9 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a tropical toucan" 
-<<<<<<< HEAD
                 src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_12.46.42_yrdqnv.jpg"
-=======
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHw6YmkrQoK6KLIfjhkpL3p6Is3w5E8i_WDUE0pxtsXzBRkw5ymC5j8pY3KvwLTwyVDpAF77jGJw2ITIh2Fg76ePKzVwRhUW1DIenX2ftJiawLn0jsI5VywTTE_tHQZT8gg-PHu5OKJkdrp_jwid8U4A8rF_JzVqNDH_UxEzCNm4oLZz9s9oTtS6SfeJ2v3M7Q_ZyxT9Vzob6yS0M12G1OAoaEGnZQlcHnWWP1UY4aB9Z4MkXYnpIODcsIdn04NAQNooFd7d3nxylp"
                 fetchPriority="high"
                 loading="eager"
->>>>>>> fb6c153 (wip: cambios locales antes de actualizar desde origin)
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>
@@ -146,13 +142,9 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a traditional Tawasa feather crown" 
-<<<<<<< HEAD
                 src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_11.58.24_ppkgxn.jpg"
-=======
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6AALHXazM1zfP6JMr6OCAOvKDnK3huNie_QdhcHhYrqUk2fS4PYn4nAJioNB1nTaPbNxP4900WDqJ4uOLGskFLeIBl2H5tVk1PIPQWp_GJaVSChVgARBJh8A91pAI0iBuHVQg_9S9mbCHBgQhn4H_u17M8jN0zbLDTfFKp-iPKN7pIVueJs77ucj4eWhSK6yVGQVKLdr86VTdFxQRliwMJw28zccafTddl0zr6DJwbaWxl0oufLLyyuJEMOjZqH66w4Ye0IH0eqHy"
                 fetchPriority="high"
                 loading="eager"
->>>>>>> fb6c153 (wip: cambios locales antes de actualizar desde origin)
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '9999px' }}
             />
           </Box>

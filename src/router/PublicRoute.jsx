@@ -4,17 +4,12 @@ import { Navigate } from 'react-router-dom';
 import { useLoginContext } from '../hooks/context/LoginContext';
 import { helpPermission } from '../helpers/permissionHelper';
 
-/**
- * Componente para rutas públicas (landing, login, etc.)
- * Redirige usuarios autenticados a su dashboard
- */
 const PublicRoute = ({ children }) => {
   const { user, isLoggedIn } = useLoginContext();
   const { filterRouter } = helpPermission();
 
-  // Si el usuario está autenticado, redirigir a su dashboard
   if (isLoggedIn && user) {
-    // Mapeo de roles del API a roles internos
+
     const roleMapping = {
       'admin': 'ADMIN',
       'student': 'ESTUDIANTE',
@@ -25,7 +20,6 @@ const PublicRoute = ({ children }) => {
     const userRole = user?.role || user?.rol;
     const mappedRole = roleMapping[userRole] || userRole;
     
-    // Obtener la primera ruta permitida según el rol
     const { routes } = filterRouter(mappedRole);
     
     if (routes && routes.length > 0) {
@@ -33,7 +27,7 @@ const PublicRoute = ({ children }) => {
     }
   }
 
-  // Usuario no autenticado, permitir acceso a ruta pública
+
   return <>{children}</>;
 };
 

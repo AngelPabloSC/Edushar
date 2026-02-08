@@ -29,7 +29,7 @@ const ProtectRoute = ({ children, requiredRole }) => {
 
   // Si no está autenticado, redirigir a login
   if (!isLoggedIn) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   // Si se requiere un rol específico, verificar

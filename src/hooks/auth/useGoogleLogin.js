@@ -38,13 +38,12 @@ export const useGoogleLogin = () => {
 
             console.log('📥 Backend response:', response);
 
-            // 4. Si es exitoso, guardar en contexto
+           
             if (response.code === 'COD_OK') {
                 console.log('✅ Login successful, saving to context');
                 login(response.data);
             } else {
-                console.error('❌ Backend returned error:', response);
-                // Mostrar error del backend
+              
                 handleOpenDialog();
                 setDialongContent({
                     title: "Error",

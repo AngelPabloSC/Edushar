@@ -101,6 +101,7 @@ const StudentLayout = () => {
                         if (path.includes('/lecciones')) return 'Lecciones';
                         if (path.includes('/cuentos')) return 'Cuentos y Mitos';
                         if (path.includes('/diccionario')) return 'Diccionario';
+                        if (path.includes('/traductor')) return 'Traductor Shuar';
                         if (path.includes('/contribuciones')) return 'Contribuciones';
                         if (path.includes('/perfil')) return 'Mi Perfil';
                         return 'Estudiante';

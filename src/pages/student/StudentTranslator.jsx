@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import {
   Box,
   Container,
@@ -13,7 +14,8 @@ import {
   Chip,
   Fade,
   useTheme,
-  alpha
+  alpha,
+  Skeleton
 } from '@mui/material';
 import {
   Translate,
@@ -26,10 +28,11 @@ import {
   Campaign,
   MenuBook,
   AutoStories,
-  CheckCircle,
   ErrorOutline
 } from '@mui/icons-material';
 import { useTranslator } from '../../hooks/pages/useTranslator';
+import { useShuarTTS } from '../../hooks/pages/useShuarTTS';
+import PageHeader from '../../components/PageHeader';
 
 const StudentTranslator = () => {
   const theme = useTheme();
@@ -43,6 +46,8 @@ const StudentTranslator = () => {
     handleClear,
     speak
   } = useTranslator();
+
+  const { play: playShuar, isPlaying: isPlayingShuar, isLoading: isLoadingShuar } = useShuarTTS();
 
   const [loadingDots, setLoadingDots] = React.useState('');
 
@@ -71,6 +76,10 @@ const StudentTranslator = () => {
     <Box sx={{ minHeight: '100vh', bgcolor: '#F8FAFC', pb: 8 }}>
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ py: 4 }}>
+        <PageHeader 
+          title="Traductor Shuar" 
+          subtitle="Traduce frases y textos del español al Shuar con justificación lingüística." 
+        />
         
         {/* Language Indicator */}
         <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
@@ -262,7 +271,51 @@ const StudentTranslator = () => {
           {/* Output Section */}
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             
-            {translationResult ? (
+            {loading ? (
+              <Fade in={true}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  {/* Loading Skeleton */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 4,
+                      borderRadius: 4,
+                      bgcolor: '#F1F7FF',
+                      border: '1px solid',
+                      borderColor: alpha(theme.palette.primary.main, 0.1),
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <Box sx={{ width: '100%' }}>
+                        <Skeleton variant="rounded" width={60} height={24} sx={{ mb: 2, borderRadius: 1 }} />
+                        <Skeleton variant="text" width="80%" height={60} sx={{ mb: 2 }} />
+                        <Skeleton variant="rounded" width={120} height={32} sx={{ borderRadius: 3 }} />
+                      </Box>
+                    </Box>
+                  </Paper>
+
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 4,
+                      borderRadius: 4,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2, pb: 2, borderBottom: '1px solid', borderColor: alpha(theme.palette.divider, 0.5) }}>
+                      <Skeleton variant="circular" width={24} height={24} />
+                      <Skeleton variant="text" width={200} height={20} />
+                    </Box>
+                    <Skeleton variant="text" width="100%" height={20} />
+                    <Skeleton variant="text" width="90%" height={20} />
+                    <Skeleton variant="text" width="95%" height={20} />
+                  </Paper>
+                </Box>
+              </Fade>
+            ) : translationResult ? (
               <Fade in={true}>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                   
@@ -284,7 +337,7 @@ const StudentTranslator = () => {
                       }
                     }}
                   >
-                    {/* Decorative Blur */}
+                 
                     <Box sx={{ position: 'absolute', top: -64, right: -64, width: 128, height: 128, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: '50%', filter: 'blur(40px)' }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
@@ -292,27 +345,47 @@ const StudentTranslator = () => {
                         <Box sx={{ display: 'inline-block', px: 1, py: 0.25, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main', borderRadius: 1, fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5, mb: 2 }}>
                           Shuar
                         </Box>
-                        <Typography variant="h3" fontWeight={800} color="text.primary" sx={{ mb: 2, fontSize: '2.5rem', lineHeight: 1.1 }}>
-                          {translationResult.translation}
-                        </Typography>
+                        <Box sx={{ mb: 2, '& p': { m: 0, fontSize: '2.5rem', lineHeight: 1.1, fontWeight: 800, color: 'text.primary', fontFamily: theme.typography.fontFamily } }}>
+                          <ReactMarkdown>
+                            {translationResult.translation}
+                          </ReactMarkdown>
+                        </Box>
                         
                         {/* Phonetics Placeholder - API doesn't verify return phonetic details always, but UI requested it */}
-                        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, bgcolor: alpha('#ffffff', 0.6), backdropFilter: 'blur(4px)', px: 1.5, py: 0.75, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.2) }}>
-                          <Campaign fontSize="small" color="primary" />
-                          <Typography variant="body1" fontWeight={500} color="primary.dark" sx={{ fontFamily: 'monospace' }}>
-                            {/* Phonetic placeholder or generic */}
-                            [{translationResult.translation.toLowerCase()}]
-                          </Typography>
-                        </Box>
+                        {/* Phonetics Display - Only show if provided by API */}
+                        {translationResult.phonetic ? (
+                          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, bgcolor: alpha('#ffffff', 0.6), backdropFilter: 'blur(4px)', px: 1.5, py: 0.75, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.2) }}>
+                            <Campaign fontSize="small" color="primary" />
+                            <Typography variant="body1" fontWeight={500} color="primary.dark" sx={{ fontFamily: 'monospace' }}>
+                              [{translationResult.phonetic}]
+                            </Typography>
+                          </Box>
+                        ) : null}
                       </Box>
 
                       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                        <Tooltip title="Escuchar">
+                        <Tooltip title={isLoadingShuar ? "Generando audio..." : isPlayingShuar ? "Reproduciendo..." : "Escuchar"}>
                           <IconButton 
-                            onClick={() => speak(translationResult.translation)}
-                            sx={{ bgcolor: 'white', border: '1px solid', borderColor: 'divider', borderRadius: 3, '&:hover': { bgcolor: 'primary.main', color: 'white', borderColor: 'primary.main' } }}
+                            onClick={() => playShuar(translationResult.translation)}
+                            disabled={isLoadingShuar}
+                            sx={{ 
+                              bgcolor: isPlayingShuar ? 'primary.main' : 'white', 
+                              color: isPlayingShuar ? 'white' : 'inherit',
+                              border: '1px solid', 
+                              borderColor: isPlayingShuar ? 'primary.main' : 'divider', 
+                              borderRadius: 3, 
+                              '&:hover': { 
+                                bgcolor: 'primary.main', 
+                                color: 'white', 
+                                borderColor: 'primary.main' 
+                              } 
+                            }}
                           >
-                            <VolumeUp />
+                             {isLoadingShuar ? (
+                               <CircularProgress size={24} color="inherit" />
+                             ) : (
+                               <VolumeUp />
+                             )}
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Copiar">
@@ -344,9 +417,11 @@ const StudentTranslator = () => {
                       </Typography>
                     </Box>
                     
-                    <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.8, fontSize: '0.95rem' }}>
-                      {translationResult.justification}
-                    </Typography>
+                    <Box sx={{ '& p': { m: 0, lineHeight: 1.8, fontSize: '0.95rem', color: 'text.secondary', fontFamily: theme.typography.fontFamily }, '& strong': { fontWeight: 700, color: 'text.primary' } }}>
+                      <ReactMarkdown>
+                        {translationResult.justification}
+                      </ReactMarkdown>
+                    </Box>
                   </Paper>
 
                   {/* References Card */}

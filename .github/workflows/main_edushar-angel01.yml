@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ✅ IMPORTANTE: VITE_* se inyectan en TIEMPO DE BUILD
+      # ✅ CRITICAL: Inject secrets into environment variables for Vite build
       - name: Build (Vite)
         run: npm run build
         env:
@@ -36,7 +36,7 @@ jobs:
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
-      # Empaqueta el contenido de dist/ para que quede en wwwroot/
+      # Package ONLY the dist folder for deployment
       - name: Zip build output (dist)
         run: |
           cd dist

@@ -1,7 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy Node.js app to Azure Web App - edushar-angel01
+name: Build and deploy Vite (React) app to Azure Web App - edushar-angel01
 
 on:
   push:
@@ -13,41 +10,58 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: "20"
+          cache: "npm"
 
-      - name: npm install, build, and test
+      - name: Install dependencies
+        run: npm ci
+
+      # ✅ IMPORTANTE: VITE_* se inyectan en TIEMPO DE BUILD
+      - name: Build (Vite)
+        run: npm run build
+        env:
+          VITE_URL_FETCH: ${{ secrets.VITE_URL_FETCH }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+
+      # Empaqueta el contenido de dist/ para que quede en wwwroot/
+      - name: Zip build output (dist)
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          cd dist
+          zip -r ../app.zip .
+          cd ..
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
         with:
-          name: node-app
-          path: .
+          name: vite-dist
+          path: app.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: node-app
-      
+          name: vite-dist
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +69,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C1F33BD4EFA348F98FAF4FE60AC427CC }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D9A382333B674581BF00959D54853B3F }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'edushar-angel01'
-          slot-name: 'Production'
-          package: .
-          
+          app-name: edushar-angel01
+          slot-name: Production
+          package: app.zip

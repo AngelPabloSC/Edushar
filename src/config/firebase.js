@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 
 // Configuración de Firebase con credenciales del cliente web
+console.log("Variables de entorno: ", import.meta.env);
 // IMPORTANTE: Todas las credenciales deben estar en el archivo .env
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,7 +22,7 @@ const requiredEnvVars = [
     'VITE_FIREBASE_MESSAGING_SENDER_ID',
     'VITE_FIREBASE_APP_ID'
 ];
-console.log("Variables de entorno: ", import.meta.env);
+
 
 const missingVars = requiredEnvVars.filter(varName => !import.meta.env[varName]);
 if (missingVars.length > 0) {

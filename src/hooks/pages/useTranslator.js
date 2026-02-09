@@ -26,17 +26,11 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
-            // In development: call external API directly (Azure Functions not running locally)
-            // In production: use Azure Function proxy (solves CORS issues)
-            // Use hostname detection for more reliable environment detection
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const apiUrl = isLocal
-                ? 'https://api-notebooklm.onrender.com/translate'
-                : '/api/translate';
+            // Use environment variable to determine which API to call
+            // VITE_TRANSLATION_API_URL should be set in .env file
+            const apiUrl = import.meta.env.VITE_TRANSLATION_API_URL || '/api/translate';
 
-            console.log('🌐 Translator - Hostname:', window.location.hostname);
-            console.log('🌐 Translator - Is Local:', isLocal);
-            console.log('🌐 Translator - Making request to:', apiUrl);
+            console.log('🌐 Translator - API URL:', apiUrl);
             console.log('📤 Translator - Request payload:', { text: inputValue });
 
             const response = await fetch(apiUrl, {

@@ -37,13 +37,19 @@ jobs:
             VITE_FIREBASE_PROJECT_ID \
             VITE_FIREBASE_STORAGE_BUCKET \
             VITE_FIREBASE_MESSAGING_SENDER_ID \
-            VITE_FIREBASE_APP_ID
-          do
-            if [ -z "${!v}" ]; then
-              echo "MISSING: $v"
+            VITE_FIREBASE_APP_ID; do
+            val="${!v}"
+            if [ -z "$val" ]; then
+              echo "❌ $v is EMPTY or UNDEFINED"
               exit 1
             else
-              echo "OK: $v"
+              length=${#val}
+              if [ "$length" -le 3 ]; then
+                 echo "⚠️ $v is very short ($length chars)"
+              else
+                 # Print first 3 chars to verify it's not just whitespace or quotes
+                 echo "✅ $v is set (Length: $length, Starts with: ${val:0:3}...)"
+              fi
             fi
           done
         env:

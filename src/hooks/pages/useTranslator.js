@@ -26,10 +26,14 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
-            // Use Azure Function proxy endpoint instead of calling external API directly
-            // This solves CORS issues in Azure Static Web Apps
-            const apiUrl = '/api/translate';
+            // In development: call external API directly (Azure Functions not running locally)
+            // In production: use Azure Function proxy (solves CORS issues)
+            const isDevelopment = import.meta.env.DEV;
+            const apiUrl = isDevelopment
+                ? 'https://api-notebooklm.onrender.com/translate'
+                : '/api/translate';
 
+            console.log('🌐 Translator - Environment:', isDevelopment ? 'Development' : 'Production');
             console.log('🌐 Translator - Making request to:', apiUrl);
             console.log('📤 Translator - Request payload:', { text: inputValue });
 

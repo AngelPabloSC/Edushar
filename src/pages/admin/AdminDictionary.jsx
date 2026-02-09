@@ -48,6 +48,7 @@ const AdminDictionary = () => {
     const navigate = useNavigate();
     const {
         entries,
+        allEntries,
         stats,
         loading,
         searchTerm,
@@ -115,11 +116,11 @@ const AdminDictionary = () => {
         'Expresión': { color: '#7b1fa2', icon: <ChatIcon fontSize="small" />, bgColor: '#f3e5f5' },
     };
 
-    // Generate categories dynamically from actual data
+    // Generate categories dynamically from ALL entries (not filtered ones)
     const categories = useMemo(() => {
-        const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))];
+        const uniqueCategories = [...new Set(allEntries.map(entry => entry.category).filter(Boolean))];
         return ['Todos', ...uniqueCategories.sort()];
-    }, [entries]);
+    }, [allEntries]);
     
     // Paginated Data
     const paginatedEntries = entries.slice(
@@ -501,22 +502,30 @@ const AdminDictionary = () => {
                         variant="standard"
                         disableUnderline
                         sx={{ 
-                            bgcolor: 'transparent', 
+                            bgcolor: categoryFilter === 'Todos' ? 'transparent' : alpha(theme.palette.primary.main, 0.08), 
                             borderRadius: 3, 
                             px: 3, py: 1.5, 
                             minWidth: 180,
                             fontWeight: 700,
                             fontSize: '0.875rem',
-                            color: 'text.primary',
+                            color: categoryFilter === 'Todos' ? 'text.primary' : 'primary.main',
                             border: '1px solid',
-                            borderColor: 'divider',
+                            borderColor: categoryFilter === 'Todos' ? 'divider' : 'primary.main',
                             '& .MuiSelect-select': { py: 0 },
-                            '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' }
+                            '&:hover': { bgcolor: categoryFilter === 'Todos' ? 'rgba(0,0,0,0.02)' : alpha(theme.palette.primary.main, 0.12) },
+                            transition: 'all 0.2s'
                         }}
                     >
                          {categories.map((cat) => (
-                             <MenuItem key={cat} value={cat}>
-                                 {cat === 'Todos' ? 'Todas las Categorías' : cat}
+                             <MenuItem 
+                                 key={cat} 
+                                 value={cat}
+                                 sx={{
+                                     fontWeight: cat === 'Todos' ? 700 : 600,
+                                     color: cat === 'Todos' ? 'text.secondary' : 'text.primary'
+                                 }}
+                             >
+                                 {cat === 'Todos' ? ' Todas las Categorías' : cat}
                              </MenuItem>
                          ))}
                      </Select>

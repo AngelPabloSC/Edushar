@@ -26,10 +26,14 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
-            console.log('🌐 Translator - Making request to:', 'https://api-notebooklm.onrender.com/translate');
+            // Use Azure Function proxy endpoint instead of calling external API directly
+            // This solves CORS issues in Azure Static Web Apps
+            const apiUrl = '/api/translate';
+
+            console.log('🌐 Translator - Making request to:', apiUrl);
             console.log('📤 Translator - Request payload:', { text: inputValue });
 
-            const response = await fetch('https://api-notebooklm.onrender.com/translate', {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

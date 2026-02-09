@@ -25,6 +25,15 @@ export default defineConfig({
       filename: 'dist/stats.html',
     }),
   ],
+  define: {
+    'import.meta.env.VITE_URL_FETCH': JSON.stringify(process.env.VITE_URL_FETCH),
+    'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(process.env.VITE_FIREBASE_API_KEY),
+    'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(process.env.VITE_FIREBASE_AUTH_DOMAIN),
+    'import.meta.env.VITE_FIREBASE_PROJECT_ID': JSON.stringify(process.env.VITE_FIREBASE_PROJECT_ID),
+    'import.meta.env.VITE_FIREBASE_STORAGE_BUCKET': JSON.stringify(process.env.VITE_FIREBASE_STORAGE_BUCKET),
+    'import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID': JSON.stringify(process.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
+    'import.meta.env.VITE_FIREBASE_APP_ID': JSON.stringify(process.env.VITE_FIREBASE_APP_ID),
+  },
   build: {
     // Disable inlining of small assets to avoid MIME type issues
     assetsInlineLimit: 0,
@@ -52,9 +61,9 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        // drop_console: true, // Remove console.logs in production
+        drop_console: false, // Keep console logs for debugging
         drop_debugger: true,
-        // pure_funcs: ['console.log', 'console.info'], // Remove specific console methods
+        pure_funcs: [], // Keep all console methods
       },
     },
   },

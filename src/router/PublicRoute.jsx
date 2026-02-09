@@ -5,28 +5,28 @@ import { useLoginContext } from '../hooks/context/LoginContext';
 import { helpPermission } from '../helpers/permissionHelper';
 
 const PublicRoute = ({ children }) => {
-  const { user, isLoggedIn } = useLoginContext();
-  const { filterRouter } = helpPermission();
+  const { user, isLoggedIn, loading } = useLoginContext();
+
+  // Wait for auth state to load before deciding what to render
+  if (loading) {
+    return null; // or return a loading spinner
+  }
 
   if (isLoggedIn && user) {
-
     const roleMapping = {
-      'admin': 'ADMIN',
-      'student': 'ESTUDIANTE',
-      'ADMIN': 'ADMIN',
-      'ESTUDIANTE': 'ESTUDIANTE'
+      'admin': '/admin/dashboard',
+      'student': '/estudiante/inicio',
+      'ADMIN': '/admin/dashboard',
+      'ESTUDIANTE': '/estudiante/inicio'
     };
 
     const userRole = user?.role || user?.rol;
-    const mappedRole = roleMapping[userRole] || userRole;
+    const dashboardPath = roleMapping[userRole];
     
-    const { routes } = filterRouter(mappedRole);
-    
-    if (routes && routes.length > 0) {
-      return <Navigate to={routes[0]} replace />;
+    if (dashboardPath) {
+      return <Navigate to={dashboardPath} replace />;
     }
   }
-
 
   return <>{children}</>;
 };

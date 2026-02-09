@@ -26,6 +26,9 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
+            console.log('🌐 Translator - Making request to:', 'https://api-notebooklm.onrender.com/translate');
+            console.log('📤 Translator - Request payload:', { text: inputValue });
+
             const response = await fetch('https://api-notebooklm.onrender.com/translate', {
                 method: 'POST',
                 headers: {
@@ -34,11 +37,17 @@ export const useTranslator = () => {
                 body: JSON.stringify({ text: inputValue }),
             });
 
+            console.log('📥 Translator - Response status:', response.status);
+            console.log('📥 Translator - Response ok:', response.ok);
+
             if (!response.ok) {
-                throw new Error('Error en la solicitud de traducción');
+                const errorText = await response.text();
+                console.error('❌ Translator - Error response:', errorText);
+                throw new Error(`Error en la solicitud de traducción (${response.status}): ${errorText}`);
             }
 
             const data = await response.json();
+            console.log('✅ Translator - Response data:', data);
 
             if (data.ok) {
                 setTranslationResult(data);
@@ -46,8 +55,18 @@ export const useTranslator = () => {
                 throw new Error('La respuesta de la API no fue exitosa');
             }
         } catch (err) {
-            console.error('Error translating:', err);
-            setError('Hubo un error al traducir el texto. Por favor intenta de nuevo.');
+            console.error('❌ Translator - Error details:', err);
+            console.error('❌ Translator - Error name:', err.name);
+            console.error('❌ Translator - Error message:', err.message);
+
+            // More specific error messages
+            if (err.name === 'TypeError' && err.message.includes('fetch')) {
+                setError('No se pudo conectar con el servicio de traducción. Por favor verifica tu conexión a internet.');
+            } else if (err.message.includes('CORS')) {
+                setError('Error de permisos al acceder al servicio de traducción.');
+            } else {
+                setError(err.message || 'Hubo un error al traducir el texto. Por favor intenta de nuevo.');
+            }
         } finally {
             setLoading(false);
         }

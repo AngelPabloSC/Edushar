@@ -11,9 +11,11 @@ const publicRoutes = [
   {
     path: '/',
     element: (
-      <Suspense fallback={<LoadingFallback />}>
-        <Landing />
-      </Suspense>
+      <PublicRoute>
+        <Suspense fallback={<LoadingFallback />}>
+          <Landing />
+        </Suspense>
+      </PublicRoute>
     ),
   },
   {

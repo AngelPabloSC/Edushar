@@ -1,10 +1,40 @@
 import { Box, Typography, Button, Container } from '@mui/material';
 import { useLogin } from '../../hooks/auth/useLogin';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLoginContext } from '../../hooks/context/LoginContext';
 
 const Landing = () => {
   const { handleGoogleSignIn } = useLogin();
   const navigate = useNavigate();
+  const { user, isLoggedIn, loading } = useLoginContext();
+
+  // Redirect authenticated users to their dashboard
+  useEffect(() => {
+    if (!loading && isLoggedIn && user) {
+      const roleMapping = {
+        'admin': '/admin/dashboard',
+        'student': '/estudiante/inicio',
+        'ADMIN': '/admin/dashboard',
+        'ESTUDIANTE': '/estudiante/inicio'
+      };
+
+      const userRole = user?.role || user?.rol;
+      const dashboardPath = roleMapping[userRole];
+      
+      console.log('🔒 Landing - User is authenticated, redirecting to:', dashboardPath);
+      
+      if (dashboardPath) {
+        navigate(dashboardPath, { replace: true });
+      }
+    }
+  }, [loading, isLoggedIn, user, navigate]);
+
+  // Don't render landing page content while checking auth or if user is authenticated
+  if (loading || isLoggedIn) {
+    return null;
+  }
+
 
   return (
     <Box 

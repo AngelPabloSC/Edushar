@@ -30,34 +30,11 @@ if (missingVars.length > 0) {
     console.error('Por favor, copia .env.example a .env y configura todas las variables.');
 }
 
-// Debugging helper
-const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-console.log('--- Firebase Debug Info ---');
-console.log('Environment:', import.meta.env.MODE);
-try {
-    console.log('FULL ENV:', JSON.stringify(import.meta.env));
-} catch (e) {
-    console.log('FULL ENV (Error):', e.message);
-}
-console.log('API Key Type:', typeof apiKey);
-console.log('API Key Length:', apiKey ? apiKey.length : '0');
-console.log('API Key Start:', apiKey ? apiKey.substring(0, 4) + '...' : 'None');
-console.log('Is "undefined" string?:', apiKey === 'undefined');
-console.log('Has Quotes?:', apiKey && (apiKey.startsWith('"') || apiKey.startsWith("'")));
-console.log('---------------------------');
-
 // Inicializar Firebase
-let app;
-try {
-    app = initializeApp(firebaseConfig);
-    console.log('✅ Firebase initialized successfully');
-} catch (error) {
-    console.error('❌ Firebase Initialization Error:', error);
-}
+const app = initializeApp(firebaseConfig);
 
 // Exportar auth y provider
-// Check if app was initialized to avoid further errors
-export const auth = app ? getAuth(app) : null;
+export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
 // Configurar el provider para solicitar email y perfil

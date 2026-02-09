@@ -10,8 +10,7 @@ import {
   Pagination,
   Skeleton,
 } from '@mui/material';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useMemo } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -36,23 +35,24 @@ const StudentDictionary = () => {
 
   const { entries, loading, stats } = usePublicDictionary();
 
-  // Extract unique categories from entries
-  const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))];
-  
-  // Build categories array dynamically
-  const categories = [
-    { id: 'all', name: 'Todas las palabras', icon: <AutoAwesomeIcon /> },
-    ...uniqueCategories.map(cat => ({
-      id: cat,
-      name: cat,
-      icon: cat === 'Animales' ? <PetsIcon /> :
-            cat === 'Naturaleza' ? <ForestIcon /> :
-            cat === 'Familia' ? <Diversity3Icon /> :
-            cat.includes('Verbo') || cat.includes('Acción') ? <HistoryEduIcon /> :
-            cat.includes('Saludo') || cat.includes('Frase') ? <RecordVoiceOverIcon /> :
-            <AutoAwesomeIcon />
-    }))
-  ];
+  // Build categories array dynamically with useMemo for performance
+  const categories = useMemo(() => {
+    const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))];
+    
+    return [
+      { id: 'all', name: 'Todas las palabras', icon: <AutoAwesomeIcon /> },
+      ...uniqueCategories.sort().map(cat => ({
+        id: cat,
+        name: cat,
+        icon: cat === 'Animales' ? <PetsIcon /> :
+              cat === 'Naturaleza' ? <ForestIcon /> :
+              cat === 'Familia' ? <Diversity3Icon /> :
+              cat.includes('Verbo') || cat.includes('Acción') ? <HistoryEduIcon /> :
+              cat.includes('Saludo') || cat.includes('Frase') ? <RecordVoiceOverIcon /> :
+              <AutoAwesomeIcon />
+      }))
+    ];
+  }, [entries]);
 
   // Client-side filtering
   const filteredEntries = entries.filter(entry => {

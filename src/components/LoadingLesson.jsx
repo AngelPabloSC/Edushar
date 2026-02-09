@@ -219,63 +219,96 @@ const LoadingLesson = ({ onCancel, query, setQuery, lessonsByLevel, skipIntro = 
              </Box>
 
              {/* Dynamic Lesson Grid - Rendering lessonsByLevel */}
-             {Object.entries(lessonsByLevel || {}).map(([levelName, lessons]) => (
-                 <Box key={levelName} sx={{ mb: 6 }}>
-                     <Typography variant="h5" sx={{ fontWeight: 800, mb: 3, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '0.1em' }}>
-                         {levelName}
-                     </Typography>
-                     
-                     <Grid container spacing={3}>
-                        {lessons.map((lesson) => (
-                            <Grid item xs={12} md={6} key={lesson.id}>
-                                <Box 
-                                    onClick={() => handleLessonClick(lesson.id)}
-                                    sx={{ 
-                                        p: 3, borderRadius: 6, 
-                                        bgcolor: alpha(theme.palette.primary.main, 0.03), 
-                                        border: '1px solid', borderColor: 'divider',
-                                        display: 'flex', gap: 3,
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': { 
-                                            boxShadow: 4, 
-                                            transform: 'translateY(-4px)',
-                                            borderColor: 'primary.main',
-                                            bgcolor: 'background.paper'
-                                        }
-                                    }}
-                                >
-                                    {/* Image thumbnail like Spotify/Card */}
-                                    <Box sx={{ width: 100, height: 100, flexShrink: 0, borderRadius: 4, overflow: 'hidden' }}>
-                                        <Box component="img" src={lesson.image} alt={lesson.title} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                    </Box>
-
-                                    <Box sx={{ flexGrow: 1 }}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                            <Typography variant="h6" fontWeight="700" sx={{ lineHeight: 1.2 }}>{lesson.title}</Typography>
-                                            <IconButton size="small" sx={{ color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
-                                                <PlayCircleIcon fontSize="small" />
-                                            </IconButton>
-                                        </Box>
-                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                            {lesson.description}
-                                        </Typography>
-                                        
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.08), px: 1, py: 0.5, borderRadius: 1 }}>
-                                                {lesson.score || 10} XP
-                                            </Typography>
-                                            {lesson.status === 'completed' && <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />}
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </Grid>
-                        ))}
-                     </Grid>
+             {(!lessonsByLevel || Object.keys(lessonsByLevel).length === 0) ? (
+                 // Show skeletons while loading
+                 <Box>
+                     {[1, 2, 3].map((levelIndex) => (
+                         <Box key={levelIndex} sx={{ mb: 6 }}>
+                             <Skeleton variant="text" width={150} height={40} sx={{ mb: 3 }} />
+                             <Grid container spacing={3}>
+                                 {[1, 2].map((cardIndex) => (
+                                     <Grid item xs={12} md={6} key={cardIndex}>
+                                         <Box sx={{ 
+                                             p: 3, borderRadius: 6, 
+                                             bgcolor: alpha(theme.palette.primary.main, 0.03), 
+                                             border: '1px solid', borderColor: 'divider',
+                                             display: 'flex', gap: 3
+                                         }}>
+                                             <Skeleton variant="rectangular" width={100} height={100} sx={{ borderRadius: 4, flexShrink: 0 }} />
+                                             <Box sx={{ flexGrow: 1 }}>
+                                                 <Skeleton variant="text" width="70%" height={30} sx={{ mb: 1 }} />
+                                                 <Skeleton variant="text" width="100%" height={20} />
+                                                 <Skeleton variant="text" width="90%" height={20} sx={{ mb: 2 }} />
+                                                 <Box sx={{ display: 'flex', gap: 1 }}>
+                                                     <Skeleton variant="rectangular" width={60} height={24} sx={{ borderRadius: 1 }} />
+                                                 </Box>
+                                             </Box>
+                                         </Box>
+                                     </Grid>
+                                 ))}
+                             </Grid>
+                         </Box>
+                     ))}
                  </Box>
-             ))}
+             ) : (
+                 Object.entries(lessonsByLevel).map(([levelName, lessons]) => (
+                     <Box key={levelName} sx={{ mb: 6 }}>
+                         <Typography variant="h5" sx={{ fontWeight: 800, mb: 3, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '0.1em' }}>
+                             {levelName}
+                         </Typography>
+                         
+                         <Grid container spacing={3}>
+                            {lessons.map((lesson) => (
+                                <Grid item xs={12} md={6} key={lesson.id}>
+                                    <Box 
+                                        onClick={() => handleLessonClick(lesson.id)}
+                                        sx={{ 
+                                            p: 3, borderRadius: 6, 
+                                            bgcolor: alpha(theme.palette.primary.main, 0.03), 
+                                            border: '1px solid', borderColor: 'divider',
+                                            display: 'flex', gap: 3,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': { 
+                                                boxShadow: 4, 
+                                                transform: 'translateY(-4px)',
+                                                borderColor: 'primary.main',
+                                                bgcolor: 'background.paper'
+                                            }
+                                        }}
+                                    >
+                                        {/* Image thumbnail like Spotify/Card */}
+                                        <Box sx={{ width: 100, height: 100, flexShrink: 0, borderRadius: 4, overflow: 'hidden' }}>
+                                            <Box component="img" src={lesson.image} alt={lesson.title} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </Box>
 
-             {(!lessonsByLevel || Object.keys(lessonsByLevel).length === 0) && (
+                                        <Box sx={{ flexGrow: 1 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                                <Typography variant="h6" fontWeight="700" sx={{ lineHeight: 1.2 }}>{lesson.title}</Typography>
+                                                <IconButton size="small" sx={{ color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.1) }}>
+                                                    <PlayCircleIcon fontSize="small" />
+                                                </IconButton>
+                                            </Box>
+                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                {lesson.description}
+                                            </Typography>
+                                            
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.08), px: 1, py: 0.5, borderRadius: 1 }}>
+                                                    {lesson.score || 10} XP
+                                                </Typography>
+                                                {lesson.status === 'completed' && <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />}
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Grid>
+                            ))}
+                         </Grid>
+                     </Box>
+                 ))
+             )}
+
+             {lessonsByLevel && Object.keys(lessonsByLevel).length === 0 && (
                  <Box sx={{ textAlign: 'center', py: 8 }}>
                      <Typography variant="h6" color="text.secondary">No se encontraron lecciones.</Typography>
                  </Box>

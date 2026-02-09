@@ -133,6 +133,13 @@ const AdminLessons = () => {
         setSelectedLesson(null);
     };
 
+    // Extract unique levels from lessons
+    const availableLevels = useMemo(() => {
+        if (!lessons?.length) return [];
+        const levels = [...new Set(lessons.map(lesson => lesson.level).filter(Boolean))];
+        return levels.sort(); // Sort alphabetically
+    }, [lessons]);
+
     // Filter lessons based on search query and level
     const normalizedQuery = (searchQuery ?? '').trim().toLowerCase();
     const filteredLessons = useMemo(() => {
@@ -438,7 +445,7 @@ const AdminLessons = () => {
 
                 {/* Right Side: Filters & Actions */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', md: 'auto' }, justifyContent: { xs: 'space-between', md: 'flex-end' } }}>
-                    {/* Level Filter */}
+                    {/* Level Filter - Dynamic */}
                     <Select
                         value={levelFilter}
                         onChange={(e) => setLevelFilter(e.target.value)}
@@ -455,9 +462,11 @@ const AdminLessons = () => {
                         }}
                     >
                         <MenuItem value="">Todos los niveles</MenuItem>
-                        <MenuItem value="Básico">Básico</MenuItem>
-                        <MenuItem value="Intermedio">Intermedio</MenuItem>
-                        <MenuItem value="Avanzado">Avanzado</MenuItem>
+                        {availableLevels.map((level) => (
+                            <MenuItem key={level} value={level}>
+                                {level}
+                            </MenuItem>
+                        ))}
                     </Select>
 
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

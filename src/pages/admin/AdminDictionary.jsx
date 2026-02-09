@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
     Box,
@@ -32,8 +32,6 @@ import StarIcon from '@mui/icons-material/Star';
 import SpeedIcon from '@mui/icons-material/Speed';
 import ChatIcon from '@mui/icons-material/Chat';
 import ClearIcon from '@mui/icons-material/Clear';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import DescriptionIcon from '@mui/icons-material/Description';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -117,7 +115,11 @@ const AdminDictionary = () => {
         'Expresión': { color: '#7b1fa2', icon: <ChatIcon fontSize="small" />, bgColor: '#f3e5f5' },
     };
 
-    const categories = ['Todos', 'Sustantivo', 'Verbo', 'Adjetivo', 'Adverbio', 'Expresión'];
+    // Generate categories dynamically from actual data
+    const categories = useMemo(() => {
+        const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))];
+        return ['Todos', ...uniqueCategories.sort()];
+    }, [entries]);
     
     // Paginated Data
     const paginatedEntries = entries.slice(

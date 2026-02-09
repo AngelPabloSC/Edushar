@@ -21,6 +21,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -46,7 +48,13 @@ const LessonDetail = () => {
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [userAnswers, setUserAnswers] = useState({});
   const [completedQuestions, setCompletedQuestions] = useState([]);
-  const [timer, setTimer] = useState(0);
+  const [timer, setTimer] = useState(null); // Will be initialized from lesson.duration
+  const [timerInitialized, setTimerInitialized] = useState(false);
+  const [initialDuration, setInitialDuration] = useState(null); // Store initial duration to calculate elapsed time
+  const [lessonStarted, setLessonStarted] = useState(false); // Control when timer starts
+  const [showStartDialog, setShowStartDialog] = useState(true); // Show initial dialog
+  const [showTimeWarning, setShowTimeWarning] = useState(false); // Show 5-minute warning
+  const [warningShown, setWarningShown] = useState(false); // Track if warning was already shown
   const [showQuestion, setShowQuestion] = useState(true);
   
   /* Completion Flow State */
@@ -61,15 +69,86 @@ const LessonDetail = () => {
   const lessonData = lesson; 
   const progressPercentage = lessonData ? Math.round((completedQuestions.length / (lessonData.totalQuestions || 1)) * 100) : 0;
 
-  // Timer effect
+  // Initialize timer from lesson duration
   useEffect(() => {
-    if (isFinished || showConfirmation) return; // Stop timer if finished or confirming
+    if (lessonData && lessonData.duration && !timerInitialized) {
+      // Convert duration (minutes) to seconds
+      const durationInSeconds = lessonData.duration * 60;
+      setTimer(durationInSeconds);
+      setInitialDuration(durationInSeconds);
+      setTimerInitialized(true);
+    }
+  }, [lessonData, timerInitialized]);
+
+  // Auto-submit handler
+  const handleAutoSubmit = async () => {
+    // Same logic as handleConfirmFinish but without confirmation
+    const finalScore = calculateScore();
+    const finalPercentage = progressPercentage;
+    
+    setIsFinished(true);
+    
+    setCompletionData({
+      score: finalScore,
+      percentage: finalPercentage,
+      timeUp: true // Flag to show "time's up" message
+    });
+
+    if (user && user.id) {
+      try {
+        const response = await getFechData({
+          endPoint: 'api/progress/update',
+          method: 'POST',
+          additionalData: {
+            userId: user.id,
+            lessonId: lessonId,
+            status: 'completed',
+            score: finalScore,
+            percentage: finalPercentage
+          }
+        });
+        
+        if (response.code === 'COD_OK' && response.data?.progress) {
+          setCompletionData(prev => ({
+            ...prev,
+            score: response.data.progress.score,
+            percentage: response.data.progress.percentage
+          }));
+        }
+      } catch (error) {
+        console.error("Error updating progress:", error);
+      }
+    }
+  };
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (isFinished || showConfirmation || timer === null || timer <= 0 || !lessonStarted) return;
 
     const interval = setInterval(() => {
-      setTimer((prev) => prev + 1);
+      setTimer((prev) => {
+        // Show warning when 5 minutes remain
+        if (prev === 300 && !warningShown) {
+          setShowTimeWarning(true);
+          setWarningShown(true);
+        }
+        
+        if (prev <= 1) {
+          // Timer reached 0, auto-submit
+          handleAutoSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
     return () => clearInterval(interval);
-  }, [isFinished, showConfirmation]);
+  }, [isFinished, showConfirmation, timer, lessonStarted]);
+
+  // Handle lesson start
+  const handleStartLesson = () => {
+    setShowStartDialog(false);
+    setLessonStarted(true);
+  };
 
   /* Navigation Handler */
   const handleExit = () => {
@@ -329,7 +408,10 @@ const LessonDetail = () => {
                     ¡Felicitaciones!
                 </Typography>
                 <Typography variant="h6" color="text.secondary" fontWeight="normal">
-                    Has completado la lección <strong>{lessonData.title}</strong> con un desempeño excepcional.
+                    {completionData?.timeUp 
+                      ? <>Se acabó el tiempo. Has completado la lección <strong>{lessonData.title}</strong>.</>
+                      : <>Has completado la lección <strong>{lessonData.title}</strong> con un desempeño excepcional.</>
+                    }
                 </Typography>
             </Box>
 
@@ -373,7 +455,10 @@ const LessonDetail = () => {
                              Tiempo
                          </Typography>
                          <Typography variant="h4" fontWeight="900" color="text.primary">
-                             {formatTime(timer)}
+                             {initialDuration !== null && timer !== null 
+                               ? formatTime(initialDuration - timer) // Show elapsed time
+                               : '00:00'
+                             }
                          </Typography>
                     </Box>
                 </Grid>
@@ -490,6 +575,107 @@ const LessonDetail = () => {
             </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Start Dialog */}
+      <Dialog
+        open={showStartDialog && lessonData !== null}
+        PaperProps={{
+          sx: { 
+            borderRadius: 4, 
+            p: 2,
+            maxWidth: 500,
+            backgroundImage: `
+              radial-gradient(circle at 10% 20%, ${alpha(theme.palette.secondary.main, 0.05)} 0%, transparent 20%),
+              radial-gradient(circle at 90% 80%, ${alpha('#FFD700', 0.08)} 0%, transparent 20%)
+            `
+          }
+        }}
+      >
+        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center', fontSize: '1.75rem', pb: 1 }}>
+          <SchoolIcon sx={{ fontSize: 48, color: 'secondary.main', mb: 2 }} />
+          <Typography variant="h5" fontWeight="900">
+            {lessonData?.title}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ textAlign: 'center', py: 2 }}>
+            <Typography variant="body1" color="text.secondary" paragraph>
+              Esta lección tiene un tiempo límite de:
+            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: 2,
+              bgcolor: alpha(theme.palette.secondary.main, 0.1),
+              borderRadius: 3,
+              py: 3,
+              px: 4,
+              mb: 2
+            }}>
+              <TimerIcon sx={{ fontSize: 40, color: 'secondary.main' }} />
+              <Typography variant="h3" fontWeight="900" color="secondary.main">
+                {lessonData?.duration} {lessonData?.duration === 1 ? 'minuto' : 'minutos'}
+              </Typography>
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              El tiempo comenzará a correr cuando presiones "Empezar". 
+              La lección se enviará automáticamente cuando el tiempo termine.
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', pb: 2, gap: 2 }}>
+          <Button 
+            onClick={handleExit} 
+            variant="outlined" 
+            color="inherit"
+            sx={{ borderRadius: 2, fontWeight: 'bold' }}
+          >
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleStartLesson} 
+            variant="contained" 
+            color="secondary"
+            autoFocus
+            startIcon={<CheckIcon />}
+            sx={{ 
+              borderRadius: 2, 
+              fontWeight: 'bold', 
+              px: 4,
+              boxShadow: 4,
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 6
+              }
+            }}
+          >
+            Empezar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* 5-Minute Warning Snackbar */}
+      <Snackbar
+        open={showTimeWarning}
+        autoHideDuration={6000}
+        onClose={() => setShowTimeWarning(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={() => setShowTimeWarning(false)} 
+          severity="warning" 
+          variant="filled"
+          sx={{ 
+            fontWeight: 'bold',
+            fontSize: '1rem',
+            boxShadow: 6
+          }}
+        >
+          ⏰ ¡Atención! Faltan 5 minutos para acabar la prueba
+        </Alert>
+      </Snackbar>
+
 
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
@@ -776,10 +962,53 @@ const LessonDetail = () => {
             </Typography>
 
             {/* Timer moved here */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 3, bgcolor: alpha(theme.palette.secondary.main, 0.1), py: 1, borderRadius: 2 }}>
-                <TimerIcon fontSize="small" color="secondary" />
-                <Typography variant="subtitle2" fontWeight="bold" color="text.primary">
-                    {formatTime(timer)}
+            <Box sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: 1, 
+              mb: 3, 
+              bgcolor: timer !== null && timer <= 60 
+                ? alpha('#f44336', 0.1) // Red for < 1 min
+                : timer !== null && timer <= 120 
+                  ? alpha('#ff9800', 0.1) // Orange for < 2 min
+                  : alpha(theme.palette.secondary.main, 0.1), 
+              py: 1, 
+              borderRadius: 2,
+              border: '2px solid',
+              borderColor: timer !== null && timer <= 60
+                ? '#f44336'
+                : timer !== null && timer <= 120
+                  ? '#ff9800'
+                  : 'transparent',
+              animation: timer !== null && timer <= 60 ? 'pulse 1s ease-in-out infinite' : 'none',
+              '@keyframes pulse': {
+                '0%, 100%': { opacity: 1 },
+                '50%': { opacity: 0.7 }
+              }
+            }}>
+                <TimerIcon 
+                  fontSize="small" 
+                  sx={{ 
+                    color: timer !== null && timer <= 60 
+                      ? '#f44336' 
+                      : timer !== null && timer <= 120 
+                        ? '#ff9800' 
+                        : 'secondary.main' 
+                  }} 
+                />
+                <Typography 
+                  variant="subtitle2" 
+                  fontWeight="bold" 
+                  sx={{ 
+                    color: timer !== null && timer <= 60 
+                      ? '#f44336' 
+                      : timer !== null && timer <= 120 
+                        ? '#ff9800' 
+                        : 'text.primary' 
+                  }}
+                >
+                    {timer !== null ? formatTime(timer) : '00:00'}
                 </Typography>
             </Box>
 

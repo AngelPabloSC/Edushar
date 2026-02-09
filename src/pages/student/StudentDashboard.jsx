@@ -90,10 +90,7 @@ const StudentDashboard = () => {
 
   // Tags for quick search
   const tags = [
-    { label: '🌿 Naturaleza', value: 'naturaleza' },
-    { label: '🏹 Caza', value: 'caza' },
-    { label: '🧶 Artesanía', value: 'artesanía' },
-    { label: '🏠 Hogar', value: 'hogar' }
+    
   ];
 
   const persistState = (query, level, showingResults) => {
@@ -193,13 +190,13 @@ const StudentDashboard = () => {
 
 
         {/* --- FILTERS CONTAINER --- */}
-        <Box sx={{ width: '100%', maxWidth: 700, display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <Box sx={{ width: '100%', maxWidth: 700, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'center' }}>
             
-            {/* Grid for Inputs */}
-            <Grid container spacing={3}>
+            {/* Grid for Inputs - Centered */}
+            <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
                 {/* Level Select */}
-                <Grid item xs={12} md={6} sx={{ textAlign: 'left' }}>
-                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', pl: 2, display: 'block', mb: 1 }}>
+                <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
+                     <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
                         Elige tu nivel
                      </Typography>
                      <FormControl fullWidth variant="filled" hiddenLabel>
@@ -210,9 +207,9 @@ const StudentDashboard = () => {
                             IconComponent={ExpandMoreIcon}
                             sx={{
                                 borderRadius: 50,
-                                bgcolor: 'background.paper', // Using paper instead of slate-100 logic for theme adaptability
+                                bgcolor: 'background.paper',
                                 '& .MuiSelect-select': { py: 2, px: 3, borderRadius: 50, '&:focus': { borderRadius: 50 } },
-                                '&:before, &:after': { display: 'none' }, // Remove underlines
+                                '&:before, &:after': { display: 'none' },
                                 boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)',
                                 '&:hover': { bgcolor: alpha(theme.palette.background.paper, 0.8) }
                             }}
@@ -229,13 +226,13 @@ const StudentDashboard = () => {
                 </Grid>
 
                 {/* Search Input */}
-                <Grid item xs={12} md={6} sx={{ textAlign: 'left' }}>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', pl: 2, display: 'block', mb: 1 }}>
+                <Grid item xs={12} md={6} sx={{ textAlign: 'center' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.1em', display: 'block', mb: 1 }}>
                         ¿Qué quieres aprender?
                      </Typography>
                     <TextField
                         fullWidth
-                        placeholder="p. ej. Naturaleza, Caza..."
+                        placeholder="p. ej. Familia, Animales..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         variant="standard"

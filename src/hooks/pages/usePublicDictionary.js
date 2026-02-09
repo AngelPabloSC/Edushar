@@ -48,8 +48,8 @@ export const usePublicDictionary = () => {
     // Estadísticas for Public Page
     const stats = useMemo(() => ({
         words: entries.length,
-        // Mock data or calculate if available in data
-        audioClips: entries.filter(e => e.audioUrl).length || 0,
+        // Count words with Shuar text (all can be played with TTS)
+        audioClips: entries.filter(e => e.wordShuar && e.wordShuar.trim()).length,
         contributors: 5, // Static for now as user data might not come with dictionary list
     }), [entries]);
 

@@ -15,16 +15,19 @@ import {
     Divider,
     List,
     ListItem,
-    ListItemText
+    ListItemText,
+    CircularProgress
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import CloseIcon from '@mui/icons-material/Close';
 import ImageIcon from '@mui/icons-material/Image';
+import { useShuarTTS } from '../hooks/pages/useShuarTTS';
 
 const DictionaryGridCard = ({ entry, onClick }) => {
     const theme = useTheme();
     const [openDialog, setOpenDialog] = useState(false);
+    const { play: playShuarAudio, isPlaying, isLoading: isAudioLoading } = useShuarTTS();
 
     // Safety check
     if (!entry) {
@@ -34,58 +37,9 @@ const DictionaryGridCard = ({ entry, onClick }) => {
     const handlePlayAudio = (e) => {
         e.stopPropagation();
         
-        if ('speechSynthesis' in window) {
-            // Cancelar cualquier pronunciación anterior
-            window.speechSynthesis.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance(entry.wordShuar);
-            
-            // Intentar obtener las voces disponibles
-            let voices = window.speechSynthesis.getVoices();
-            
-            // Función para seleccionar la mejor voz
-            const selectVoice = () => {
-                // Buscar voces en español
-                const esVoices = voices.filter(voice => voice.lang.startsWith('es'));
-                
-                // Priorizar voces de alta calidad (Google, Microsoft, Paulina, Monica)
-                let bestVoice = esVoices.find(voice => 
-                    voice.name.includes('Google') || 
-                    voice.name.includes('Paulina') || 
-                    voice.name.includes('Monica') || 
-                    voice.name.includes('Jorge')
-                );
-
-                // Si no encuentra una específica, usar la primera en español disponible
-                if (!bestVoice && esVoices.length > 0) {
-                    bestVoice = esVoices[0];
-                }
-
-                if (bestVoice) {
-                    utterance.voice = bestVoice;
-                    utterance.lang = bestVoice.lang;
-                } else {
-                    // Fallback
-                    utterance.lang = 'es-ES';
-                }
-                
-                utterance.rate = 0.9; // Un poco más fluido
-                utterance.pitch = 1;
-                window.speechSynthesis.speak(utterance);
-            };
-
-            // Si las voces ya están cargadas
-            if (voices.length > 0) {
-                selectVoice();
-            } else {
-                // En algunos navegadores (Chrome), las voces se cargan asincrónicamente
-                window.speechSynthesis.onvoiceschanged = () => {
-                    voices = window.speechSynthesis.getVoices();
-                    selectVoice();
-                    // Limpiar el evento para evitar fugas o múltiples llamadas
-                    window.speechSynthesis.onvoiceschanged = null;
-                };
-            }
+        // Use Shuar TTS API
+        if (entry.wordShuar) {
+            playShuarAudio(entry.wordShuar);
         }
     };
 
@@ -225,6 +179,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                             {/* Audio Button */}
                             <IconButton
                                 onClick={handlePlayAudio}
+                                disabled={isAudioLoading}
                                 sx={{
                                     bgcolor: alpha(theme.palette.common.white, 0.2),
                                     color: 'white',
@@ -233,7 +188,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                                     }
                                 }}
                             >
-                                <VolumeUpIcon />
+                                {isAudioLoading || isPlaying ? <CircularProgress size={24} sx={{ color: 'white' }} /> : <VolumeUpIcon />}
                             </IconButton>
                         </Box>
                     )}
@@ -263,6 +218,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                         <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
                             <IconButton
                                 onClick={handlePlayAudio}
+                                disabled={isAudioLoading}
                                 sx={{
                                     bgcolor: alpha(theme.palette.common.white, 0.9),
                                     color: 'secondary.main',
@@ -272,7 +228,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                                     }
                                 }}
                             >
-                                <VolumeUpIcon />
+                                {isAudioLoading || isPlaying ? <CircularProgress size={24} color="secondary" /> : <VolumeUpIcon />}
                             </IconButton>
                         </Box>
                     )}
@@ -433,6 +389,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                             </Box>
                             <IconButton
                                 onClick={handlePlayAudio}
+                                disabled={isAudioLoading}
                                 color="secondary"
                                 sx={{
                                     bgcolor: alpha(theme.palette.secondary.main, 0.1),
@@ -441,7 +398,7 @@ const DictionaryGridCard = ({ entry, onClick }) => {
                                     }
                                 }}
                             >
-                                <VolumeUpIcon />
+                                {isAudioLoading || isPlaying ? <CircularProgress size={24} color="secondary" /> : <VolumeUpIcon />}
                             </IconButton>
                         </Box>
                         

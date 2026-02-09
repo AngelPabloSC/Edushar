@@ -34,6 +34,11 @@ if (missingVars.length > 0) {
 const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
 console.log('--- Firebase Debug Info ---');
 console.log('Environment:', import.meta.env.MODE);
+try {
+    console.log('FULL ENV:', JSON.stringify(import.meta.env));
+} catch (e) {
+    console.log('FULL ENV (Error):', e.message);
+}
 console.log('API Key Type:', typeof apiKey);
 console.log('API Key Length:', apiKey ? apiKey.length : '0');
 console.log('API Key Start:', apiKey ? apiKey.substring(0, 4) + '...' : 'None');

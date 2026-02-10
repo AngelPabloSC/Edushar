@@ -9,10 +9,7 @@ export const useShuarTTS = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    // Cache for generated audio URLs to avoid re-fetching: { text: audioUrl }
-    const audioCache = useRef({});
-    // Ref for the current Audio object
+    const audioCache = useRef({}); 
     const audioRef = useRef(null);
 
     const playAudio = useCallback(async (text) => {

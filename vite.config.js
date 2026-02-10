@@ -25,6 +25,14 @@ export default defineConfig({
       filename: 'dist/stats.html',
     }),
   ],
+  resolve: {
+    alias: {
+      '@': '/src',
+      '@shared': '/src/shared',
+      '@features': '/src/features',
+      '@core': '/src/core',
+    },
+  },
   build: {
     // Disable inlining of small assets to avoid MIME type issues
     assetsInlineLimit: 0,

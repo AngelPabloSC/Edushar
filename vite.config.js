@@ -25,6 +25,14 @@ export default defineConfig({
       filename: 'dist/stats.html',
     }),
   ],
+  resolve: {
+    alias: {
+      '@': '/src',
+      '@shared': '/src/shared',
+      '@features': '/src/features',
+      '@core': '/src/core',
+    },
+  },
   build: {
     // Disable inlining of small assets to avoid MIME type issues
     assetsInlineLimit: 0,
@@ -52,9 +60,10 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true, // Remove console.logs in production
+        // Temporarily disabled for production debugging
+        // drop_console: true, // Remove console.logs in production
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info'], // Remove specific console methods
+        // pure_funcs: ['console.log', 'console.info'], // Remove specific console methods
       },
     },
   },

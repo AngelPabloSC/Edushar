@@ -213,13 +213,6 @@ Consulta siempre [`src/theme/lightTheme.jsx`](file:///Users/angelsarango/Documen
 
 **Ejemplo:**
 ```jsx
-// ✅ CORRECTO - Restricción clara
-<ActionCard
-  disabled={!isUnlocked}
-  icon={LockIcon}
-  tooltip="Completa la lección anterior para desbloquear"
-/>
-
 // ✅ CORRECTO - Validación de formulario
 <TextField
   error={!isValid}

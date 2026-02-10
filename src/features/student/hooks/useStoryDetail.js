@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useFetchDataPromise } from '../api/useFetchDataPromise';
+import { useFetchDataPromise } from '../../../shared/hooks/useFetchDataPromise';
 
 /**
  * Hook to fetch and prepare story details from the API

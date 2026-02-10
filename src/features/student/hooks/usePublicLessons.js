@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useFetchDataPromise } from '../api/useFetchDataPromise';
+import { useFetchDataPromise } from '../../../shared/hooks/useFetchDataPromise';
 
 export const usePublicLessons = () => {
     const { getFechData } = useFetchDataPromise();

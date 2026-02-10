@@ -26,9 +26,7 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
-         
             const apiUrl = import.meta.env.VITE_TRANSLATION_API_URL;
-
             console.log('🌐 Translator - API URL:', apiUrl);
             console.log('📤 Translator - Request payload:', { text: inputValue });
 
@@ -41,11 +39,9 @@ export const useTranslator = () => {
             });
 
             console.log('📥 Translator - Response status:', response.status);
-            console.log('📥 Translator - Response ok:', response.ok);
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('❌ Translator - Error response:', errorText);
                 throw new Error(`Error en la solicitud de traducción (${response.status}): ${errorText}`);
             }
 
@@ -55,18 +51,14 @@ export const useTranslator = () => {
             if (data.ok) {
                 setTranslationResult(data);
             } else {
-                throw new Error('La respuesta de la API no fue exitosa');
+                throw new Error(data.message || 'La respuesta de la API no fue exitosa');
             }
         } catch (err) {
             console.error('❌ Translator - Error details:', err);
-            console.error('❌ Translator - Error name:', err.name);
-            console.error('❌ Translator - Error message:', err.message);
 
             // More specific error messages
             if (err.name === 'TypeError' && err.message.includes('fetch')) {
-                setError('No se pudo conectar con el servicio de traducción. Por favor verifica tu conexión a internet.');
-            } else if (err.message.includes('CORS')) {
-                setError('Error de permisos al acceder al servicio de traducción.');
+                setError('No se pudo conectar con el servicio de traducción. Por favor verifica el servicio de Onrender.');
             } else {
                 setError(err.message || 'Hubo un error al traducir el texto. Por favor intenta de nuevo.');
             }

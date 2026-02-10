@@ -31,7 +31,7 @@ const StudentHome = () => {
       subtitle: globalStats?.levelLabel || 'Nivel 1 • Fundamentos',
       title: 'Lecciones Shuar',
       description: 'Descubre vocabulario, frases y gramática esencial a través de lecciones interactivas.',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnJTDrkt500fndZP9vKtTNr1zSwj-2GerGg4bqdQdx0WZCMLwaoM6VhZgS7G_z4Nle8OkYoQBPDJ-SD-KRUcJHbuc_eYvds4JxTGRBxE6sFBwtZbnjmgh5UOKQOsIrjHIzpBfogBkKNq5WH6u_PLjaMWVGlGk4nERhUvlWUjIonuReGcRD9PTTar9vorEPtZCCwuV-BZyxlFhLRvuwxeedfzAVQBO8WTjLIKdOg6A2o51ad73hgndpGFQwYrtho6RSEUNjHnB8bs1r',
+      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_tb14eetb14eetb14_jeleah.png',
       color: 'primary',
       onClick: () => navigate('/estudiante/lecciones'),
       buttonText: 'Empezar'
@@ -41,7 +41,7 @@ const StudentHome = () => {
       subtitle: 'Cultura • Narrativa',
       title: 'Cuentos y Mitos',
       description: 'Sumérgete en la cosmovisión Shuar a través de historias tradicionales animadas.',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA-2SgvvJMUxaWi64AgnZ52AMSrBoWNY5HJekhl3I5HpZAdV4Im6rLnddmQkWxP-RuX44U8Q_meiy3a436vNJ5gI6iDpnYIDPHcRu0OE9YOLqRozskc8wsGlaFCA_46Ub7WBKe5er7juJNpv1a59onOBYfIfVnF5nqb5jvVnCsl5pyNonNRtQBJ7lNcPmOxbcEt64vvDiwrufijMLFqYFauWjFYRLVZKAuMY-zyAWLSmCZKromOhQ7Qi3_uOHA1Pba2_SzTjON7VVO0',
+      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758464/unnamed_mp5fkp.jpg',
       color: 'secondary',
       onClick: () => navigate('/estudiante/cuentos'),
       buttonText: 'Leer ahora'
@@ -51,7 +51,7 @@ const StudentHome = () => {
       subtitle: 'Herramienta • Traducción',
       title: 'Traductor Shuar',
       description: 'Traduce frases y textos del español al Shuar con justificación lingüística.',
-      image: '/translator.png', 
+      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_fr77f6fr77f6fr77_qhdusr.png', 
       color: 'primary',
       onClick: () => navigate('/estudiante/traductor'),
       buttonText: 'Traducir'
@@ -61,7 +61,7 @@ const StudentHome = () => {
       subtitle: 'Vocabulario • Consulta',
       title: 'Diccionario',
       description: 'Explora más de 5,000 términos con ejemplos de uso y pronunciación.',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhmlOon5LaA0nr9rlhgvEp7mZsaQiqfO2wyKGV8VlP2lfNsaeNNd0vE0d1DPM4pJQ79GaG1PEKL7pxuPPEbtMqnkuMRwAXLHsUyES40j5tthdd8eQamrJUMby0jmuy-an1R6ll99fF91tEPanjGNPsY5-5OCS_V4GPV6RnL-MYmRTlfo8ddgh4ivADkO8pUQCvYQ8dkZ7nZFer-5N5tzbActkW0QG6bYCpX6ktPUciiLCixpJzAsIECAXPHT8Cs7V0XbbQ_F1zT8yY',
+      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_o7ok5oo7ok5oo7ok_cugl1j.png',
       color: 'secondary',
       onClick: () => navigate('/estudiante/diccionario'),
       buttonText: 'Buscar'
@@ -71,7 +71,7 @@ const StudentHome = () => {
       subtitle: 'Comunidad • Colaboración',
       title: 'Contribuciones',
       description: 'Ayuda a expandir el conocimiento compartiendo nuevas palabras o historias.',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAvyybVkV1n8WSPH4_vgGMcwOi1dqGWNfAk7VD_fW2TeW5wskU0qBThQWD3rGKO9xS7Z2_PpZkcsNA8usSY7xDo3oUl7xIPARjZLwCEq2ZH1qwsrNxiUQ_D4Ur7QDBc1HWF_nPS5_IlXh-43aUpno6WnKfvq9dpiQ6-G6cbISSvbq6ipPAc2pEQ2DXXdWMT-5RLzibf2PHjJ7metQhxBkl-wW-LYoR0iSkUYwESUjBmx-M2L5pJ0gneWsBnBcS8RNlte02_MgnsNOBn',
+      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_2tb9xw2tb9xw2tb9_ozbsbl.png',
       color: 'primary',
       onClick: () => navigate('/estudiante/contribuciones'),
       buttonText: 'Colaborar'
@@ -113,7 +113,7 @@ const StudentHome = () => {
                             mb: 3
                         }}
                     >
-                        EduShar<br/>
+                        EduShuar<br/>
                         <Box component="span" sx={{ color: 'secondary.main' }}>Dashboard</Box>
                     </Typography>
 

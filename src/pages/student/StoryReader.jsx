@@ -8,6 +8,14 @@ import {
   IconButton,
   Chip,
   Paper,
+  Divider,
+  Fade,
+  useTheme,
+  alpha,
+  Grid,
+  Pagination,
+  Skeleton,
+  CircularProgress
 } from '@mui/material';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -16,21 +24,45 @@ import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
-import { storiesData } from '../../data/storiesData';
+import { useStoryDetail } from '../../hooks/pages/useStoryDetail';
 
 /**
  * Página de lectura de cuentos bilingüe (Shuar-Español)
  * Incluye paginación y toggle de traducción
  */
 const StoryReader = () => {
-  const { storyId } = useParams();
+  const { storyId: paramStoryId, id: paramId } = useParams();
+  const storyId = paramStoryId || paramId;
   const navigate = useNavigate();
   const [showTranslation, setShowTranslation] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const { story, loading, error } = useStoryDetail(storyId);
 
-  const story = storiesData.find(s => s.id === Number(storyId)) || storiesData[0];
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', bgcolor: 'background.default' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress color="error" size={60} thickness={4} />
+          <Typography sx={{ mt: 2, color: 'text.secondary', fontWeight: 'bold' }}>Cargando historia...</Typography>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error || !story) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', bgcolor: 'background.default' }}>
+        <Typography variant="h5" color="error" gutterBottom fontWeight="bold">{error || 'Historia no encontrada'}</Typography>
+        <Typography variant="body1" color="text.secondary" paragraph>
+          No pudimos cargar la información de este relato.
+        </Typography>
+        <Button onClick={() => navigate('/estudiante/cuentos')} variant="contained" color="error" sx={{ borderRadius: 2, fontWeight: 'bold' }}>
+          Volver a la Biblioteca
+        </Button>
+      </Box>
+    );
+  }
 
   const totalPages = story.pages.length;
   const currentPageData = story.pages[currentPage];
@@ -92,33 +124,11 @@ const StoryReader = () => {
                 color: 'text.primary',
               }}
             >
-              {story.titleSpanish}
+              {story.title?.es}
             </Typography>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={showTranslation}
-                    onChange={(e) => setShowTranslation(e.target.checked)}
-                    color="error"
-                  />
-                }
-                label={
-                  <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
-                    Traducir
-                  </Typography>
-                }
-                sx={{
-                  bgcolor: 'rgba(0, 0, 0, 0.03)',
-                  px: 2,
-                  py: 0.5,
-                  borderRadius: 10,
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  m: 0,
-                }}
-              />
+              {/* Toggle removed from here as per user request */}
             </Box>
           </Box>
         </Container>
@@ -137,7 +147,7 @@ const StoryReader = () => {
           sx={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: `url(${story.image})`,
+            backgroundImage: `url(${story.cover})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             transition: 'transform 2s',
@@ -194,7 +204,7 @@ const StoryReader = () => {
                 textShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}
             >
-              {story.titleShuar}
+              {story.title?.shuar}
             </Typography>
             <Typography
               variant="h5"
@@ -204,7 +214,7 @@ const StoryReader = () => {
                 color: 'text.secondary',
               }}
             >
-              {story.titleSpanish}
+              {story.title?.es}
             </Typography>
           </Container>
         </Box>
@@ -222,10 +232,43 @@ const StoryReader = () => {
               fontStyle: 'italic',
               color: 'text.secondary',
               lineHeight: 1.8,
+              mb: 3,
             }}
           >
             "{story.introduction}"
           </Typography>
+
+          {/* Translation Toggle moved here */}
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={showTranslation}
+                  onChange={(e) => setShowTranslation(e.target.checked)}
+                  color="error"
+                />
+              }
+              label={
+                <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Traducir
+                </Typography>
+              }
+              sx={{
+                bgcolor: 'rgba(192, 86, 33, 0.05)',
+                px: 3,
+                py: 1,
+                borderRadius: 10,
+                border: '1px solid',
+                borderColor: 'rgba(192, 86, 33, 0.2)',
+                m: 0,
+                transition: 'all 0.3s',
+                '&:hover': {
+                  bgcolor: 'rgba(192, 86, 33, 0.1)',
+                  borderColor: 'rgba(192, 86, 33, 0.4)',
+                }
+              }}
+            />
+          </Box>
         </Box>
 
         {/* Paragraphs */}

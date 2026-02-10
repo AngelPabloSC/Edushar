@@ -180,7 +180,7 @@ const DashboardCard = ({
         {/* Image */}
         <Box 
           component="img"
-          className="card-image"
+          className="7e"
           alt={title} 
           src={image} 
           sx={{

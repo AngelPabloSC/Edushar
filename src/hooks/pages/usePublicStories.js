@@ -11,7 +11,7 @@ export const usePublicStories = () => {
     // Transform API data to match component expectations
     const transformedStories = useMemo(() => {
         return apiStories.map(story => ({
-            id: story.id,
+            id: story.id || story._id,
             title: {
                 shuar: story.title_shuar || '',
                 es: story.title_español || ''

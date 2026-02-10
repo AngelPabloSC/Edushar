@@ -291,9 +291,9 @@ const Landing = () => {
                 fontSize: { xs: '1.25rem', md: '1.5rem' } 
             }}
           >
-              Una serie de mini experimentos 
+              Una serie de pequeñas lecciones
               <Box component="br" sx={{ display: { xs: 'none', md: 'block' } }}/>
-              para aprender Shuar con stickers interactivos.
+              Descubre el idioma Shuar y conecta con su cultura.
           </Typography>
 
           <Button

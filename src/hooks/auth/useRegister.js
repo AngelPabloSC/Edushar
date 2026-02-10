@@ -86,30 +86,30 @@ export const useRegister = () => {
     const handleRegisterAPI = useCallback(async (data) => {
         setIsLoading(true);
         try {
-            // Crear FormData para enviar archivo de foto
-            const formData = new FormData();
+            // Preparar datos como JSON
+            const requestBody = {
+                email: data.email,
+                password: data.password,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                birthdate: data.birthdate,
+                role: data.role || 'student',
+            };
 
-            // Agregar campos de texto
-            formData.append('email', data.email);
-            formData.append('password', data.password);
-            formData.append('firstName', data.firstName);
-            formData.append('lastName', data.lastName);
-            formData.append('birthdate', data.birthdate);
-            formData.append('role', data.role || 'student');
-
-            // Agregar foto si existe
+            // Agregar foto si existe (como base64 o URL)
             if (data.photoProfile) {
-                formData.append('photoProfile', data.photoProfile);
+                requestBody.photoProfile = data.photoProfile;
             }
-
-            console.log('📤 Sending registration data...');
 
             // Enviar al backend
             const response = await fetch(
                 `${import.meta.env.VITE_URL_FETCH}/api/users/create`,
                 {
                     method: 'POST',
-                    body: formData,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
                 }
             );
 
@@ -141,11 +141,26 @@ export const useRegister = () => {
                 }
             } else {
                 console.error('❌ Registration failed:', responseData);
+
+                // Traducir mensaje de error a español
+                let errorMessage = responseData.message || 'No se pudo crear la cuenta. Intenta nuevamente.';
+
+                // Traducir mensajes comunes del backend
+                if (errorMessage.includes('Faltan campos obligatorios')) {
+                    errorMessage = 'Por favor completa todos los campos requeridos (nombre, apellido, correo y contraseña)';
+                } else if (errorMessage.includes('email')) {
+                    errorMessage = 'El correo electrónico ya está registrado o no es válido';
+                } else if (errorMessage.includes('password')) {
+                    errorMessage = 'La contraseña no cumple con los requisitos de seguridad';
+                } else if (errorMessage.toLowerCase().includes('already exists')) {
+                    errorMessage = 'Este correo electrónico ya está registrado';
+                }
+
                 handleSetDataSnackbar({
-                    message: responseData.message || 'No se pudo crear la cuenta. Intenta nuevamente.',
+                    message: errorMessage,
                     type: 'error'
                 });
-                return { success: false, error: responseData.message };
+                return { success: false, error: errorMessage };
             }
         } catch (error) {
             console.error('Error en registro:', error);
@@ -192,6 +207,10 @@ export const useRegister = () => {
 
         const isValid = validateAll(fieldsConfig);
 
+        if (!isValid) {
+            return;
+        }
+
         // Additional validations
         if (registerData.birthdate) {
             const birthDate = new Date(registerData.birthdate);
@@ -210,10 +229,6 @@ export const useRegister = () => {
 
         if (!registerData.acceptTerms) {
             setFieldError('acceptTerms', 'Debes aceptar los términos y condiciones');
-            return;
-        }
-
-        if (!isValid) {
             return;
         }
 

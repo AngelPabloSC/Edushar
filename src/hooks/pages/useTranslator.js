@@ -26,9 +26,8 @@ export const useTranslator = () => {
         setTranslationResult(null);
 
         try {
-            // Use environment variable to determine which API to call
-            // VITE_TRANSLATION_API_URL should be set in .env file
-            const apiUrl = import.meta.env.VITE_TRANSLATION_API_URL || '/api/translate';
+         
+            const apiUrl = import.meta.env.VITE_TRANSLATION_API_URL;
 
             console.log('🌐 Translator - API URL:', apiUrl);
             console.log('📤 Translator - Request payload:', { text: inputValue });

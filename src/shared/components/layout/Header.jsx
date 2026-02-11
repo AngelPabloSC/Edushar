@@ -29,7 +29,7 @@ const Header = () => {
           {/* Logo */}
           <Button
             onClick={() => navigate('/')}
-            aria-label="Ir a la página principal de EduShar"
+            aria-label="Ir a la página principal de EduShuar"
             sx={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -48,7 +48,7 @@ const Header = () => {
               fontWeight="bold"
               sx={{ color: 'text.primary' }}
             >
-              EduShar
+              EduShuar
             </Typography>
           </Button>
 
@@ -90,7 +90,7 @@ const Header = () => {
             variant="contained" 
             color="secondary"
             onClick={() => navigate('/login')}
-            aria-label="Iniciar sesión en EduShar"
+            aria-label="Iniciar sesión en EduShuar"
             sx={{
               fontWeight: 600,
               px: 3,

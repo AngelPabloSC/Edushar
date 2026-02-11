@@ -32,7 +32,7 @@ const Footer = () => {
             <Nature sx={{ fontSize: 40, color: 'secondary.main' }} />
             <Box>
               <Typography variant="h6" fontWeight="bold" color="text.primary">
-                EduShar
+                EduShuar
               </Typography>
               <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 2 }}>
                 Ecuador
@@ -92,7 +92,7 @@ const Footer = () => {
               <Email />
             </IconButton>
             <IconButton
-              aria-label="Compartir EduShar"
+              aria-label="Compartir EduShuar"
               sx={{
                 bgcolor: 'secondary.light',
                 color: 'secondary.main',

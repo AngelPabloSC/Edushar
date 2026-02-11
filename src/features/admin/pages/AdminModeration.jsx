@@ -32,7 +32,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useAdminModeration } from '@features/admin/hooks/useAdminModeration';
 
 /**
- * Admin Moderation Dashboard
+ * Admin Moderation Inicio
  * Allows admins to review and approve/reject contributions
  */
 const AdminModeration = () => {

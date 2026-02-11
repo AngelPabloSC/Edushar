@@ -400,20 +400,6 @@ const AdminLessons = () => {
                             <Typography variant="h3" fontWeight={900} sx={{ color: '#2D3436' }}>{filteredLessons.length}</Typography>
                         </Box>
                     </Paper>
-                    {/* Card 2: Published */}
-                    <Paper elevation={0} sx={{ flex: 1, p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: '#FFFFFF', transition: 'all 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                            <Box sx={{ width: 48, height: 48, borderRadius: '50%', bgcolor: '#E0F2F1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#009688' }}>
-                                <CheckCircleIcon />
-                            </Box>
-                        </Box>
-                        <Box>
-                            <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>PUBLICADAS</Typography>
-                            <Typography variant="h3" fontWeight={900} sx={{ color: '#2D3436' }}>
-                                {lessons?.filter(l => l.is_active || l.status === 'published').length || 0}
-                            </Typography>
-                        </Box>
-                    </Paper>
                 </Box>
             </Box>
 

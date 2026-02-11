@@ -3,7 +3,7 @@ export const helpPermission = () => {
         menuItems: [
             {
                 id: 1,
-                name: 'Dashboard',
+                name: 'Inicio',
                 route: '/admin/dashboard',
                 icon: 'dashboard',
             },

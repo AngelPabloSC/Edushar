@@ -114,7 +114,7 @@ const StudentHome = () => {
               }}
             >
               EduShuar<br />
-              <Box component="span" sx={{ color: 'secondary.main' }}>Dashboard</Box>
+              <Box component="span" sx={{ color: 'secondary.main' }}>Inicio</Box>
             </Typography>
 
             <Typography

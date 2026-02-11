@@ -1,4 +1,4 @@
-# Guía de Diseño EduShar
+# Guía de Diseño EduShuar
 
 Documento de referencia para el diseño y desarrollo de componentes en EduShar. Todos los componentes nuevos deben seguir estas directrices.
 

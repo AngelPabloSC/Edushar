@@ -35,6 +35,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import PeopleIcon from '@mui/icons-material/People';
+import NatureIcon from '@mui/icons-material/Nature';
+import PetsIcon from '@mui/icons-material/Pets';
+import GrassIcon from '@mui/icons-material/Grass';
+import CategoryIcon from '@mui/icons-material/Category';
+import PaletteIcon from '@mui/icons-material/Palette';
 import Fade from '@mui/material/Fade';
 
 
@@ -76,7 +82,7 @@ const AdminDictionary = () => {
         setViewDialogOpen(false);
         setSelectedEntry(null);
     };
-    
+
     // Pagination State (Persisted)
     const [page, setPage] = useState(() => {
         const savedPage = sessionStorage.getItem('adminDictionaryPage');
@@ -109,11 +115,12 @@ const AdminDictionary = () => {
 
     // Categorías con iconos y colores (Mapping + Visibility)
     const categoryConfig = {
-        'Sustantivo': { color: '#1976d2', icon: <PersonIcon fontSize="small" />, bgColor: '#e3f2fd' },
-        'Verbo': { color: '#d32f2f', icon: <DirectionsRunIcon fontSize="small" />, bgColor: '#ffebee' },
-        'Adjetivo': { color: '#388e3c', icon: <StarIcon fontSize="small" />, bgColor: '#e8f5e9' },
-        'Adverbio': { color: '#f57c00', icon: <SpeedIcon fontSize="small" />, bgColor: '#fff3e0' },
-        'Expresión': { color: '#7b1fa2', icon: <ChatIcon fontSize="small" />, bgColor: '#f3e5f5' },
+        'Familia': { color: '#1976d2', icon: <PeopleIcon fontSize="small" />, bgColor: '#e3f2fd' },
+        'Naturaleza': { color: '#388e3c', icon: <NatureIcon fontSize="small" />, bgColor: '#e8f5e9' },
+        'Animales': { color: '#d32f2f', icon: <PetsIcon fontSize="small" />, bgColor: '#ffebee' },
+        'Alimentos y Plantas': { color: '#f57c00', icon: <GrassIcon fontSize="small" />, bgColor: '#fff3e0' },
+        'Objetos': { color: '#7b1fa2', icon: <CategoryIcon fontSize="small" />, bgColor: '#f3e5f5' },
+        'Números y Colores': { color: '#00bcd4', icon: <PaletteIcon fontSize="small" />, bgColor: '#e0f7fa' },
     };
 
     // Generate categories dynamically from ALL entries (not filtered ones)
@@ -121,7 +128,7 @@ const AdminDictionary = () => {
         const uniqueCategories = [...new Set(allEntries.map(entry => entry.category).filter(Boolean))];
         return ['Todos', ...uniqueCategories.sort()];
     }, [allEntries]);
-    
+
     // Paginated Data
     const paginatedEntries = entries.slice(
         page * rowsPerPage,
@@ -143,9 +150,9 @@ const AdminDictionary = () => {
     const handleConfirmDelete = () => {
         if (selectedEntry) {
             deleteEntry(selectedEntry.id);
-            handleSetDataSnackbar({ 
-                message: `Palabra "${selectedEntry.wordShuar}" eliminada exitosamente`, 
-                type: 'success' 
+            handleSetDataSnackbar({
+                message: `Palabra "${selectedEntry.wordShuar}" eliminada exitosamente`,
+                type: 'success'
             });
             handleCloseDialog();
             setSelectedEntry(null);
@@ -160,26 +167,26 @@ const AdminDictionary = () => {
             options: {
                 customBodyRender: (value, tableMeta) => (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-                        <Box sx={{ 
-                             width: 40, 
-                             height: 40, 
-                             borderRadius: 2.5, 
-                             background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.2)} 100%)`, 
-                             color: 'primary.main',
-                             display: 'flex', 
-                             alignItems: 'center', 
-                             justifyContent: 'center',
-                             boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                        <Box sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2.5,
+                            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)} 0%, ${alpha(theme.palette.primary.main, 0.2)} 100%)`,
+                            color: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                         }}>
-                             <BookIcon fontSize="small" />
+                            <BookIcon fontSize="small" />
                         </Box>
                         <Box>
-                             <Typography variant="subtitle2" fontWeight={700} color="text.primary">
-                                 {value}
-                             </Typography>
-                             <Typography variant="caption" color="text.secondary">
-                                 {entries[tableMeta.rowIndex]?.category || 'General'}
-                             </Typography>
+                            <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                                {value}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                                {entries[tableMeta.rowIndex]?.category || 'General'}
+                            </Typography>
                         </Box>
                     </Box>
                 ),
@@ -203,12 +210,12 @@ const AdminDictionary = () => {
                 customBodyRender: (value) => {
                     const config = categoryConfig[value] || {};
                     return (
-                        <Chip 
+                        <Chip
                             icon={config.icon}
-                            label={value} 
+                            label={value}
                             size="small"
-                            variant="outlined" 
-                            sx={{ 
+                            variant="outlined"
+                            sx={{
                                 bgcolor: 'transparent',
                                 color: 'text.secondary',
                                 fontWeight: 600,
@@ -216,7 +223,7 @@ const AdminDictionary = () => {
                                 '& .MuiChip-icon': {
                                     color: config.color || 'text.secondary'
                                 }
-                            }} 
+                            }}
                         />
                     );
                 },
@@ -227,10 +234,10 @@ const AdminDictionary = () => {
             label: 'Ejemplo de Uso',
             options: {
                 customBodyRender: (value) => (
-                    <Typography 
-                        variant="body2" 
+                    <Typography
+                        variant="body2"
                         color="text.secondary"
-                        sx={{ 
+                        sx={{
                             fontStyle: 'italic',
                             maxWidth: 250,
                             overflow: 'hidden',
@@ -248,14 +255,14 @@ const AdminDictionary = () => {
             label: 'Estado',
             options: {
                 customBodyRender: (value) => (
-                    <Chip 
-                        label={value} 
-                        size="small" 
-                        sx={{ 
+                    <Chip
+                        label={value}
+                        size="small"
+                        sx={{
                             fontWeight: 700,
                             bgcolor: value === 'Publicado' ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.warning.main, 0.1),
                             color: value === 'Publicado' ? 'success.dark' : 'warning.dark'
-                         }} 
+                        }}
                     />
                 ),
             },
@@ -268,19 +275,19 @@ const AdminDictionary = () => {
                 sort: false,
                 customBodyRender: (value, tableMeta) => {
                     const entry = paginatedEntries[tableMeta.rowIndex];
-                     // Verify entry exists to avoid crashes on pagination edge cases if data changes
+                    // Verify entry exists to avoid crashes on pagination edge cases if data changes
                     if (!entry) return null;
 
                     return (
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                             <Tooltip title="Ver Detalles" arrow TransitionComponent={Fade}>
-                                <IconButton 
-                                    size="small" 
+                                <IconButton
+                                    size="small"
                                     onClick={() => handleViewClick(entry)}
-                                    sx={{ 
+                                    sx={{
                                         color: 'text.secondary',
                                         transition: 'all 0.2s',
-                                        '&:hover': { 
+                                        '&:hover': {
                                             color: 'primary.main',
                                             bgcolor: alpha(theme.palette.primary.main, 0.1),
                                             transform: 'translateY(-2px)'
@@ -291,13 +298,13 @@ const AdminDictionary = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Editar" arrow TransitionComponent={Fade}>
-                                <IconButton 
-                                    size="small" 
+                                <IconButton
+                                    size="small"
                                     onClick={() => navigate(`/admin/diccionario/editar/${entry.id}`)}
-                                    sx={{ 
+                                    sx={{
                                         color: 'text.secondary',
                                         transition: 'all 0.2s',
-                                        '&:hover': { 
+                                        '&:hover': {
                                             color: 'info.main',
                                             bgcolor: alpha(theme.palette.info.main, 0.1),
                                             transform: 'translateY(-2px)'
@@ -308,13 +315,13 @@ const AdminDictionary = () => {
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Eliminar" arrow TransitionComponent={Fade}>
-                                <IconButton 
-                                    size="small" 
+                                <IconButton
+                                    size="small"
                                     onClick={() => handleDeleteClick(entry)}
-                                    sx={{ 
+                                    sx={{
                                         color: 'text.secondary',
                                         transition: 'all 0.2s',
-                                        '&:hover': { 
+                                        '&:hover': {
                                             color: 'error.main',
                                             bgcolor: alpha(theme.palette.error.main, 0.1),
                                             transform: 'translateY(-2px)'
@@ -334,8 +341,8 @@ const AdminDictionary = () => {
     const options = {
         elevation: 0,
         selectableRows: 'none',
-        search: false, 
-        filter: false, 
+        search: false,
+        filter: false,
         viewColumns: false,
         print: false,
         download: false,
@@ -344,17 +351,17 @@ const AdminDictionary = () => {
 
     return (
         <Box sx={{ p: { xs: 2, md: 5 }, bgcolor: 'background.default', minHeight: '100vh', transition: 'all 0.3s' }}>
-             {/* Breadcrumbs */}
-             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
+            {/* Breadcrumbs */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 4 }}>
                 <Link to="/admin/dashboard" style={{ textDecoration: 'none' }}>
-                    <Typography 
-                        variant="body2" 
-                        color="text.secondary" 
-                        fontWeight={600} 
-                        sx={{ 
-                            cursor: 'pointer', 
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        fontWeight={600}
+                        sx={{
+                            cursor: 'pointer',
                             transition: 'all 0.2s',
-                            '&:hover': { color: 'text.primary', textDecoration: 'underline' } 
+                            '&:hover': { color: 'text.primary', textDecoration: 'underline' }
                         }}
                     >
                         Admin
@@ -380,7 +387,7 @@ const AdminDictionary = () => {
                     <Tooltip title="Recargar datos">
                         <IconButton
                             onClick={refetch}
-                            sx={{ 
+                            sx={{
                                 borderRadius: 3,
                                 width: 44,
                                 height: 44,
@@ -389,8 +396,8 @@ const AdminDictionary = () => {
                                 color: 'text.secondary',
                                 bgcolor: 'white',
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.02)',
-                                '&:hover': { 
-                                    bgcolor: 'text.primary', 
+                                '&:hover': {
+                                    bgcolor: 'text.primary',
                                     color: 'white',
                                     borderColor: 'text.primary',
                                     transform: 'rotate(180deg)',
@@ -426,7 +433,13 @@ const AdminDictionary = () => {
             </Box>
 
             {/* Stats Cards */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' }, gap: 3, mb: 4 }}>
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' },
+                gap: 3, mb: 4,
+                overflowX: 'auto',
+                pb: 1
+            }}>
                 <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
                     <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: alpha(theme.palette.primary.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'primary.dark' }}>
                         <BookIcon fontSize="large" />
@@ -436,48 +449,41 @@ const AdminDictionary = () => {
                         <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.total}</Typography>
                     </Box>
                 </Paper>
-                <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
-                    <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: alpha(theme.palette.success.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'success.dark' }}>
-                        <DirectionsRunIcon fontSize="large" />
-                    </Box>
-                    <Box>
-                        <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Verbos</Typography>
-                        <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.byCategory?.verbo || 0}</Typography>
-                    </Box>
-                </Paper>
-                <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
-                    <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: alpha(theme.palette.warning.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'warning.dark' }}>
-                        <StarIcon fontSize="large" />
-                    </Box>
-                    <Box>
-                        <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Adjetivos</Typography>
-                        <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.byCategory?.adjetivo || 0}</Typography>
-                    </Box>
-                </Paper>
-                <Paper elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
-                    <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: alpha(theme.palette.info.main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'info.dark' }}>
-                        <PersonIcon fontSize="large" />
-                    </Box>
-                    <Box>
-                        <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>Sustantivos</Typography>
-                        <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.byCategory?.sustantivo || 0}</Typography>
-                    </Box>
-                </Paper>
+
+                {/* Dynamically show new categories */}
+                {[
+                    { key: 'familia', label: 'Familia', icon: <PeopleIcon fontSize="large" />, color: 'info' },
+                    { key: 'naturaleza', label: 'Naturaleza', icon: <NatureIcon fontSize="large" />, color: 'success' },
+                    { key: 'animales', label: 'Animales', icon: <PetsIcon fontSize="large" />, color: 'error' },
+                    { key: 'alimentos', label: 'Alimentos y Plantas', icon: <GrassIcon fontSize="large" />, color: 'warning' },
+                    { key: 'objetos', label: 'Objetos', icon: <CategoryIcon fontSize="large" />, color: 'secondary' },
+                    { key: 'numeros', label: 'Números y Colores', icon: <PaletteIcon fontSize="large" />, color: 'primary' }
+                ].map((stat) => (
+                    <Paper key={stat.key} elevation={0} sx={{ p: 3, border: '1px solid', borderColor: 'divider', borderRadius: 4, display: 'flex', alignItems: 'center', gap: 2, transition: 'transform 0.2s, box-shadow 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.08)' } }}>
+                        <Box sx={{ width: 56, height: 56, borderRadius: '50%', bgcolor: alpha(theme.palette[stat.color].main, 0.1), display: 'flex', alignItems: 'center', justifyContent: 'center', color: `${stat.color}.dark` }}>
+                            {stat.icon}
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</Typography>
+                            <Typography variant="h4" fontWeight={900} sx={{ color: 'text.primary' }}>{stats.byCategory[stat.key] || 0}</Typography>
+                        </Box>
+                    </Paper>
+                ))}
             </Box>
 
-             {/* Custom Search & Filter Toolbar */}
-             <Paper elevation={0} sx={{ 
-                p: 1.5, mb: 4, borderRadius: 4, 
-                border: '1px solid', borderColor: 'rgba(0,0,0,0.05)', 
-                display: 'flex', flexDirection: { xs: 'column', md: 'row' }, 
+            {/* Custom Search & Filter Toolbar */}
+            <Paper elevation={0} sx={{
+                p: 1.5, mb: 4, borderRadius: 4,
+                border: '1px solid', borderColor: 'rgba(0,0,0,0.05)',
+                display: 'flex', flexDirection: { xs: 'column', md: 'row' },
                 gap: 2, alignItems: 'center',
                 boxShadow: '0 4px 24px rgba(0,0,0,0.02)',
                 bgcolor: 'rgba(255,255,255,0.9)',
                 backdropFilter: 'blur(10px)'
-                }}>
+            }}>
                 <Box sx={{ position: 'relative', flexGrow: 1, width: '100%', display: 'flex', alignItems: 'center', px: 2 }}>
                     <SearchIcon color="action" sx={{ mr: 2 }} />
-                    <TextField 
+                    <TextField
                         fullWidth
                         placeholder="Buscar palabra..."
                         value={searchTerm}
@@ -486,25 +492,25 @@ const AdminDictionary = () => {
                         InputProps={{
                             disableUnderline: true,
                             sx: { fontSize: '1rem', fontWeight: 500 },
-                             endAdornment: searchTerm && (
+                            endAdornment: searchTerm && (
                                 <InputAdornment position="end">
-                                    <IconButton size="small" onClick={() => setSearchTerm('')}><ClearIcon fontSize="small"/></IconButton>
+                                    <IconButton size="small" onClick={() => setSearchTerm('')}><ClearIcon fontSize="small" /></IconButton>
                                 </InputAdornment>
                             ),
                         }}
                     />
                 </Box>
                 <Box sx={{ display: 'flex', gap: 1, width: { xs: '100%', md: 'auto' }, p: 0.5 }}>
-                     <Select 
+                    <Select
                         value={categoryFilter}
                         onChange={(e) => setCategoryFilter(e.target.value)}
                         displayEmpty
                         variant="standard"
                         disableUnderline
-                        sx={{ 
-                            bgcolor: categoryFilter === 'Todos' ? 'transparent' : alpha(theme.palette.primary.main, 0.08), 
-                            borderRadius: 3, 
-                            px: 3, py: 1.5, 
+                        sx={{
+                            bgcolor: categoryFilter === 'Todos' ? 'transparent' : alpha(theme.palette.primary.main, 0.08),
+                            borderRadius: 3,
+                            px: 3, py: 1.5,
                             minWidth: 180,
                             fontWeight: 700,
                             fontSize: '0.875rem',
@@ -516,19 +522,19 @@ const AdminDictionary = () => {
                             transition: 'all 0.2s'
                         }}
                     >
-                         {categories.map((cat) => (
-                             <MenuItem 
-                                 key={cat} 
-                                 value={cat}
-                                 sx={{
-                                     fontWeight: cat === 'Todos' ? 700 : 600,
-                                     color: cat === 'Todos' ? 'text.secondary' : 'text.primary'
-                                 }}
-                             >
-                                 {cat === 'Todos' ? ' Todas las Categorías' : cat}
-                             </MenuItem>
-                         ))}
-                     </Select>
+                        {categories.map((cat) => (
+                            <MenuItem
+                                key={cat}
+                                value={cat}
+                                sx={{
+                                    fontWeight: cat === 'Todos' ? 700 : 600,
+                                    color: cat === 'Todos' ? 'text.secondary' : 'text.primary'
+                                }}
+                            >
+                                {cat === 'Todos' ? ' Todas las Categorías' : cat}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </Box>
             </Paper>
 
@@ -540,7 +546,7 @@ const AdminDictionary = () => {
             {/* Table */}
             {!loading && (
                 <>
-                    <Box sx={{ 
+                    <Box sx={{
                         '& .MuiPaper-root': { boxShadow: '0 4px 24px rgba(0,0,0,0.02)', border: '1px solid', borderColor: 'divider', borderRadius: '16px 16px 0 0', borderBottom: 'none', overflow: 'hidden' },
                         '& .MuiTableCell-head': { bgcolor: alpha(theme.palette.background.paper, 0.5), fontWeight: 800, color: 'text.secondary', fontSize: '0.75rem', letterSpacing: '0.05em' },
                         '& .MuiTableRow-root': { transition: 'bgcolor 0.2s', '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.02) } }
@@ -553,118 +559,118 @@ const AdminDictionary = () => {
                         />
                     </Box>
 
-             {/* Pagination Client Side */}
-             {(() => {
-                const totalItems = entries.length;
-                const totalPages = Math.ceil(totalItems / rowsPerPage);
-                const startItem = page * rowsPerPage + 1;
-                const endItem = Math.min((page + 1) * rowsPerPage, totalItems);
-                
-                if (totalItems === 0) return null;
+                    {/* Pagination Client Side */}
+                    {(() => {
+                        const totalItems = entries.length;
+                        const totalPages = Math.ceil(totalItems / rowsPerPage);
+                        const startItem = page * rowsPerPage + 1;
+                        const endItem = Math.min((page + 1) * rowsPerPage, totalItems);
 
-                return (
-                <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: '0 0 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper', flexWrap: 'wrap', gap: 2, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{totalItems}</Box> palabras
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2, borderLeft: '1px solid', borderColor: 'divider', pl: 2 }}>
-                            <Typography variant="caption" color="text.secondary" fontWeight={600}>
-                                Filas:
-                            </Typography>
-                            <Select
-                                value={rowsPerPage}
-                                onChange={(e) => {
-                                    setRowsPerPage(e.target.value);
-                                    setPage(0);
-                                }}
-                                variant="standard"
-                                disableUnderline
-                                sx={{ 
-                                    fontSize: '0.875rem', 
-                                    fontWeight: 700,
-                                    '& .MuiSelect-select': { py: 0, pr: '24px !important' } 
-                                }}
-                            >
-                                <MenuItem value={5}>5</MenuItem>
-                                <MenuItem value={10}>10</MenuItem>
-                                <MenuItem value={25}>25</MenuItem>
-                                <MenuItem value={50}>50</MenuItem>
-                            </Select>
-                        </Box>
-                    </Box>
-                    
-                    {totalPages > 1 && (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton 
-                        size="small" 
-                        disabled={page === 0}
-                        onClick={() => setPage(prev => Math.max(0, prev - 1))}
-                        sx={{ border: '1px solid', borderColor: 'divider' }}
-                        >
-                        <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 20 }} />
-                        </IconButton>
-                        
-                        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                        let pageNum; 
-                        const currentPage = page;
-                        
-                        if (totalPages <= 5) {
-                            pageNum = i;
-                        } else if (currentPage <= 2) {
-                            pageNum = i;
-                        } else if (currentPage >= totalPages - 2) {
-                            pageNum = totalPages - 5 + i;
-                        } else {
-                            pageNum = currentPage - 2 + i;
-                        }
-                        
+                        if (totalItems === 0) return null;
+
                         return (
-                            <Button 
-                            key={pageNum}
-                            variant={currentPage === pageNum ? "contained" : "text"}
-                            size="small" 
-                            onClick={() => setPage(pageNum)}
-                            sx={{ 
-                                minWidth: 40, 
-                                height: 40,
-                                borderRadius: 2,
-                                px: 0, 
-                                bgcolor: currentPage === pageNum ? 'primary.main' : 'transparent',
-                                color: currentPage === pageNum ? 'white' : 'text.secondary',
-                                fontWeight: 'bold', 
-                                boxShadow: currentPage === pageNum ? theme.shadows[4] : 'none',
-                                '&:hover': {
-                                    bgcolor: currentPage === pageNum ? 'primary.dark' : 'action.hover'
-                                }
-                            }}
-                            >
-                            {pageNum + 1}
-                            </Button>
+                            <Paper elevation={0} sx={{ p: 2, border: '1px solid', borderColor: 'divider', borderRadius: '0 0 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: 'background.paper', flexWrap: 'wrap', gap: 2, boxShadow: '0 4px 24px rgba(0,0,0,0.02)' }}>
+
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                                        Mostrando <Box component="span" fontWeight="bold" color="text.primary">{startItem} - {endItem}</Box> de <Box component="span" fontWeight="bold" color="text.primary">{totalItems}</Box> palabras
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 2, borderLeft: '1px solid', borderColor: 'divider', pl: 2 }}>
+                                        <Typography variant="caption" color="text.secondary" fontWeight={600}>
+                                            Filas:
+                                        </Typography>
+                                        <Select
+                                            value={rowsPerPage}
+                                            onChange={(e) => {
+                                                setRowsPerPage(e.target.value);
+                                                setPage(0);
+                                            }}
+                                            variant="standard"
+                                            disableUnderline
+                                            sx={{
+                                                fontSize: '0.875rem',
+                                                fontWeight: 700,
+                                                '& .MuiSelect-select': { py: 0, pr: '24px !important' }
+                                            }}
+                                        >
+                                            <MenuItem value={5}>5</MenuItem>
+                                            <MenuItem value={10}>10</MenuItem>
+                                            <MenuItem value={25}>25</MenuItem>
+                                            <MenuItem value={50}>50</MenuItem>
+                                        </Select>
+                                    </Box>
+                                </Box>
+
+                                {totalPages > 1 && (
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        <IconButton
+                                            size="small"
+                                            disabled={page === 0}
+                                            onClick={() => setPage(prev => Math.max(0, prev - 1))}
+                                            sx={{ border: '1px solid', borderColor: 'divider' }}
+                                        >
+                                            <ChevronRightIcon sx={{ transform: 'rotate(180deg)', fontSize: 20 }} />
+                                        </IconButton>
+
+                                        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                            let pageNum;
+                                            const currentPage = page;
+
+                                            if (totalPages <= 5) {
+                                                pageNum = i;
+                                            } else if (currentPage <= 2) {
+                                                pageNum = i;
+                                            } else if (currentPage >= totalPages - 2) {
+                                                pageNum = totalPages - 5 + i;
+                                            } else {
+                                                pageNum = currentPage - 2 + i;
+                                            }
+
+                                            return (
+                                                <Button
+                                                    key={pageNum}
+                                                    variant={currentPage === pageNum ? "contained" : "text"}
+                                                    size="small"
+                                                    onClick={() => setPage(pageNum)}
+                                                    sx={{
+                                                        minWidth: 40,
+                                                        height: 40,
+                                                        borderRadius: 2,
+                                                        px: 0,
+                                                        bgcolor: currentPage === pageNum ? 'primary.main' : 'transparent',
+                                                        color: currentPage === pageNum ? 'white' : 'text.secondary',
+                                                        fontWeight: 'bold',
+                                                        boxShadow: currentPage === pageNum ? theme.shadows[4] : 'none',
+                                                        '&:hover': {
+                                                            bgcolor: currentPage === pageNum ? 'primary.dark' : 'action.hover'
+                                                        }
+                                                    }}
+                                                >
+                                                    {pageNum + 1}
+                                                </Button>
+                                            );
+                                        })}
+
+                                        <IconButton
+                                            size="small"
+                                            disabled={page >= totalPages - 1}
+                                            onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                            sx={{ border: '1px solid', borderColor: 'divider' }}
+                                        >
+                                            <ChevronRightIcon sx={{ fontSize: 20 }} />
+                                        </IconButton>
+                                    </Box>
+                                )}
+                            </Paper>
                         );
-                        })}
-                        
-                        <IconButton 
-                        size="small" 
-                        disabled={page >= totalPages - 1}
-                        onClick={() => setPage(prev => Math.min(totalPages - 1, prev + 1))}
-                        sx={{ border: '1px solid', borderColor: 'divider' }}
-                        >
-                        <ChevronRightIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                    </Box>
-                    )}
-                </Paper>
-                );
-            })()}
+                    })()}
                 </>
             )}
 
 
             {/* View Detail Dialog */}
-             <Dialog
+            <Dialog
                 open={viewDialogOpen}
                 onClose={handleCloseViewDialog}
                 maxWidth="sm"
@@ -683,28 +689,28 @@ const AdminDictionary = () => {
                                 </Box>
                             )}
                             <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)' }} />
-                            <IconButton 
+                            <IconButton
                                 onClick={handleCloseViewDialog}
                                 sx={{ position: 'absolute', top: 16, right: 16, bgcolor: 'rgba(0,0,0,0.3)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.5)' } }}
                             >
                                 <ClearIcon />
                             </IconButton>
                             <Box sx={{ position: 'absolute', bottom: 24, left: 24, right: 24 }}>
-                                <Chip 
-                                    label={selectedEntry.category} 
-                                    size="small" 
-                                    sx={{ 
-                                        bgcolor: 'rgba(255,255,255,0.9)', 
-                                        color: 'text.primary', 
-                                        fontWeight: 800, 
+                                <Chip
+                                    label={selectedEntry.category}
+                                    size="small"
+                                    sx={{
+                                        bgcolor: 'rgba(255,255,255,0.9)',
+                                        color: 'text.primary',
+                                        fontWeight: 800,
                                         mb: 1,
                                         backdropFilter: 'blur(4px)'
-                                    }} 
+                                    }}
                                 />
                                 <Typography variant="h4" fontWeight={900} color="white" sx={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                                     {selectedEntry.wordShuar}
                                 </Typography>
-                                 <Typography variant="h6" color="rgba(255,255,255,0.9)" fontWeight={500} sx={{ fontStyle: 'italic', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
+                                <Typography variant="h6" color="rgba(255,255,255,0.9)" fontWeight={500} sx={{ fontStyle: 'italic', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>
                                     {selectedEntry.wordSpanish}
                                 </Typography>
                             </Box>
@@ -715,19 +721,19 @@ const AdminDictionary = () => {
                                     Ejemplo de Uso
                                 </Typography>
                                 <Box sx={{ mt: 2, p: 3, bgcolor: 'rgba(209, 154, 74, 0.08)', borderRadius: 3, borderLeft: '4px solid', borderColor: 'secondary.main' }}>
-                                     <Typography variant="body1" fontWeight={600} color="text.primary" gutterBottom sx={{ fontStyle: 'italic' }}>
+                                    <Typography variant="body1" fontWeight={600} color="text.primary" gutterBottom sx={{ fontStyle: 'italic' }}>
                                         "{selectedEntry.exampleShuar || 'Sin ejemplo'}"
                                     </Typography>
                                     {selectedEntry.exampleSpanish && (
-                                         <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="body2" color="text.secondary">
                                             {selectedEntry.exampleSpanish}
                                         </Typography>
                                     )}
                                 </Box>
                             </Box>
-                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                                <Button 
-                                    variant="outlined" 
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                                <Button
+                                    variant="outlined"
                                     startIcon={<EditIcon />}
                                     onClick={() => {
                                         handleCloseViewDialog();
@@ -737,7 +743,7 @@ const AdminDictionary = () => {
                                 >
                                     Editar
                                 </Button>
-                             </Box>
+                            </Box>
                         </DialogContent>
                     </>
                 )}

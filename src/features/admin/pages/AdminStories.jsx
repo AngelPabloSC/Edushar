@@ -87,7 +87,7 @@ const AdminStories = () => {
                         Gestión de Cuentos
                     </Typography>
                     <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 600, fontSize: '1rem', lineHeight: 1.5 }}>
-                        Administra el repositorio bilingüe de la comunidad Shuar. Crea y edita mitos, leyendas y fábulas.
+                        Administra el repositorio bilingüe de la comunidad Shuar. Crea y edita mitos, leyendas.
                     </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

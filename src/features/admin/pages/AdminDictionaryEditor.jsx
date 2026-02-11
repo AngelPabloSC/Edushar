@@ -43,7 +43,7 @@ const AdminDictionaryEditor = () => {
     const { handleSetDataSnackbar } = useSnackBarContext();
     const { isOpen: isDialogOpen, dialogContent, handleOpenDialog, handleCloseDialog, setDialogContent } = useDialog();
     const { getFechData } = useFetchDataPromise();
-    
+
     const fileInputRef = useRef(null);
     const [isSaving, setIsSaving] = useState(false);
     const isSavingRef = useRef(false);
@@ -61,12 +61,12 @@ const AdminDictionaryEditor = () => {
     // Cargar datos en modo edición
     useEffect(() => {
         if (isEditMode) {
-             const fetchEntry = async () => {
+            const fetchEntry = async () => {
                 try {
                     const response = await getFechData({
                         endPoint: 'api/dictionary/get',
                         method: 'POST',
-                        additionalData: { id } 
+                        additionalData: { id }
                     });
 
                     if (response.code === 'COD_OK') {
@@ -74,14 +74,25 @@ const AdminDictionaryEditor = () => {
                         // Some endpoints might wrap the term details in a 'word' object, others might return it flat.
                         // Check for 'wordShuar' at root, if not found or empty, try data.word
                         const term = (data.wordShuar) ? data : (data.word || data);
-                        
+
                         if (term) {
+                            // Normalize category
+                            const rawCategory = term.category || '';
+                            const normalizedCategory =
+                                rawCategory.toLowerCase() === 'familia' ? 'Familia' :
+                                    rawCategory.toLowerCase() === 'naturaleza' ? 'Naturaleza' :
+                                        rawCategory.toLowerCase() === 'animales' ? 'Animales' :
+                                            (rawCategory.toLowerCase() === 'alimentos y plantas' || rawCategory.toLowerCase() === 'plantas') ? 'Alimentos y Plantas' :
+                                                rawCategory.toLowerCase() === 'objetos' ? 'Objetos' :
+                                                    rawCategory.toLowerCase() === 'números y colores' ? 'Números y Colores' :
+                                                        rawCategory;
+
                             setFormData({
                                 wordShuar: term.wordShuar || '',
                                 wordSpanish: term.wordSpanish || '',
-                                category: term.category || '',
+                                category: normalizedCategory,
                                 exampleShuar: Array.isArray(term.examples) ? term.examples[0] : (term.examples || ''),
-                                exampleSpanish: term.exampleSpanish || '', 
+                                exampleSpanish: term.exampleSpanish || '',
                                 image: term.image || null,
                             });
                         } else {
@@ -89,14 +100,14 @@ const AdminDictionaryEditor = () => {
                             navigate('/admin/diccionario');
                         }
                     } else {
-                         handleSetDataSnackbar({ message: 'Error al cargar los datos', type: 'error' });
+                        handleSetDataSnackbar({ message: 'Error al cargar los datos', type: 'error' });
                     }
                 } catch (error) {
                     console.error("Error fetching entry", error);
                     handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
                 }
-             };
-             fetchEntry();
+            };
+            fetchEntry();
         }
     }, [id, isEditMode, getFechData, handleSetDataSnackbar, navigate]);
 
@@ -112,7 +123,7 @@ const AdminDictionaryEditor = () => {
     // Image Upload Handling
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
-        
+
         if (file) {
             console.log("File selected:", file.name);
             const reader = new FileReader();
@@ -140,9 +151,9 @@ const AdminDictionaryEditor = () => {
             wordShuar: formData.wordShuar,
             wordSpanish: formData.wordSpanish,
             category: formData.category,
-            examples: [formData.exampleShuar], 
+            examples: [formData.exampleShuar],
             image: formData.image,
-            imageDescription: formData.wordSpanish 
+            imageDescription: formData.wordSpanish
         };
 
         const endpoint = isEditMode ? 'api/dictionary/update' : 'api/dictionary/create';
@@ -157,21 +168,21 @@ const AdminDictionaryEditor = () => {
             });
 
             if (response.code === 'COD_OK') {
-                handleSetDataSnackbar({ 
-                    message: isEditMode ? 'Término actualizado exitosamente' : 'Término creado exitosamente', 
-                    type: 'success' 
+                handleSetDataSnackbar({
+                    message: isEditMode ? 'Término actualizado exitosamente' : 'Término creado exitosamente',
+                    type: 'success'
                 });
                 navigate('/admin/diccionario');
             } else {
-                 handleSetDataSnackbar({ message: response.message || 'Error al guardar', type: 'error' });
+                handleSetDataSnackbar({ message: response.message || 'Error al guardar', type: 'error' });
             }
         } catch (error) {
-             handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+            handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
         } finally {
             isSavingRef.current = false;
             setIsSaving(false);
         }
-        
+
         handleCloseDialog();
     };
 
@@ -187,9 +198,9 @@ const AdminDictionaryEditor = () => {
     };
 
     const handleConfirmAction = () => {
-         // Since we only have one main action now (Create/Save), we route to performSave directly
-         // Previously we had draft vs publish logic. Now simplify to just Save.
-         performSave();
+        // Since we only have one main action now (Create/Save), we route to performSave directly
+        // Previously we had draft vs publish logic. Now simplify to just Save.
+        performSave();
     };
 
     const performPublish = () => {
@@ -213,11 +224,11 @@ const AdminDictionaryEditor = () => {
                 }}
             >
                 Subir Imagen
-                <input 
-                    type="file" 
-                    hidden 
-                    accept="image/*" 
-                    onChange={handleImageUpload} 
+                <input
+                    type="file"
+                    hidden
+                    accept="image/*"
+                    onChange={handleImageUpload}
                     ref={fileInputRef}
                 />
             </Button>
@@ -271,9 +282,9 @@ const AdminDictionaryEditor = () => {
                             Imagen de Referencia (Opcional)
                         </Typography>
                         <Box
-                          onClick={() => fileInputRef.current?.click()}
-                          sx={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', mx: 'auto', '&:hover .overlay': { opacity: 1 } }}
-                         >
+                            onClick={() => fileInputRef.current?.click()}
+                            sx={{ position: 'relative', width: '100%', maxWidth: 400, aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', mx: 'auto', '&:hover .overlay': { opacity: 1 } }}
+                        >
                             {formData.image ? (
                                 <Box component="img" src={formData.image} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
@@ -334,15 +345,18 @@ const AdminDictionaryEditor = () => {
                                         sx={{ bgcolor: 'grey.50', borderRadius: 2 }}
                                     >
                                         <MenuItem value="" disabled>Seleccionar categoría</MenuItem>
-                                        <MenuItem value="Sustantivo">Sustantivo</MenuItem>
-                                        <MenuItem value="Verbo">Verbo</MenuItem>
-                                        <MenuItem value="Adjetivo">Adjetivo</MenuItem>
-                                        <MenuItem value="Adverbio">Adverbio</MenuItem>
-                                        <MenuItem value="Expresión">Expresión</MenuItem>
-                                        <MenuItem value="Animales">Animales</MenuItem>
-                                        <MenuItem value="Plantas">Plantas</MenuItem>
+                                        <MenuItem value="Familia">Familia</MenuItem>
                                         <MenuItem value="Naturaleza">Naturaleza</MenuItem>
-                                        <MenuItem value="Otro">Otro</MenuItem>
+                                        <MenuItem value="Animales">Animales</MenuItem>
+                                        <MenuItem value="Alimentos y Plantas">Alimentos y Plantas</MenuItem>
+                                        <MenuItem value="Objetos">Objetos</MenuItem>
+                                        <MenuItem value="Números y Colores">Números y Colores</MenuItem>
+
+                                        {/* Show actual category from database if it's not in the new list (case insensitive check) */}
+                                        {formData.category &&
+                                            !['familia', 'naturaleza', 'animales', 'alimentos y plantas', 'objetos', 'números y colores'].includes(formData.category.toLowerCase()) && (
+                                                <MenuItem value={formData.category}>{formData.category}</MenuItem>
+                                            )}
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -421,10 +435,10 @@ const AdminDictionaryEditor = () => {
                         variant="contained"
                         color={dialogContent.color || 'primary'}
                         startIcon={isSaving ? <CircularProgress size={20} color="inherit" /> : null}
-                        sx={{ 
-                            borderRadius: 2, 
-                            fontWeight: 'bold', 
-                            px: 3, 
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 'bold',
+                            px: 3,
                             boxShadow: 'none',
                             '&:disabled': {
                                 bgcolor: 'action.disabledBackground',

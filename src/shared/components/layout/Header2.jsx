@@ -93,7 +93,7 @@ const Header2 = () => {
               letterSpacing: '-0.01em',
             }}
           >
-            EduShar
+            EduShuar
           </Typography>
         </Box>
 

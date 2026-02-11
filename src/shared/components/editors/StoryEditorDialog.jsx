@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Dialog, 
-    AppBar, 
-    Toolbar, 
-    IconButton, 
-    Typography, 
-    Button, 
-    Box, 
+import {
+    Dialog,
+    AppBar,
+    Toolbar,
+    IconButton,
+    Typography,
+    Button,
+    Box,
     Container,
     Paper,
     TextField,
@@ -52,11 +52,13 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
             setFormData({
                 titleShuar: story.title?.shuar || '',
                 titleEs: story.title?.es || '',
-                category: story.category || 'Mito',
+                category: (story.category?.toLowerCase() === 'leyenda' ? 'Leyenda' :
+                    story.category?.toLowerCase() === 'mito' ? 'Mito' :
+                        story.category) || 'Mito',
                 author: story.author || '',
-                difficulty: 'Básico', 
-                contentShuar: story.content?.shuar || '', 
-                contentEs: story.content?.es || '', 
+                difficulty: 'Básico',
+                contentShuar: story.content?.shuar || '',
+                contentEs: story.content?.es || '',
                 cover: story.cover
             });
         } else {
@@ -83,10 +85,10 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
     };
 
     return (
-        <Dialog 
-            fullScreen 
-            open={open} 
-            onClose={handleClose} 
+        <Dialog
+            fullScreen
+            open={open}
+            onClose={handleClose}
             TransitionComponent={React.forwardRef(function Transition(props, ref) {
                 return <React.Fragment>{props.children}</React.Fragment>;
             })}
@@ -94,16 +96,16 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
             {/* Header / Navbar */}
             <AppBar position="sticky" elevation={0} sx={{ bgcolor: 'background.paper', borderBottom: '1px solid', borderColor: 'divider' }}>
                 <Toolbar sx={{ justifyContent: 'space-between' }}>
-                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                         <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close" sx={{ color: 'text.secondary' }}>
                             <CloseIcon />
                         </IconButton>
                         <Box>
                             {/* Breadcrumbs simulation */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5, display: { xs: 'none', md: 'flex'} }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main'} }}>Dashboard</Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5, display: { xs: 'none', md: 'flex' } }}>
+                                <Typography variant="caption" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>Dashboard</Typography>
                                 <ChevronRightIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                                <Typography variant="caption" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main'} }}>Cuentos</Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>Cuentos</Typography>
                                 <ChevronRightIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
                                 <Typography variant="caption" color="text.primary" fontWeight={600}>{story ? 'Editar Cuento' : 'Nuevo Cuento'}</Typography>
                             </Box>
@@ -114,11 +116,11 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                     </Box>
 
                     <Box sx={{ display: 'flex', gap: 2 }}>
-                         <Button 
-                            sx={{ 
-                                borderRadius: 3, 
-                                fontWeight: 700, 
-                                borderColor: 'text.primary', 
+                        <Button
+                            sx={{
+                                borderRadius: 3,
+                                fontWeight: 700,
+                                borderColor: 'text.primary',
                                 color: 'text.primary',
                                 borderWidth: 2,
                                 '&:hover': { borderWidth: 2, bgcolor: 'text.primary', color: 'white' }
@@ -128,14 +130,14 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                         >
                             Cancelar
                         </Button>
-                        <Button 
-                            autoFocus 
-                            variant="contained" 
+                        <Button
+                            autoFocus
+                            variant="contained"
                             startIcon={<SaveIcon />}
                             onClick={() => onSave(formData)}
-                            sx={{ 
-                                borderRadius: 3, 
-                                fontWeight: 700, 
+                            sx={{
+                                borderRadius: 3,
+                                fontWeight: 700,
                                 boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
                                 bgcolor: 'secondary.main', // Gold accent
                                 '&:hover': { bgcolor: 'secondary.dark', boxShadow: '0 6px 20px rgba(0,0,0,0.15)' }
@@ -151,20 +153,20 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
             <Box sx={{ bgcolor: alpha(theme.palette.secondary.light, 0.05), minHeight: '100vh', py: 5 }}>
                 <Container maxWidth="xl">
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: '4fr 8fr' }, gap: 5 }}>
-                        
+
                         {/* LEFT COLUMN: Metadata */}
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                            
+
                             {/* Cover Image Card */}
                             <Paper elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden' }}>
                                 <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                                     <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                    <Typography variant="caption" fontWeight={800} color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                         Portada del Cuento
-                                     </Typography>
+                                    </Typography>
                                 </Box>
                                 <Box sx={{ p: 3 }}>
                                     <Box sx={{ position: 'relative', width: '100%', aspectRatio: '16/9', borderRadius: 3, overflow: 'hidden', bgcolor: 'grey.100', cursor: 'pointer', group: 'true', '&:hover .overlay': { opacity: 1 } }}>
-                                         {formData.cover ? (
+                                        {formData.cover ? (
                                             <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         ) : (
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', color: 'text.disabled' }}>
@@ -186,15 +188,15 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
 
                             {/* Info Fields Card */}
                             <Paper elevation={0} sx={{ p: 3, borderRadius: 4, border: '1px solid', borderColor: 'divider', display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                
+
                                 {/* Shuar Title */}
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                         Título en Shuar
                                     </Typography>
-                                    <TextField 
-                                        fullWidth 
-                                        variant="outlined" 
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
                                         value={formData.titleShuar}
                                         onChange={handleChange('titleShuar')}
                                         placeholder="Ej: Nunkui..."
@@ -207,9 +209,9 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                                     <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                         Título en Español
                                     </Typography>
-                                    <TextField 
-                                        fullWidth 
-                                        variant="outlined" 
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
                                         value={formData.titleEs}
                                         onChange={handleChange('titleEs')}
                                         placeholder="Ej: Nunkui y la abundancia..."
@@ -222,9 +224,9 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                                     <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
                                         Autor / Recopilador
                                     </Typography>
-                                    <TextField 
-                                        fullWidth 
-                                        variant="outlined" 
+                                    <TextField
+                                        fullWidth
+                                        variant="outlined"
                                         value={formData.author}
                                         onChange={handleChange('author')}
                                         placeholder="Nombre del autor"
@@ -245,9 +247,12 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                                         >
                                             <MenuItem value="Mito">Mito</MenuItem>
                                             <MenuItem value="Leyenda">Leyenda</MenuItem>
-                                            <MenuItem value="Fábula">Fábula</MenuItem>
-                                            <MenuItem value="Naturaleza">Naturaleza</MenuItem>
-                                            <MenuItem value="Tradición">Tradición</MenuItem>
+                                            {/* Show actual category from database if it's not Mito or Leyenda (case insensitive check) */}
+                                            {formData.category &&
+                                                formData.category.toLowerCase() !== 'mito' &&
+                                                formData.category.toLowerCase() !== 'leyenda' && (
+                                                    <MenuItem value={formData.category}>{formData.category}</MenuItem>
+                                                )}
                                         </Select>
                                     </FormControl>
                                 </Box>
@@ -259,15 +264,15 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                             <Paper elevation={0} sx={{ borderRadius: 4, border: '1px solid', borderColor: 'divider', overflow: 'hidden', minHeight: 600, display: 'flex', flexDirection: 'column' }}>
                                 {/* Language Tabs */}
                                 <Box sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
-                                    <Tabs 
-                                        value={activeTab} 
+                                    <Tabs
+                                        value={activeTab}
                                         onChange={handleTabChange}
                                         textColor="secondary"
                                         indicatorColor="secondary"
-                                        sx={{ 
-                                            '& .MuiTab-root': { 
-                                                textTransform: 'none', 
-                                                fontWeight: 700, 
+                                        sx={{
+                                            '& .MuiTab-root': {
+                                                textTransform: 'none',
+                                                fontWeight: 700,
                                                 fontSize: '0.95rem',
                                                 minWidth: 120,
                                                 py: 2
@@ -291,7 +296,7 @@ const StoryEditorDialog = ({ open, handleClose, story, onSave }) => {
                                     <Tooltip title="Quote"><IconButton size="small"><FormatQuoteIcon fontSize="small" /></IconButton></Tooltip>
                                     <Tooltip title="Link"><IconButton size="small"><InsertLinkIcon fontSize="small" /></IconButton></Tooltip>
                                 </Box>
-                                
+
                                 {/* Content Area */}
                                 <Box sx={{ flex: 1, p: 4, bgcolor: 'white' }}>
                                     {activeTab === 0 && (

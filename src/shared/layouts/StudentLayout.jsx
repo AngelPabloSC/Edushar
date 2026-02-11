@@ -11,7 +11,7 @@ import { useState } from 'react';
 
 /**
  * Layout para estudiantes - Header Only (Sin Sidebar)
- * Diseño basado en "EduShar Lab"
+ * Diseño basado en "EduShuar Lab"
  */
 const StudentLayout = () => {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const StudentLayout = () => {
             {/* Center: Title (Hidden on small screens) */}
             <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: { xs: 'none', md: 'block' }, textAlign: 'center' }}>
                 <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', lineHeight: 1, mb: 0.5, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                    EduShar Lab
+                    EduShuar Lab
                 </Typography>
                 <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1 }}>
                     {(() => {

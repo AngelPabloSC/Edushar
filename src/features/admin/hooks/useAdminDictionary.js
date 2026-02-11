@@ -85,9 +85,12 @@ export const useAdminDictionary = () => {
         published: entries.filter(e => e.status === 'Publicado').length,
         draft: entries.filter(e => e.status === 'Borrador').length,
         byCategory: {
-            sustantivo: entries.filter(e => e.category === 'Sustantivo').length,
-            verbo: entries.filter(e => e.category === 'Verbo').length,
-            adjetivo: entries.filter(e => e.category === 'Adjetivo').length,
+            familia: entries.filter(e => e.category?.toLowerCase() === 'familia').length,
+            naturaleza: entries.filter(e => e.category?.toLowerCase() === 'naturaleza').length,
+            animales: entries.filter(e => e.category?.toLowerCase() === 'animales').length,
+            alimentos: entries.filter(e => (e.category?.toLowerCase() === 'alimentos y plantas' || e.category?.toLowerCase() === 'plantas')).length,
+            objetos: entries.filter(e => e.category?.toLowerCase() === 'objetos').length,
+            numeros: entries.filter(e => e.category?.toLowerCase() === 'números y colores').length,
         }
     }), [entries]);
 

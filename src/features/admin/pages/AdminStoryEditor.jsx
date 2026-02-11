@@ -82,7 +82,9 @@ const AdminStoryEditor = () => {
                     setFormData({
                         titleShuar: story.title_shuar || '',
                         titleEs: story.title_español || '',
-                        category: story.category || 'Mito',
+                        category: (story.category?.toLowerCase() === 'leyenda' ? 'Leyenda' :
+                            story.category?.toLowerCase() === 'mito' ? 'Mito' :
+                                story.category) || 'Mito',
                         author: story.author || '',
                         difficulty: 'Básico',
                         contentShuar: story.contentShuar || '',
@@ -362,9 +364,12 @@ const AdminStoryEditor = () => {
                                     >
                                         <MenuItem value="Mito">Mito</MenuItem>
                                         <MenuItem value="Leyenda">Leyenda</MenuItem>
-                                        <MenuItem value="Naturaleza">Naturaleza</MenuItem>
-                                        <MenuItem value="Tradición">Tradición</MenuItem>
-                                        <MenuItem value="Fábula">Fábula</MenuItem>
+                                        {/* Show actual category from database if it's not Mito or Leyenda (case insensitive check) */}
+                                        {formData.category &&
+                                            formData.category.toLowerCase() !== 'mito' &&
+                                            formData.category.toLowerCase() !== 'leyenda' && (
+                                                <MenuItem value={formData.category}>{formData.category}</MenuItem>
+                                            )}
                                     </Select>
                                 </FormControl>
                             </Box>
@@ -470,10 +475,10 @@ const AdminStoryEditor = () => {
                         variant="contained"
                         color={dialogContent.color || 'primary'}
                         startIcon={createLoading || updateLoading ? <CircularProgress size={20} color="inherit" /> : null}
-                        sx={{ 
-                            borderRadius: 2, 
-                            fontWeight: 'bold', 
-                            px: 3, 
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 'bold',
+                            px: 3,
                             boxShadow: 'none',
                             '&:disabled': {
                                 bgcolor: 'action.disabledBackground',

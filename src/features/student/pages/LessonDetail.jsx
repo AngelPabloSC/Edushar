@@ -31,6 +31,8 @@ import CheckIcon from '@mui/icons-material/Check';
 import TimerIcon from '@mui/icons-material/Timer';
 import SchoolIcon from '@mui/icons-material/School';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLessonDetail } from '../../../features/student/hooks/useLessonDetail';
@@ -56,7 +58,7 @@ const LessonDetail = () => {
   const [showTimeWarning, setShowTimeWarning] = useState(false); // Show 5-minute warning
   const [warningShown, setWarningShown] = useState(false); // Track if warning was already shown
   const [showQuestion, setShowQuestion] = useState(true);
-  
+
   /* Completion Flow State */
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -66,7 +68,7 @@ const LessonDetail = () => {
 
   // Calculate progress
   // data is now in 'lesson', not 'lessonData'
-  const lessonData = lesson; 
+  const lessonData = lesson;
   const progressPercentage = lessonData ? Math.round((completedQuestions.length / (lessonData.totalQuestions || 1)) * 100) : 0;
 
   // Initialize timer from lesson duration
@@ -85,9 +87,9 @@ const LessonDetail = () => {
     // Same logic as handleConfirmFinish but without confirmation
     const finalScore = calculateScore();
     const finalPercentage = progressPercentage;
-    
+
     setIsFinished(true);
-    
+
     setCompletionData({
       score: finalScore,
       percentage: finalPercentage,
@@ -107,7 +109,7 @@ const LessonDetail = () => {
             percentage: finalPercentage
           }
         });
-        
+
         if (response.code === 'COD_OK' && response.data?.progress) {
           setCompletionData(prev => ({
             ...prev,
@@ -132,7 +134,7 @@ const LessonDetail = () => {
           setShowTimeWarning(true);
           setWarningShown(true);
         }
-        
+
         if (prev <= 1) {
           // Timer reached 0, auto-submit
           handleAutoSubmit();
@@ -160,14 +162,14 @@ const LessonDetail = () => {
   };
 
   if (loading) {
-     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-            <Box sx={{ textAlign: 'center' }}>
-                <CircularProgress color="secondary" size={60} thickness={4} />
-                <Typography sx={{ mt: 2, color: 'text.secondary' }}>Cargando lección...</Typography>
-            </Box>
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress color="secondary" size={60} thickness={4} />
+          <Typography sx={{ mt: 2, color: 'text.secondary' }}>Cargando lección...</Typography>
         </Box>
-     );
+      </Box>
+    );
   }
 
   if (error || !lessonData) {
@@ -175,7 +177,7 @@ const LessonDetail = () => {
       <Box sx={{ p: 4, textAlign: 'center', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="h5" color="error" gutterBottom>{error || 'Lección no encontrada'}</Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-            No pudimos cargar la información de esta lección.
+          No pudimos cargar la información de esta lección.
         </Typography>
         <Button onClick={handleExit} variant="contained" color="secondary">
           Volver
@@ -196,10 +198,10 @@ const LessonDetail = () => {
   const handleNext = () => {
     // Save current answer
     if (selectedAnswer) {
-        setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
-        if (!completedQuestions.includes(currentQuestion)) {
-            setCompletedQuestions([...completedQuestions, currentQuestion]);
-        }
+      setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
+      if (!completedQuestions.includes(currentQuestion)) {
+        setCompletedQuestions([...completedQuestions, currentQuestion]);
+      }
     }
 
     if (currentQuestion < lessonData.questions.length - 1) {
@@ -218,7 +220,7 @@ const LessonDetail = () => {
   const handlePrevious = () => {
     // Save current answer before moving back (optional, but good UX)
     if (selectedAnswer) {
-        setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
+      setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
     }
 
     if (currentQuestion > 0) {
@@ -237,9 +239,9 @@ const LessonDetail = () => {
   const handleQuestionClick = (index) => {
     // Save current answer
     if (selectedAnswer) {
-        setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
+      setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
     }
-    
+
     setShowQuestion(false);
     setTimeout(() => {
       setCurrentQuestion(index);
@@ -250,14 +252,14 @@ const LessonDetail = () => {
   };
 
   if (loading) {
-     return (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
-            <Box sx={{ textAlign: 'center' }}>
-                <CircularProgress color="secondary" size={60} thickness={4} />
-                <Typography sx={{ mt: 2, color: 'text.secondary' }}>Cargando lección...</Typography>
-            </Box>
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress color="secondary" size={60} thickness={4} />
+          <Typography sx={{ mt: 2, color: 'text.secondary' }}>Cargando lección...</Typography>
         </Box>
-     );
+      </Box>
+    );
   }
 
   if (error || !lessonData) {
@@ -265,7 +267,7 @@ const LessonDetail = () => {
       <Box sx={{ p: 4, textAlign: 'center', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
         <Typography variant="h5" color="error" gutterBottom>{error || 'Lección no encontrada'}</Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-            No pudimos cargar la información de esta lección.
+          No pudimos cargar la información de esta lección.
         </Typography>
         <Button onClick={handleExit} variant="contained" color="secondary">
           Volver a Lecciones
@@ -275,20 +277,20 @@ const LessonDetail = () => {
   }
 
   /* Completion Logic Restored & isLastQuestion Defined */
-  
+
   // Calculate Score based on correct answers
   const calculateScore = () => {
     if (!lessonData || !lessonData.questions) return 0;
-    
+
     let correctCount = 0;
     lessonData.questions.forEach((q, index) => {
-        // Check current/final answer in state or userAnswers map
-        const answer = index === currentQuestion ? selectedAnswer : userAnswers[index];
-        if (answer === q.correctAnswer) {
-            correctCount++;
-        }
+      // Check current/final answer in state or userAnswers map
+      const answer = index === currentQuestion ? selectedAnswer : userAnswers[index];
+      if (answer === q.correctAnswer) {
+        correctCount++;
+      }
     });
-    
+
     const totalPoints = lessonData.totalPoints || 100;
     const totalQs = lessonData.totalQuestions || 1;
     return Math.round((correctCount / totalQs) * totalPoints);
@@ -299,57 +301,57 @@ const LessonDetail = () => {
   const handleFinishClick = () => {
     // Mark the last question as completed if an answer is selected
     if (selectedAnswer) {
-        if (!completedQuestions.includes(currentQuestion)) {
-             setCompletedQuestions(prev => [...prev, currentQuestion]);
-        }
-        // Save final answer
-        setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
+      if (!completedQuestions.includes(currentQuestion)) {
+        setCompletedQuestions(prev => [...prev, currentQuestion]);
+      }
+      // Save final answer
+      setUserAnswers(prev => ({ ...prev, [currentQuestion]: selectedAnswer }));
     }
     setShowConfirmation(true);
   };
 
   const handleConfirmFinish = async () => {
     setShowConfirmation(false);
-    
+
     // Calculate final score for submission
     const finalScore = calculateScore();
     const finalPercentage = progressPercentage; // Use current progress
-    
+
     // Optimistic update to show completion screen immediately
     setIsFinished(true);
-    
+
     // Set initial completion data from local state
     setCompletionData({
-        score: finalScore,
-        percentage: finalPercentage
-        // status will be 'completed'
+      score: finalScore,
+      percentage: finalPercentage
+      // status will be 'completed'
     });
 
     if (user && user.id) {
-        try {
-            const response = await getFechData({
-                endPoint: 'api/progress/update',
-                method: 'POST',
-                additionalData: {
-                    userId: user.id,
-                    lessonId: lessonId,
-                    status: 'completed',
-                    score: finalScore,
-                    percentage: finalPercentage
-                }
-            });
-            
-            if (response.code === 'COD_OK' && response.data?.progress) {
-                 // Update with server confirmed data
-                 setCompletionData(prev => ({
-                    ...prev,
-                    score: response.data.progress.score,
-                    percentage: response.data.progress.percentage
-                 }));
-            }
-        } catch (error) {
-            console.error("Error updating progress:", error);
+      try {
+        const response = await getFechData({
+          endPoint: 'api/progress/update',
+          method: 'POST',
+          additionalData: {
+            userId: user.id,
+            lessonId: lessonId,
+            status: 'completed',
+            score: finalScore,
+            percentage: finalPercentage
+          }
+        });
+
+        if (response.code === 'COD_OK' && response.data?.progress) {
+          // Update with server confirmed data
+          setCompletionData(prev => ({
+            ...prev,
+            score: response.data.progress.score,
+            percentage: response.data.progress.percentage
+          }));
         }
+      } catch (error) {
+        console.error("Error updating progress:", error);
+      }
     }
   };
 
@@ -367,13 +369,13 @@ const LessonDetail = () => {
   /* Completion View */
   if (isFinished) {
     return (
-      <Box 
-        sx={{ 
-          minHeight: '100vh', 
-          bgcolor: 'background.default', 
-          display: 'flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
+      <Box
+        sx={{
+          minHeight: '100vh',
+          bgcolor: 'background.default',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           justifyContent: 'center',
           p: 4,
           backgroundImage: `
@@ -384,153 +386,217 @@ const LessonDetail = () => {
         }}
       >
         <Paper
-            elevation={3}
-            sx={{
-                p: { xs: 4, md: 6 },
-                borderRadius: 4,
-                maxWidth: 800,
-                width: '100%',
-                textAlign: 'center',
-                border: '1px solid',
-                borderColor: alpha(theme.palette.secondary.main, 0.1),
-                backdropFilter: 'blur(10px)',
-                bgcolor: alpha(theme.palette.background.paper, 0.8)
-            }}
+          elevation={3}
+          sx={{
+            p: { xs: 4, md: 6 },
+            borderRadius: 4,
+            maxWidth: 800,
+            width: '100%',
+            textAlign: 'center',
+            border: '1px solid',
+            borderColor: alpha(theme.palette.secondary.main, 0.1),
+            backdropFilter: 'blur(10px)',
+            bgcolor: alpha(theme.palette.background.paper, 0.8)
+          }}
         >
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
-                    {[1, 2, 3].map((star) => (
-                        <SchoolIcon key={star} sx={{ fontSize: { xs: 40, md: 56 }, color: '#FFD700' }} />
-                    ))}
-                </Box>
-                <Typography variant="h3" component="h1" fontWeight="900" gutterBottom sx={{ color: 'text.primary' }}>
-                    ¡Felicitaciones!
-                </Typography>
-                <Typography variant="h6" color="text.secondary" fontWeight="normal">
-                    {completionData?.timeUp 
-                      ? <>Se acabó el tiempo. Has completado la lección <strong>{lessonData.title}</strong>.</>
-                      : <>Has completado la lección <strong>{lessonData.title}</strong> con un desempeño excepcional.</>
-                    }
-                </Typography>
+          {/* Header */}
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mb: 2 }}>
+              {[1, 2, 3].map((star) => (
+                <SchoolIcon key={star} sx={{ fontSize: { xs: 40, md: 56 }, color: '#FFD700' }} />
+              ))}
             </Box>
+            <Typography variant="h3" component="h1" fontWeight="900" gutterBottom sx={{ color: 'text.primary' }}>
+              ¡Felicitaciones!
+            </Typography>
+            <Typography variant="h6" color="text.secondary" fontWeight="normal">
+              {completionData?.timeUp
+                ? <>Se acabó el tiempo. Has completado la lección <strong>{lessonData.title}</strong>.</>
+                : <>Has completado la lección <strong>{lessonData.title}</strong> con un desempeño excepcional.</>
+              }
+            </Typography>
+          </Box>
 
-            {/* Stats Grid */}
-            <Grid container spacing={3} sx={{ mb: 6 }}>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                     <Box sx={{ 
-                        p: 3, 
-                        borderRadius: 3, 
-                        border: '1px solid', 
-                        borderColor: alpha(theme.palette.secondary.main, 0.2),
-                        bgcolor: alpha(theme.palette.secondary.main, 0.05),
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1
-                    }}>
-                         <SchoolIcon color="secondary" />
-                         <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
-                             Puntaje
-                         </Typography>
-                         <Typography variant="h4" fontWeight="900" color="secondary.main">
-                             {completionData?.score ?? score} XP
-                         </Typography>
-                    </Box>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                    <Box sx={{ 
-                        p: 3, 
-                        borderRadius: 3, 
-                        border: '1px solid', 
-                        borderColor: 'divider',
-                        bgcolor: 'background.paper',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1
-                    }}>
-                         <TimerIcon color="secondary" />
-                         <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
-                             Tiempo
-                         </Typography>
-                         <Typography variant="h4" fontWeight="900" color="text.primary">
-                             {initialDuration !== null && timer !== null 
-                               ? formatTime(initialDuration - timer) // Show elapsed time
-                               : '00:00'
-                             }
-                         </Typography>
-                    </Box>
-                </Grid>
-                <Grid size={{ xs: 12, sm: 4 }}>
-                    <Box sx={{ 
-                        p: 3, 
-                        borderRadius: 3, 
-                        border: '1px solid', 
-                        borderColor: 'divider',
-                         bgcolor: 'background.paper',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 1
-                    }}>
-                         <CheckCircleIcon color="secondary" />
-                         <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
-                             Preguntas
-                         </Typography>
-                         <Typography variant="h4" fontWeight="900" color="text.primary">
-                             {completedQuestions.length}
-                         </Typography>
-                    </Box>
-                </Grid>
+          {/* Stats Grid */}
+          <Grid container spacing={3} sx={{ mb: 6 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{
+                p: 3,
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.secondary.main, 0.2),
+                bgcolor: alpha(theme.palette.secondary.main, 0.05),
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <SchoolIcon color="secondary" />
+                <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Puntaje
+                </Typography>
+                <Typography variant="h4" fontWeight="900" color="secondary.main">
+                  {completionData?.score ?? score} XP
+                </Typography>
+              </Box>
             </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{
+                p: 3,
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <TimerIcon color="secondary" />
+                <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
+                  Tiempo
+                </Typography>
+                <Typography variant="h4" fontWeight="900" color="text.primary">
+                  {initialDuration !== null && timer !== null
+                    ? formatTime(initialDuration - timer) // Show elapsed time
+                    : '00:00'
+                  }
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <Box sx={{
+                p: 3,
+                borderRadius: 3,
+                border: '1px solid',
+                borderColor: 'divider',
+                bgcolor: 'background.paper',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1
+              }}>
+                <CheckCircleIcon color="secondary" />
+                <Typography variant="caption" fontWeight="bold" sx={{ textTransform: 'uppercase', letterSpacing: 1, color: 'text.secondary' }}>
+                  Preguntas
+                </Typography>
+                <Typography variant="h4" fontWeight="900" color="text.primary">
+                  {completedQuestions.length}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
 
-            {/* Action Buttons */}
-            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center' }}>
-                <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={handleReplay}
-                    startIcon={<ArrowBackIcon />}
+          {/* Detailed Results Breakdown */}
+          <Box sx={{ mb: 6, textAlign: 'left' }}>
+            <Typography variant="h5" fontWeight="800" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
+              <HelpOutlineIcon color="secondary" />
+              Revisión de la Lección
+            </Typography>
+
+            <Box sx={{
+              display: 'flex', flexDirection: 'column', gap: 2, maxHeight: 400, overflowY: 'auto', pr: 1,
+              '&::-webkit-scrollbar': { width: '8px' },
+              '&::-webkit-scrollbar-track': { bgcolor: alpha(theme.palette.secondary.main, 0.05), borderRadius: '10px' },
+              '&::-webkit-scrollbar-thumb': { bgcolor: alpha(theme.palette.secondary.main, 0.2), borderRadius: '10px', '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.3) } }
+            }}>
+              {lessonData.questions.map((q, index) => {
+                const userAnswerId = userAnswers[index];
+                const isCorrect = userAnswerId === q.correctAnswer;
+                const userAnswerText = q.options.find(opt => opt.id === userAnswerId)?.text || 'No respondida';
+                const correctAnswerText = q.options.find(opt => opt.id === q.correctAnswer)?.text;
+
+                return (
+                  <Paper
+                    key={index}
+                    elevation={0}
                     sx={{
-                        borderRadius: 50,
-                        px: 4,
-                        py: 1.5,
-                        fontWeight: 'bold',
-                        borderWidth: 2,
-                         borderColor: alpha(theme.palette.secondary.main, 0.3),
-                         color: 'text.primary',
-                        '&:hover': {
-                            borderWidth: 2,
-                            borderColor: 'secondary.main',
-                            bgcolor: alpha(theme.palette.secondary.main, 0.05)
-                        }
+                      p: 3,
+                      borderRadius: 3,
+                      border: '1px solid',
+                      borderColor: isCorrect ? alpha(theme.palette.success.main, 0.2) : alpha(theme.palette.error.main, 0.2),
+                      bgcolor: isCorrect ? alpha(theme.palette.success.main, 0.02) : alpha(theme.palette.error.main, 0.02),
+                      transition: 'transform 0.2s',
+                      '&:hover': { transform: 'translateX(4px)' }
                     }}
-                >
-                    Volver a Jugar
-                </Button>
-                 <Button
-                    variant="contained"
-                    size="large"
-                    onClick={handleExit}
-                    startIcon={<SchoolIcon />}
-                    sx={{
-                        borderRadius: 50,
-                        px: 4,
-                        py: 1.5,
-                        fontWeight: 'bold',
-                        bgcolor: 'secondary.main',
-                        boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
-                        '&:hover': {
-                            bgcolor: 'secondary.dark',
-                             transform: 'translateY(-2px)',
-                             boxShadow: '0 6px 20px 0 rgba(0,0,0,0.15)'
-                        }
-                    }}
-                >
-                    Continuar
-                </Button>
+                  >
+                    <Grid container spacing={2} alignItems="flex-start">
+                      <Grid size={{ xs: 'auto' }}>
+                        {isCorrect ? (
+                          <CheckCircleIcon color="success" sx={{ mt: 0.5 }} />
+                        ) : (
+                          <CancelIcon color="error" sx={{ mt: 0.5 }} />
+                        )}
+                      </Grid>
+                      <Grid size={{ xs: true }}>
+                        <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1, color: 'text.primary' }}>
+                          {index + 1}. {q.question}
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="body2" sx={{ color: isCorrect ? 'success.dark' : 'error.dark' }}>
+                            <strong>Tu respuesta:</strong> {userAnswerText}
+                          </Typography>
+                          {!isCorrect && (
+                            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                              <strong>Respuesta correcta:</strong> {correctAnswerText}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                );
+              })}
             </Box>
+          </Box>
+
+          {/* Action Buttons */}
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, justifyContent: 'center' }}>
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={handleReplay}
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                borderRadius: 50,
+                px: 4,
+                py: 1.5,
+                fontWeight: 'bold',
+                borderWidth: 2,
+                borderColor: alpha(theme.palette.secondary.main, 0.3),
+                color: 'text.primary',
+                '&:hover': {
+                  borderWidth: 2,
+                  borderColor: 'secondary.main',
+                  bgcolor: alpha(theme.palette.secondary.main, 0.05)
+                }
+              }}
+            >
+              Volver a Jugar
+            </Button>
+            <Button
+              variant="contained"
+              size="large"
+              onClick={handleExit}
+              startIcon={<SchoolIcon />}
+              sx={{
+                borderRadius: 50,
+                px: 4,
+                py: 1.5,
+                fontWeight: 'bold',
+                bgcolor: 'secondary.main',
+                boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
+                '&:hover': {
+                  bgcolor: 'secondary.dark',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 20px 0 rgba(0,0,0,0.15)'
+                }
+              }}
+            >
+              Continuar
+            </Button>
+          </Box>
         </Paper>
       </Box>
     );
@@ -543,36 +609,36 @@ const LessonDetail = () => {
         open={showConfirmation}
         onClose={() => setShowConfirmation(false)}
         PaperProps={{
-            sx: { borderRadius: 3, p: 1 }
+          sx: { borderRadius: 3, p: 1 }
         }}
       >
         <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-            ¿Entregar Lección?
+          ¿Entregar Lección?
         </DialogTitle>
         <DialogContent>
-            <DialogContentText sx={{ textAlign: 'center' }}>
-                Has respondido {completedQuestions.length} de {lessonData.questions.length || 0} preguntas. 
-                ¿Estás seguro de que quieres finalizar esta lección?
-            </DialogContentText>
+          <DialogContentText sx={{ textAlign: 'center' }}>
+            Has respondido {completedQuestions.length} de {lessonData.questions.length || 0} preguntas.
+            ¿Estás seguro de que quieres finalizar esta lección?
+          </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 2, gap: 2 }}>
-            <Button 
-                onClick={() => setShowConfirmation(false)} 
-                variant="outlined" 
-                color="inherit"
-                sx={{ borderRadius: 2, fontWeight: 'bold' }}
-            >
-                Cancelar
-            </Button>
-            <Button 
-                onClick={handleConfirmFinish} 
-                variant="contained" 
-                color="secondary"
-                autoFocus
-                sx={{ borderRadius: 2, fontWeight: 'bold', px: 3 }}
-            >
-                Entregar
-            </Button>
+          <Button
+            onClick={() => setShowConfirmation(false)}
+            variant="outlined"
+            color="inherit"
+            sx={{ borderRadius: 2, fontWeight: 'bold' }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirmFinish}
+            variant="contained"
+            color="secondary"
+            autoFocus
+            sx={{ borderRadius: 2, fontWeight: 'bold', px: 3 }}
+          >
+            Entregar
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -580,8 +646,8 @@ const LessonDetail = () => {
       <Dialog
         open={showStartDialog && lessonData !== null}
         PaperProps={{
-          sx: { 
-            borderRadius: 4, 
+          sx: {
+            borderRadius: 4,
             p: 2,
             maxWidth: 500,
             backgroundImage: `
@@ -602,10 +668,10 @@ const LessonDetail = () => {
             <Typography variant="body1" color="text.secondary" paragraph>
               Esta lección tiene un tiempo límite de:
             </Typography>
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               gap: 2,
               bgcolor: alpha(theme.palette.secondary.main, 0.1),
               borderRadius: 3,
@@ -619,29 +685,29 @@ const LessonDetail = () => {
               </Typography>
             </Box>
             <Typography variant="body2" color="text.secondary">
-              El tiempo comenzará a correr cuando presiones "Empezar". 
+              El tiempo comenzará a correr cuando presiones "Empezar".
               La lección se enviará automáticamente cuando el tiempo termine.
             </Typography>
           </Box>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center', pb: 2, gap: 2 }}>
-          <Button 
-            onClick={handleExit} 
-            variant="outlined" 
+          <Button
+            onClick={handleExit}
+            variant="outlined"
             color="inherit"
             sx={{ borderRadius: 2, fontWeight: 'bold' }}
           >
             Cancelar
           </Button>
-          <Button 
-            onClick={handleStartLesson} 
-            variant="contained" 
+          <Button
+            onClick={handleStartLesson}
+            variant="contained"
             color="secondary"
             autoFocus
             startIcon={<CheckIcon />}
-            sx={{ 
-              borderRadius: 2, 
-              fontWeight: 'bold', 
+            sx={{
+              borderRadius: 2,
+              fontWeight: 'bold',
               px: 4,
               boxShadow: 4,
               '&:hover': {
@@ -662,11 +728,11 @@ const LessonDetail = () => {
         onClose={() => setShowTimeWarning(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Alert 
-          onClose={() => setShowTimeWarning(false)} 
-          severity="warning" 
+        <Alert
+          onClose={() => setShowTimeWarning(false)}
+          severity="warning"
           variant="filled"
-          sx={{ 
+          sx={{
             fontWeight: 'bold',
             fontSize: '1rem',
             boxShadow: 6
@@ -679,38 +745,38 @@ const LessonDetail = () => {
 
       {/* Main Content */}
       <Container maxWidth="xl" sx={{ py: 4, px: { xs: 3, sm: 4, md: 6 } }}>
-        
+
         {/* Header Replacement - Clean Title Area */}
         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box>
-                <Typography variant="h4" fontWeight="900" sx={{ color: 'text.primary', mb: 1 }}>
-                    {lessonData.title}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Chip 
-                        label={`Lección ${lessonId}`} 
-                        size="small" 
-                        color="secondary" 
-                        sx={{ fontWeight: 'bold', borderRadius: 1 }} 
-                    />
-                    <Typography variant="body2" color="text.secondary" fontWeight={500}>
-                        Pregunta {currentQuestion + 1} de {totalQuestions}
-                    </Typography>
-                </Box>
+          <Box>
+            <Typography variant="h4" fontWeight="900" sx={{ color: 'text.primary', mb: 1 }}>
+              {lessonData.title}
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Chip
+                label={lessonData.title}
+                size="small"
+                color="secondary"
+                sx={{ fontWeight: 'bold', borderRadius: 1 }}
+              />
+              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+                Pregunta {currentQuestion + 1} de {totalQuestions}
+              </Typography>
             </Box>
-            
-            <Tooltip title="Salir de la lección">
-                <IconButton 
-                    onClick={handleExit}
-                    sx={{ 
-                        bgcolor: 'background.paper', 
-                        boxShadow: 1,
-                        '&:hover': { bgcolor: 'error.main', color: 'white' }
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </Tooltip>
+          </Box>
+
+          <Tooltip title="Salir de la lección">
+            <IconButton
+              onClick={handleExit}
+              sx={{
+                bgcolor: 'background.paper',
+                boxShadow: 1,
+                '&:hover': { bgcolor: 'error.main', color: 'white' }
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
         <Paper
           elevation={0}
@@ -962,18 +1028,18 @@ const LessonDetail = () => {
             </Typography>
 
             {/* Timer moved here */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              gap: 1, 
-              mb: 3, 
-              bgcolor: timer !== null && timer <= 60 
+            <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              mb: 3,
+              bgcolor: timer !== null && timer <= 60
                 ? alpha('#f44336', 0.1) // Red for < 1 min
-                : timer !== null && timer <= 120 
+                : timer !== null && timer <= 120
                   ? alpha('#ff9800', 0.1) // Orange for < 2 min
-                  : alpha(theme.palette.secondary.main, 0.1), 
-              py: 1, 
+                  : alpha(theme.palette.secondary.main, 0.1),
+              py: 1,
               borderRadius: 2,
               border: '2px solid',
               borderColor: timer !== null && timer <= 60
@@ -987,29 +1053,29 @@ const LessonDetail = () => {
                 '50%': { opacity: 0.7 }
               }
             }}>
-                <TimerIcon 
-                  fontSize="small" 
-                  sx={{ 
-                    color: timer !== null && timer <= 60 
-                      ? '#f44336' 
-                      : timer !== null && timer <= 120 
-                        ? '#ff9800' 
-                        : 'secondary.main' 
-                  }} 
-                />
-                <Typography 
-                  variant="subtitle2" 
-                  fontWeight="bold" 
-                  sx={{ 
-                    color: timer !== null && timer <= 60 
-                      ? '#f44336' 
-                      : timer !== null && timer <= 120 
-                        ? '#ff9800' 
-                        : 'text.primary' 
-                  }}
-                >
-                    {timer !== null ? formatTime(timer) : '00:00'}
-                </Typography>
+              <TimerIcon
+                fontSize="small"
+                sx={{
+                  color: timer !== null && timer <= 60
+                    ? '#f44336'
+                    : timer !== null && timer <= 120
+                      ? '#ff9800'
+                      : 'secondary.main'
+                }}
+              />
+              <Typography
+                variant="subtitle2"
+                fontWeight="bold"
+                sx={{
+                  color: timer !== null && timer <= 60
+                    ? '#f44336'
+                    : timer !== null && timer <= 120
+                      ? '#ff9800'
+                      : 'text.primary'
+                }}
+              >
+                {timer !== null ? formatTime(timer) : '00:00'}
+              </Typography>
             </Box>
 
             {/* Progress percentage */}
@@ -1073,8 +1139,8 @@ const LessonDetail = () => {
             </Grid>
           </Box>
         </Paper>
-      </Container>
-    </Box>
+      </Container >
+    </Box >
   );
 };
 

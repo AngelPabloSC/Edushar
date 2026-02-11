@@ -68,7 +68,8 @@ export const useStudentContributions = () => {
                         fecha: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
                         estado: item.status === 'pending' ? 'pendiente'
                             : item.status === 'approved' ? 'aprobado'
-                                : 'revision',
+                                : item.status === 'rejected' ? 'rechazado'
+                                    : 'revision',
                         timestamp: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : ''
                     }));
 
@@ -304,6 +305,7 @@ export const useStudentContributions = () => {
             case 'aprobado': return 'success';
             case 'pendiente': return 'warning';
             case 'revision': return 'warning';
+            case 'rechazado': return 'error';
             default: return 'default';
         }
     };
@@ -313,6 +315,7 @@ export const useStudentContributions = () => {
             case 'aprobado': return 'Aprobado';
             case 'pendiente': return 'Pendiente';
             case 'revision': return 'En Revisión';
+            case 'rechazado': return 'Rechazado';
             default: return estado;
         }
     };

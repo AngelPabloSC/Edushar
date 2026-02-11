@@ -31,8 +31,7 @@ export const useAdminDictionary = () => {
                 const processedItems = items.map(item => ({
                     ...item,
                     exampleShuar: Array.isArray(item.examples) ? item.examples[0] : (item.examples || ''),
-                    // Status might not be in API yet based on prompt, defaulting to 'Publicado' if missing
-                    status: item.status || 'Publicado'
+                    status: item.status || 'pending'
                 }));
 
                 setEntries(processedItems);
@@ -71,6 +70,9 @@ export const useAdminDictionary = () => {
                 (entry.wordShuar || '').toLowerCase().includes(searchLower) ||
                 (entry.wordSpanish || '').toLowerCase().includes(searchLower);
             // Can add example search if needed
+
+            const isPending = (entry.status || '').toLowerCase() === 'pending';
+            if (!isPending) return false;
 
             const matchesCategory = categoryFilter === 'Todos' || entry.category === categoryFilter;
             const matchesStatus = statusFilter === 'Todos' || entry.status === statusFilter;

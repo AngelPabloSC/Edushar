@@ -54,7 +54,6 @@ const AdminDictionaryEditor = () => {
         wordSpanish: '',
         category: '',
         exampleShuar: '',
-        exampleSpanish: '',
         image: null,
     });
 
@@ -92,7 +91,6 @@ const AdminDictionaryEditor = () => {
                                 wordSpanish: term.wordSpanish || '',
                                 category: normalizedCategory,
                                 exampleShuar: Array.isArray(term.examples) ? term.examples[0] : (term.examples || ''),
-                                exampleSpanish: term.exampleSpanish || '',
                                 image: term.image || null,
                             });
                         } else {
@@ -384,21 +382,6 @@ const AdminDictionaryEditor = () => {
                                     value={formData.exampleShuar}
                                     onChange={handleChange('exampleShuar')}
                                     placeholder="Escriba una oración de ejemplo en Shuar..."
-                                    sx={{ bgcolor: 'white', '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12 }}>
-                                <Typography variant="subtitle2" fontWeight={700} color="text.primary" sx={{ mb: 1 }}>
-                                    Traducción del Ejemplo (Español)
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    rows={2}
-                                    variant="outlined"
-                                    value={formData.exampleSpanish}
-                                    onChange={handleChange('exampleSpanish')}
-                                    placeholder="Traducción de la oración al español..."
                                     sx={{ bgcolor: 'white', '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
                                 />
                             </Grid>

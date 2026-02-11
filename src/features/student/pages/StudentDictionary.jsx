@@ -19,6 +19,9 @@ import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
 import ForestIcon from '@mui/icons-material/Forest';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import PetsIcon from '@mui/icons-material/Pets';
+import GrassIcon from '@mui/icons-material/Grass';
+import CategoryIcon from '@mui/icons-material/Category';
+import PaletteIcon from '@mui/icons-material/Palette';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import DictionaryGridCard from '@shared/components/cards/DictionaryGridCard';
 import { usePublicDictionary } from '../../../features/student/hooks/usePublicDictionary';
@@ -38,31 +41,32 @@ const StudentDictionary = () => {
   // Build categories array dynamically with useMemo for performance
   const categories = useMemo(() => {
     const uniqueCategories = [...new Set(entries.map(entry => entry.category).filter(Boolean))];
-    
+
     return [
       { id: 'all', name: 'Todas las palabras', icon: <AutoAwesomeIcon /> },
       ...uniqueCategories.sort().map(cat => ({
         id: cat,
         name: cat,
         icon: cat === 'Animales' ? <PetsIcon /> :
-              cat === 'Naturaleza' ? <ForestIcon /> :
-              cat === 'Familia' ? <Diversity3Icon /> :
-              cat.includes('Verbo') || cat.includes('Acción') ? <HistoryEduIcon /> :
-              cat.includes('Saludo') || cat.includes('Frase') ? <RecordVoiceOverIcon /> :
-              <AutoAwesomeIcon />
+          cat === 'Naturaleza' ? <ForestIcon /> :
+            cat === 'Familia' ? <Diversity3Icon /> :
+              cat === 'Alimentos y Plantas' ? <GrassIcon /> :
+                cat === 'Objetos' ? <CategoryIcon /> :
+                  cat === 'Números y Colores' ? <PaletteIcon /> :
+                    <AutoAwesomeIcon />
       }))
     ];
   }, [entries]);
 
   // Client-side filtering
   const filteredEntries = entries.filter(entry => {
-    const matchesSearch = (entry.wordShuar || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (entry.wordSpanish || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || 
-                            (entry.category && entry.category === selectedCategory);
+    const matchesSearch = (entry.wordShuar || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (entry.wordSpanish || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' ||
+      (entry.category && entry.category === selectedCategory);
     return matchesSearch && matchesCategory;
   });
-  
+
   // Pagination
   const ITEMS_PER_PAGE = 9;
   const count = Math.ceil(filteredEntries.length / ITEMS_PER_PAGE);
@@ -158,23 +162,23 @@ const StudentDictionary = () => {
                 ))}
               </Box>
             </Box>
-            
+
             {/* Stats Mini Widget */}
-             <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="caption" color="text.secondary" fontWeight="bold">
-                    ESTADÍSTICAS
-                </Typography>
-                <Grid container spacing={2} sx={{ mt: 1 }}>
-                    <Grid size={{ xs: 6 }}>
-                        <Typography variant="h5" color="text.primary" fontWeight="800">{stats.words || 0}</Typography>
-                        <Typography variant="caption" color="text.secondary">Palabras</Typography>
-                    </Grid>
-                    <Grid size={{ xs: 6 }}>
-                        <Typography variant="h5" color="text.primary" fontWeight="800">{stats.audioClips || 0}</Typography>
-                        <Typography variant="caption" color="text.secondary">Audios</Typography>
-                    </Grid>
+            <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid', borderColor: 'divider' }}>
+              <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                ESTADÍSTICAS
+              </Typography>
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="h5" color="text.primary" fontWeight="800">{stats.words || 0}</Typography>
+                  <Typography variant="caption" color="text.secondary">Palabras</Typography>
                 </Grid>
-             </Box>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="h5" color="text.primary" fontWeight="800">{stats.audioClips || 0}</Typography>
+                  <Typography variant="caption" color="text.secondary">Audios</Typography>
+                </Grid>
+              </Grid>
+            </Box>
           </Paper>
         </Grid>
 
@@ -217,63 +221,63 @@ const StudentDictionary = () => {
           {/* Grid de Cards (List View) */}
           <Grid container spacing={3}>
             {loading ? (
-                 // Loading Skeletons
-                 Array.from(new Array(6)).map((_, index) => (
-                  <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
-                     <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
-                       <Skeleton variant="rectangular" height={200} />
-                       <Box sx={{ p: 2 }}>
-                         <Skeleton variant="text" height={32} width="80%" />
-                         <Skeleton variant="text" height={20} width="60%" />
-                       </Box>
-                     </Paper>
-                  </Grid>
-                ))
-            ) : filteredEntries.length === 0 ? (
-                <Grid size={{ xs: 12 }}>
-                    <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
-                        <SearchOffIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
-                        <Typography variant="h5" color="text.secondary">
-                            No se encontraron palabras
-                        </Typography>
-                         <Typography variant="body1" color="text.secondary">
-                            Prueba con otro término de búsqueda.
-                        </Typography>
-                        <Button 
-                            variant="outlined" 
-                            color="secondary" 
-                            startIcon={<AddCircleOutlineIcon />}
-                            onClick={() => navigate('/estudiante/contribuciones')}
-                            sx={{ mt: 3, borderRadius: 50 }}
-                        >
-                            Contribuir Palabra
-                        </Button>
+              // Loading Skeletons
+              Array.from(new Array(6)).map((_, index) => (
+                <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
+                    <Skeleton variant="rectangular" height={200} />
+                    <Box sx={{ p: 2 }}>
+                      <Skeleton variant="text" height={32} width="80%" />
+                      <Skeleton variant="text" height={20} width="60%" />
                     </Box>
+                  </Paper>
                 </Grid>
+              ))
+            ) : filteredEntries.length === 0 ? (
+              <Grid size={{ xs: 12 }}>
+                <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
+                  <SearchOffIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
+                  <Typography variant="h5" color="text.secondary">
+                    No se encontraron palabras
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Prueba con otro término de búsqueda.
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<AddCircleOutlineIcon />}
+                    onClick={() => navigate('/estudiante/contribuciones')}
+                    sx={{ mt: 3, borderRadius: 50 }}
+                  >
+                    Contribuir Palabra
+                  </Button>
+                </Box>
+              </Grid>
             ) : (
-                paginatedEntries.map((entry) => (
+              paginatedEntries.map((entry) => (
                 <Grid key={entry.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <DictionaryGridCard entry={entry} />
+                  <DictionaryGridCard entry={entry} />
                 </Grid>
-                ))
+              ))
             )}
           </Grid>
 
           {/* Paginación */}
           {!loading && filteredEntries.length > 0 && (
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-                <Pagination
+              <Pagination
                 count={count}
                 page={page}
                 onChange={(e, value) => setPage(value)}
                 color="secondary"
                 size="large"
                 sx={{
-                    '& .MuiPaginationItem-root': {
+                  '& .MuiPaginationItem-root': {
                     fontWeight: 'bold',
-                    },
+                  },
                 }}
-                />
+              />
             </Box>
           )}
         </Grid>

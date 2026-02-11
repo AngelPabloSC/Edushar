@@ -6,8 +6,7 @@ export const STORY_CATEGORIES = [
     'Mito',
     'Leyenda',
     'Naturaleza',
-    'Tradición',
-    'Fábula'
+    'Tradición'
 ];
 
 /**
@@ -18,8 +17,7 @@ export const STORY_CATEGORIES_WITH_ICONS = [
     { id: 'mito', name: 'Mito', value: 'Mito' },
     { id: 'leyenda', name: 'Leyenda', value: 'Leyenda' },
     { id: 'naturaleza', name: 'Naturaleza', value: 'Naturaleza' },
-    { id: 'tradicion', name: 'Tradición', value: 'Tradición' },
-    { id: 'fabula', name: 'Fábula', value: 'Fábula' }
+    { id: 'tradicion', name: 'Tradición', value: 'Tradición' }
 ];
 
 export default STORY_CATEGORIES;

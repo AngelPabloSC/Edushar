@@ -29,12 +29,12 @@ const StudentStories = () => {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
 
-  const { 
-    stories, 
-    loading, 
-    selectedCategory, 
-    setSelectedCategory, 
-    searchQuery, 
+  const {
+    stories,
+    loading,
+    selectedCategory,
+    setSelectedCategory,
+    searchQuery,
     setSearchQuery,
     categories
   } = usePublicStories();
@@ -46,7 +46,6 @@ const StudentStories = () => {
       case 'Leyenda': return <ForestIcon />;
       case 'Naturaleza': return <ForestIcon />;
       case 'Tradición': return <Diversity3Icon />;
-      case 'Fábula': return <Diversity3Icon />;
       default: return <AutoAwesomeIcon />;
     }
   };
@@ -183,57 +182,57 @@ const StudentStories = () => {
           {/* Grid de Cards */}
           <Grid container spacing={3}>
             {loading ? (
-                 // Loading Skeletons
-                 Array.from(new Array(6)).map((_, index) => (
-                  <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
-                     <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
-                       <Skeleton variant="rectangular" height={200} />
-                       <Box sx={{ p: 2 }}>
-                         <Skeleton variant="text" height={32} width="80%" />
-                         <Skeleton variant="text" height={20} width="60%" />
-                       </Box>
-                     </Paper>
-                  </Grid>
-                ))
-            ) : stories.length === 0 ? (
-                <Grid size={{ xs: 12 }}>
-                    <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
-                        <AutoAwesomeIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
-                        <Typography variant="h5" color="text.secondary">
-                            No se encontraron historias
-                        </Typography>
-                         <Typography variant="body1" color="text.secondary">
-                            Intenta cambiar los filtros o la búsqueda
-                        </Typography>
+              // Loading Skeletons
+              Array.from(new Array(6)).map((_, index) => (
+                <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+                  <Paper sx={{ p: 0, overflow: 'hidden', borderRadius: 2 }}>
+                    <Skeleton variant="rectangular" height={200} />
+                    <Box sx={{ p: 2 }}>
+                      <Skeleton variant="text" height={32} width="80%" />
+                      <Skeleton variant="text" height={20} width="60%" />
                     </Box>
+                  </Paper>
                 </Grid>
+              ))
+            ) : stories.length === 0 ? (
+              <Grid size={{ xs: 12 }}>
+                <Box sx={{ textAlign: 'center', py: 8, opacity: 0.7 }}>
+                  <AutoAwesomeIcon sx={{ fontSize: 60, mb: 2, color: 'text.disabled' }} />
+                  <Typography variant="h5" color="text.secondary">
+                    No se encontraron historias
+                  </Typography>
+                  <Typography variant="body1" color="text.secondary">
+                    Intenta cambiar los filtros o la búsqueda
+                  </Typography>
+                </Box>
+              </Grid>
             ) : (
-                stories.map((story) => (
+              stories.map((story) => (
                 <Grid key={story.id} size={{ xs: 12, sm: 6, md: 4 }}>
-                    <StoryCard
+                  <StoryCard
                     story={story}
                     onClick={() => navigate(`/estudiante/cuentos/${story.id}`)}
-                    />
+                  />
                 </Grid>
-                ))
+              ))
             )}
           </Grid>
 
           {/* Paginación */}
           {!loading && stories.length > 0 && (
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'center' }}>
-                <Pagination
+              <Pagination
                 count={Math.ceil(stories.length / 9)} // Client-side pagination logic since hook returns all
                 page={page}
                 onChange={(e, value) => setPage(value)}
                 color="secondary"
                 size="large"
                 sx={{
-                    '& .MuiPaginationItem-root': {
+                  '& .MuiPaginationItem-root': {
                     fontWeight: 'bold',
-                    },
+                  },
                 }}
-                />
+              />
             </Box>
           )}
         </Grid>

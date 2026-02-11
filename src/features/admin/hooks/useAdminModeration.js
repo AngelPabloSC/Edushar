@@ -33,6 +33,10 @@ export const useAdminModeration = () => {
             (item.data?.wordShuar?.toLowerCase().includes(searchQuery.toLowerCase())) ||
             (item.data?.title_shuar?.toLowerCase().includes(searchQuery.toLowerCase()));
 
+        // Filter by status (strict pending)
+        const isPending = (item.status || '').toLowerCase() === 'pending';
+        if (!isPending) return false;
+
         // Filter by type
         const matchesType = filterType === 'all' ||
             (filterType === 'dictionary' && item.type === 'dictionary') ||

@@ -26,14 +26,14 @@ export const useAdminStories = () => {
             },
             category: story.category || 'Mito',
             author: story.author || 'Desconocido',
-            status: 'Publicado', // API doesn't provide status yet, default to Publicado
+            status: story.status || 'pending',
             cover: story.coverImage || ''
         }));
     }, [apiStories]);
 
     // Extract unique categories from stories
     const uniqueCategories = useMemo(() => {
-        if (!transformedStories?.length) return ['Mito', 'Leyenda', 'Fábula']; // Defaults
+        if (!transformedStories?.length) return ['Mito', 'Leyenda']; // Defaults
         const categories = new Set(transformedStories.map(story => story.category).filter(Boolean));
         // Ensure standard categories exist if desired, or just use what is there.
         // Let's mix defaults with actuals to ensure tabs exist even if data is empty? 
@@ -62,6 +62,9 @@ export const useAdminStories = () => {
                 );
             }
 
+            // Filter by status (strict pending)
+            if ((story.status || '').toLowerCase() !== 'pending') return false;
+
             return true;
         });
     }, [transformedStories, activeTab, searchQuery]);
@@ -78,8 +81,7 @@ export const useAdminStories = () => {
         uniqueCategories, // Export this
         stats: {
             total: transformedStories.length,
-            published: transformedStories.filter(s => s.status === 'Publicado').length,
-            drafts: transformedStories.filter(s => s.status === 'Borrador').length
+            pending: transformedStories.filter(s => (s.status || '').toLowerCase() === 'pending').length,
         }
     };
 };

@@ -196,11 +196,12 @@ const StudentContributions = () => {
                       }}
                     >
                       <MenuItem value="">Seleccione una categoría</MenuItem>
-                      <MenuItem value="animales">Animales</MenuItem>
-                      <MenuItem value="plantas">Plantas</MenuItem>
-                      <MenuItem value="familia">Familia</MenuItem>
-                      <MenuItem value="verbos">Verbos</MenuItem>
-                      <MenuItem value="otros">Otros</MenuItem>
+                      <MenuItem value="Familia">Familia</MenuItem>
+                      <MenuItem value="Naturaleza">Naturaleza</MenuItem>
+                      <MenuItem value="Animales">Animales</MenuItem>
+                      <MenuItem value="Alimentos y Plantas">Alimentos y Plantas</MenuItem>
+                      <MenuItem value="Objetos">Objetos</MenuItem>
+                      <MenuItem value="Números y Colores">Números y Colores</MenuItem>
                     </Select>
                     {errors.categoria && (
                       <Typography variant="caption" color="error" sx={{ ml: 1.5, mt: 0.5 }}>
@@ -244,16 +245,16 @@ const StudentContributions = () => {
                     }}
                   >
                     {formData.cover ? (
-                        <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     ) : (
-                        <>
-                            <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
-                              <span className="material-symbols-outlined">add_photo_alternate</span>
-                            </Box>
-                            <Typography variant="body2" fontWeight="medium">
-                              Subir una imagen o foto (Opcional)
-                            </Typography>
-                        </>
+                      <>
+                        <Box sx={{ p: 1, borderRadius: '50%', bgcolor: 'background.default' }}>
+                          <span className="material-symbols-outlined">add_photo_alternate</span>
+                        </Box>
+                        <Typography variant="body2" fontWeight="medium">
+                          Subir una imagen o foto (Opcional)
+                        </Typography>
+                      </>
                     )}
                     <input
                       type="file"
@@ -281,173 +282,172 @@ const StudentContributions = () => {
             )}
 
             {activeTab === 'cuento' && (
-                 <Grid container spacing={3}>
-                    {/* Cover Image */}
-                    <Grid size={{ xs: 12 }}>
-                        <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1 }}>
-                            Portada del Cuento
-                        </Typography>
-                         <Button
-                            component="label"
-                            fullWidth
-                            sx={{
-                                height: 200,
-                                bgcolor: 'grey.100',
-                                borderStyle: 'dashed',
-                                borderWidth: 2,
-                                borderColor: 'divider',
-                                borderRadius: 3,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                overflow: 'hidden',
-                                '&:hover': { bgcolor: 'grey.200' }
-                            }}
-                        >
-                             {formData.cover ? (
-                                <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                                <>
-                                    <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#aaa' }}>image</span>
-                                    <Typography color="text.secondary">Subir portada</Typography>
-                                </>
-                            )}
-                            <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
-                        </Button>
-                    </Grid>
-                    <Grid size={{ xs: 12 }}>
-                        <TextField
-                            fullWidth
-                            label="Descripción de la portada (Opcional)"
-                            placeholder="Describe brevemente la portada del cuento..."
-                            value={formData.imageDescription}
-                            onChange={(e) =>handleInputChange('imageDescription', e.target.value)}
-                            sx={{
-                                '& .MuiOutlinedInput-root': {
-                                    borderRadius: 2,
-                                },
-                            }}
-                        />
-                    </Grid>
+              <Grid container spacing={3}>
+                {/* Cover Image */}
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1 }}>
+                    Portada del Cuento
+                  </Typography>
+                  <Button
+                    component="label"
+                    fullWidth
+                    sx={{
+                      height: 200,
+                      bgcolor: 'grey.100',
+                      borderStyle: 'dashed',
+                      borderWidth: 2,
+                      borderColor: 'divider',
+                      borderRadius: 3,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      '&:hover': { bgcolor: 'grey.200' }
+                    }}
+                  >
+                    {formData.cover ? (
+                      <Box component="img" src={formData.cover} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <>
+                        <span className="material-symbols-outlined" style={{ fontSize: 40, color: '#aaa' }}>image</span>
+                        <Typography color="text.secondary">Subir portada</Typography>
+                      </>
+                    )}
+                    <input type="file" hidden accept="image/*" onChange={handleImageUpload} />
+                  </Button>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Descripción de la portada (Opcional)"
+                    placeholder="Describe brevemente la portada del cuento..."
+                    value={formData.imageDescription}
+                    onChange={(e) => handleInputChange('imageDescription', e.target.value)}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+                </Grid>
 
-                    {/* Meta Fields */}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                         <TextField
-                            fullWidth
-                            label="Título en Shuar"
-                            placeholder="Ej: Nunkui"
-                            value={formData.titleShuar}
-                            onChange={(e) => handleInputChange('titleShuar', e.target.value)}
-                            error={!!errors.titleShuar}
-                            helperText={errors.titleShuar}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            label="Título en Español"
-                            placeholder="Ej: Nunkui y la abundancia"
-                            value={formData.titleEs}
-                            onChange={(e) => handleInputChange('titleEs', e.target.value)}
-                            error={!!errors.titleEs}
-                            helperText={errors.titleEs}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                        <TextField
-                            fullWidth
-                            label="Autor"
-                            placeholder="Nombre del autor"
-                            value={formData.author}
-                            onChange={(e) => handleInputChange('author', e.target.value)}
-                            error={!!errors.author}
-                            helperText={errors.author}
-                        />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                         <FormControl fullWidth>
-                            <InputLabel>Categoría</InputLabel>
-                            <Select
-                                value={formData.categoryStory}
-                                label="Categoría"
-                                onChange={(e) => handleInputChange('categoryStory', e.target.value)}
-                            >
-                                <MenuItem value="Mito">Mito</MenuItem>
-                                <MenuItem value="Leyenda">Leyenda</MenuItem>
-                                <MenuItem value="Naturaleza">Naturaleza</MenuItem>
-                                <MenuItem value="Tradición">Tradición</MenuItem>
-                                <MenuItem value="Fábula">Fábula</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </Grid>
+                {/* Meta Fields */}
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Título en Shuar"
+                    placeholder="Ej: Nunkui"
+                    value={formData.titleShuar}
+                    onChange={(e) => handleInputChange('titleShuar', e.target.value)}
+                    error={!!errors.titleShuar}
+                    helperText={errors.titleShuar}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Título en Español"
+                    placeholder="Ej: Nunkui y la abundancia"
+                    value={formData.titleEs}
+                    onChange={(e) => handleInputChange('titleEs', e.target.value)}
+                    error={!!errors.titleEs}
+                    helperText={errors.titleEs}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Autor"
+                    placeholder="Nombre del autor"
+                    value={formData.author}
+                    onChange={(e) => handleInputChange('author', e.target.value)}
+                    error={!!errors.author}
+                    helperText={errors.author}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <FormControl fullWidth>
+                    <InputLabel>Categoría</InputLabel>
+                    <Select
+                      value={formData.categoryStory}
+                      label="Categoría"
+                      onChange={(e) => handleInputChange('categoryStory', e.target.value)}
+                    >
+                      <MenuItem value="Mito">Mito</MenuItem>
+                      <MenuItem value="Leyenda">Leyenda</MenuItem>
+                      <MenuItem value="Naturaleza">Naturaleza</MenuItem>
+                      <MenuItem value="Tradición">Tradición</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
 
-                    {/* Content Editor */}
-                    <Grid size={{ xs: 12 }}>
-                        <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1, mt: 1 }}>
-                            Contenido del Historia
-                        </Typography>
-                        <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
-                            <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
-                                <Button 
-                                    onClick={() => setStoryLangTab(0)}
-                                    sx={{ 
-                                        fontWeight: 'bold', 
-                                        color: storyLangTab === 0 ? 'secondary.main' : 'text.secondary',
-                                        borderBottom: storyLangTab === 0 ? 2 : 0,
-                                        borderRadius: 0,
-                                        borderColor: 'secondary.main',
-                                        px: 3
-                                    }}
-                                >
-                                    Shuar
-                                </Button>
-                                <Button 
-                                    onClick={() => setStoryLangTab(1)}
-                                    sx={{ 
-                                        fontWeight: 'bold', 
-                                        color: storyLangTab === 1 ? 'secondary.main' : 'text.secondary',
-                                        borderBottom: storyLangTab === 1 ? 2 : 0,
-                                        borderRadius: 0,
-                                        borderColor: 'secondary.main',
-                                        px: 3
-                                    }}
-                                >
-                                    Español
-                                </Button>
-                            </Box>
-                            <Box sx={{ p: 2, minHeight: 300, bgcolor: 'white' }}>
-                                {storyLangTab === 0 ? (
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        minRows={12}
-                                        variant="standard"
-                                        placeholder="Escribe la historia en Shuar..."
-                                        InputProps={{ disableUnderline: true }}
-                                        value={formData.contentShuar}
-                                        onChange={(e) => handleInputChange('contentShuar', e.target.value)}
-                                        error={!!errors.contentShuar}
-                                        helperText={errors.contentShuar}
-                                    />
-                                ) : (
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        minRows={12}
-                                        variant="standard"
-                                        placeholder="Escribe la historia en Español..."
-                                        InputProps={{ disableUnderline: true }}
-                                        value={formData.contentEs}
-                                        onChange={(e) => handleInputChange('contentEs', e.target.value)}
-                                        error={!!errors.contentEs}
-                                        helperText={errors.contentEs}
-                                    />
-                                )}
-                            </Box>
-                        </Box>
-                    </Grid>
-                 </Grid>
+                {/* Content Editor */}
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1, mt: 1 }}>
+                    Contenido del Historia
+                  </Typography>
+                  <Box sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 2, overflow: 'hidden' }}>
+                    <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
+                      <Button
+                        onClick={() => setStoryLangTab(0)}
+                        sx={{
+                          fontWeight: 'bold',
+                          color: storyLangTab === 0 ? 'secondary.main' : 'text.secondary',
+                          borderBottom: storyLangTab === 0 ? 2 : 0,
+                          borderRadius: 0,
+                          borderColor: 'secondary.main',
+                          px: 3
+                        }}
+                      >
+                        Shuar
+                      </Button>
+                      <Button
+                        onClick={() => setStoryLangTab(1)}
+                        sx={{
+                          fontWeight: 'bold',
+                          color: storyLangTab === 1 ? 'secondary.main' : 'text.secondary',
+                          borderBottom: storyLangTab === 1 ? 2 : 0,
+                          borderRadius: 0,
+                          borderColor: 'secondary.main',
+                          px: 3
+                        }}
+                      >
+                        Español
+                      </Button>
+                    </Box>
+                    <Box sx={{ p: 2, minHeight: 300, bgcolor: 'white' }}>
+                      {storyLangTab === 0 ? (
+                        <TextField
+                          fullWidth
+                          multiline
+                          minRows={12}
+                          variant="standard"
+                          placeholder="Escribe la historia en Shuar..."
+                          InputProps={{ disableUnderline: true }}
+                          value={formData.contentShuar}
+                          onChange={(e) => handleInputChange('contentShuar', e.target.value)}
+                          error={!!errors.contentShuar}
+                          helperText={errors.contentShuar}
+                        />
+                      ) : (
+                        <TextField
+                          fullWidth
+                          multiline
+                          minRows={12}
+                          variant="standard"
+                          placeholder="Escribe la historia en Español..."
+                          InputProps={{ disableUnderline: true }}
+                          value={formData.contentEs}
+                          onChange={(e) => handleInputChange('contentEs', e.target.value)}
+                          error={!!errors.contentEs}
+                          helperText={errors.contentEs}
+                        />
+                      )}
+                    </Box>
+                  </Box>
+                </Grid>
+              </Grid>
             )}
 
             <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>

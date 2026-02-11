@@ -31,11 +31,7 @@ import SendIcon from '@mui/icons-material/Send';
 import TranslateIcon from '@mui/icons-material/Translate';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-
-/**
- * Página de Contribuciones del Estudiante
- * Permite a los estudiantes contribuir con palabras, cuentos y correcciones
- */
+import { STORY_CATEGORIES } from '../../../core/constants/storyCategories';
 import { useStudentContributions } from '../../../features/student/hooks/useStudentContributions.js';
 import { useRef } from 'react';
 
@@ -374,10 +370,9 @@ const StudentContributions = () => {
                       label="Categoría"
                       onChange={(e) => handleInputChange('categoryStory', e.target.value)}
                     >
-                      <MenuItem value="Mito">Mito</MenuItem>
-                      <MenuItem value="Leyenda">Leyenda</MenuItem>
-                      <MenuItem value="Naturaleza">Naturaleza</MenuItem>
-                      <MenuItem value="Tradición">Tradición</MenuItem>
+                      {STORY_CATEGORIES.map((cat) => (
+                        <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
                 </Grid>

@@ -25,6 +25,9 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useStoryDetail } from '../hooks/useStoryDetail';
+import { useLoginContext as useAuth } from '@features/auth/context/LoginContext';
+import { useFetchDataPromise } from '../../../shared/hooks/useFetchDataPromise';
+import { useSnackBarContext } from '../../../shared/context/SnackbarContext';
 
 /**
  * Componente lector de cuentos para estudiantes.
@@ -39,6 +42,10 @@ const StoryReader = () => {
   const [currentPage, setCurrentPage] = useState(0);
 
   const { story, loading, error } = useStoryDetail(storyId);
+  const { user } = useAuth();
+  const { getFechData } = useFetchDataPromise();
+  const { handleSetDataSnackbar } = useSnackBarContext();
+  const [isSubmittingProgress, setIsSubmittingProgress] = useState(false);
 
   if (loading) {
     return (
@@ -80,6 +87,42 @@ const StoryReader = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleMarkRead = async () => {
+    if (!user || !user.id || !storyId) {
+      handleSetDataSnackbar({ message: 'Error: Usuario no identificado', type: 'error' });
+      return;
+    }
+
+    setIsSubmittingProgress(true);
+    try {
+      const response = await getFechData({
+        endPoint: 'api/progress/update',
+        method: 'POST',
+        additionalData: {
+          userId: user.id,
+          lessonId: storyId,
+          status: 'completed',
+          score: 10,
+          percentage: 100
+        }
+      });
+
+      if (response.code === 'COD_OK') {
+        handleSetDataSnackbar({ message: '¡Felicidades! Has completado la historia.', type: 'success' });
+        setTimeout(() => {
+          navigate('/estudiante/cuentos');
+        }, 1500);
+      } else {
+        handleSetDataSnackbar({ message: response.message || 'Error al actualizar progreso', type: 'error' });
+      }
+    } catch (err) {
+      console.error('Error marking story as read:', err);
+      handleSetDataSnackbar({ message: 'Error de conexión', type: 'error' });
+    } finally {
+      setIsSubmittingProgress(false);
     }
   };
 
@@ -407,7 +450,9 @@ const StoryReader = () => {
               <Button
                 variant="contained"
                 size="large"
-                startIcon={<VerifiedIcon />}
+                disabled={isSubmittingProgress}
+                startIcon={isSubmittingProgress ? <CircularProgress size={20} color="inherit" /> : <VerifiedIcon />}
+                onClick={handleMarkRead}
                 sx={{
                   px: 6,
                   py: 2,
@@ -423,7 +468,7 @@ const StoryReader = () => {
                   },
                 }}
               >
-                Marcar como Leído
+                {isSubmittingProgress ? 'Procesando...' : 'Marcar como Leído'}
               </Button>
             </Box>
             <Typography variant="caption" display="block" sx={{ mt: 2, color: 'text.disabled', fontWeight: 500 }}>

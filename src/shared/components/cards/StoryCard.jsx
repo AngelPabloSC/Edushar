@@ -34,9 +34,9 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
             }}
         >
             {/* Cover Image & Badges */}
-            <Box sx={{ 
-                position: 'relative', 
-                width: '100%', 
+            <Box sx={{
+                position: 'relative',
+                width: '100%',
                 aspectRatio: '16/9',
                 maxHeight: '225px',
                 overflow: 'hidden',
@@ -70,20 +70,22 @@ const StoryCard = ({ story, onEdit, onDelete, onClick }) => {
                             backdropFilter: 'blur(4px)'
                         }}
                     />
-                    <Chip
-                        label={story?.status || 'Borrador'}
-                        size="small"
-                        sx={{
-                            height: 20,
-                            fontSize: '0.65rem',
-                            fontWeight: 800,
-                            textTransform: 'uppercase',
-                            bgcolor: story?.status === 'Publicado' ? alpha(theme.palette.info.main, 0.9) : alpha(theme.palette.grey[500], 0.9),
-                            color: 'white',
-                            border: 'none',
-                            backdropFilter: 'blur(4px)'
-                        }}
-                    />
+                    {story?.isRead && (
+                        <Chip
+                            label="Leído"
+                            size="small"
+                            color="success"
+                            sx={{
+                                height: 20,
+                                fontSize: '0.65rem',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                color: 'white',
+                                border: 'none',
+                                backdropFilter: 'blur(4px)'
+                            }}
+                        />
+                    )}
                 </Box>
             </Box>
 

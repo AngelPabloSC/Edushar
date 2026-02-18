@@ -15,13 +15,13 @@ import PropTypes from 'prop-types';
  * Sigue principios de Don Norman: visibilidad, feedback, y mapping
  * Optimizado para performance - usa símbolos Unicode en lugar de iconos MUI
  */
-const ProgressCard = ({ 
-  moduleName, 
-  percentage, 
-  completedLessons, 
+const ProgressCard = ({
+  moduleName,
+  percentage,
+  completedLessons,
   totalLessons,
   streak = 0,
-  showDetails = true 
+  showDetails = true
 }) => {
   return (
     <Card
@@ -43,10 +43,10 @@ const ProgressCard = ({
       <CardContent sx={{ p: 4 }}>
         {/* Título y nivel */}
         <Box sx={{ mb: 3, pr: 10 }}>
-          <Typography 
-            variant="overline" 
-            sx={{ 
-              color: 'secondary.main', 
+          <Typography
+            variant="overline"
+            sx={{
+              color: 'secondary.main',
               fontWeight: 700,
               letterSpacing: 1.5,
               fontSize: '0.875rem',
@@ -54,10 +54,10 @@ const ProgressCard = ({
           >
             PROGRESO ACTUAL
           </Typography>
-          <Typography 
-            variant="h4" 
+          <Typography
+            variant="h4"
             component="h2"
-            sx={{ 
+            sx={{
               fontWeight: 800,
               mt: 0.5,
               mb: 1,
@@ -73,18 +73,18 @@ const ProgressCard = ({
             <Typography variant="body1" fontWeight="600" color="text.secondary">
               Completado del Módulo
             </Typography>
-            <Typography variant="h6" fontWeight="bold" color="secondary.main">
+            <Typography variant="body1" component="p" sx={{ fontWeight: "bold", color: "secondary.main" }}>
               {percentage}%
             </Typography>
           </Box>
-          
-          <Tooltip 
+
+          <Tooltip
             title={`${completedLessons} de ${totalLessons} lecciones completadas`}
             arrow
             placement="top"
           >
-            <LinearProgress 
-              variant="determinate" 
+            <LinearProgress
+              variant="determinate"
               value={percentage}
               sx={{
                 height: 16,
@@ -114,59 +114,59 @@ const ProgressCard = ({
             }}
           >
             {/* Lecciones completadas */}
-            <Box 
-                sx={{ 
-                    p: 2, 
-                    borderRadius: 3, 
-                    bgcolor: 'grey.50', 
-                    textAlign: 'center',
-                    border: '1px solid',
-                    borderColor: 'divider'
-                }}
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: 'grey.50',
+                textAlign: 'center',
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
             >
               <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
                 LECCIONES
               </Typography>
-              <Typography variant="h6" fontWeight="900" color="text.primary">
+              <Typography variant="body1" component="p" sx={{ fontWeight: "900", color: "text.primary" }}>
                 {completedLessons} / {totalLessons}
               </Typography>
             </Box>
 
             {/* Lecciones restantes */}
-            <Box 
-                sx={{ 
-                    p: 2, 
-                    borderRadius: 3, 
-                    bgcolor: 'grey.50', 
-                    textAlign: 'center',
-                    border: '1px solid',
-                    borderColor: 'divider'
-                }}
+            <Box
+              sx={{
+                p: 2,
+                borderRadius: 3,
+                bgcolor: 'grey.50',
+                textAlign: 'center',
+                border: '1px solid',
+                borderColor: 'divider'
+              }}
             >
               <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
                 POR COMPLETAR
               </Typography>
-              <Typography variant="h6" fontWeight="900" color="secondary.main">
+              <Typography variant="body1" component="p" sx={{ fontWeight: "900", color: "secondary.main" }}>
                 {totalLessons - completedLessons}
               </Typography>
             </Box>
 
-             {/* Racha de días */}
-             {streak > 0 && (
-              <Box 
-                sx={{ 
-                    p: 2, 
-                    borderRadius: 3, 
-                    bgcolor: 'rgba(209, 154, 74, 0.1)', 
-                    textAlign: 'center',
-                    border: '1px solid',
-                    borderColor: 'rgba(209, 154, 74, 0.3)'
+            {/* Racha de días */}
+            {streak > 0 && (
+              <Box
+                sx={{
+                  p: 2,
+                  borderRadius: 3,
+                  bgcolor: 'rgba(209, 154, 74, 0.1)',
+                  textAlign: 'center',
+                  border: '1px solid',
+                  borderColor: 'rgba(209, 154, 74, 0.3)'
                 }}
               >
                 <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ display: 'block', mb: 0.5 }}>
                   RACHA
                 </Typography>
-                <Typography variant="h6" fontWeight="900" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+                <Typography variant="body1" component="p" sx={{ fontWeight: "900", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                   🔥 {streak}
                 </Typography>
               </Box>

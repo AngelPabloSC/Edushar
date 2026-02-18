@@ -114,14 +114,16 @@ const StudentHome = () => {
               }}
             >
               EduShuar<br />
-              <Box component="span" sx={{ color: 'secondary.main' }}>Inicio</Box>
+              <Box component="span" sx={{ color: '#935106' }}>Inicio</Box>
             </Typography>
 
             <Typography
-              variant="h5"
+              variant="h2"
               sx={{
-                color: 'text.secondary',
+                color: 'text.primary',
+                opacity: 0.85, // Better contrast than standard secondary
                 fontWeight: 400,
+                fontSize: { xs: '1.25rem', md: '1.5rem' }, // Same as landing h5
                 mb: 4,
                 maxWidth: 400,
                 lineHeight: 1.6
@@ -132,7 +134,14 @@ const StudentHome = () => {
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, bgcolor: 'background.paper', py: 1, px: 2, borderRadius: 10, boxShadow: 1 }}>
               <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: 'success.main', boxShadow: '0 0 0 2px rgba(76, 175, 80, 0.2)' }} />
-              <Typography variant="subtitle2" fontWeight="700" color="text.primary">
+              <Typography
+                variant="subtitle2"
+                component="p" // Avoid h6 semantically
+                sx={{
+                  fontWeight: "700",
+                  color: "text.primary"
+                }}
+              >
                 {completedCount} de {totalLessons} lecciones completadas
               </Typography>
             </Box>

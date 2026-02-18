@@ -56,10 +56,10 @@ const Header2 = () => {
   };
 
   return (
-    <AppBar 
-      position="fixed" 
+    <AppBar
+      position="fixed"
       elevation={0}
-      sx={{ 
+      sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
         bgcolor: 'background.paper',
         borderBottom: '1px solid',
@@ -74,7 +74,7 @@ const Header2 = () => {
             color="inherit"
             aria-label="menu"
             onClick={toggleSidebar}
-            sx={{ 
+            sx={{
               color: 'text.primary',
               '&:hover': {
                 bgcolor: 'rgba(0, 0, 0, 0.04)',
@@ -84,10 +84,10 @@ const Header2 = () => {
             <MenuIcon />
           </IconButton>
 
-          <Typography 
-            variant="h6" 
-            component="div" 
-            sx={{ 
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
               fontWeight: 900,
               color: 'text.primary',
               letterSpacing: '-0.01em',
@@ -99,9 +99,9 @@ const Header2 = () => {
 
         {/* Right Section: User Info + Avatar */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography 
-            variant="body2" 
-            sx={{ 
+          <Typography
+            variant="body2"
+            sx={{
               display: { xs: 'none', sm: 'block' },
               color: 'text.primary',
               fontWeight: 600,
@@ -109,10 +109,10 @@ const Header2 = () => {
           >
             {getDisplayName()}
           </Typography>
-          
+
           <IconButton
             onClick={handleMenuOpen}
-            sx={{ 
+            sx={{
               p: 0,
               '&:hover': {
                 transform: 'scale(1.05)',
@@ -120,9 +120,9 @@ const Header2 = () => {
               transition: 'transform 0.2s',
             }}
           >
-            <Avatar 
-              sx={{ 
-                bgcolor: 'secondary.main',
+            <Avatar
+              sx={{
+                bgcolor: '#935106', // Darker orange for accessibility
                 color: 'white',
                 fontWeight: 'bold',
                 width: 40,

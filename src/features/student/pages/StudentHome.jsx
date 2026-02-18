@@ -31,7 +31,7 @@ const StudentHome = () => {
       subtitle: globalStats?.levelLabel || 'Nivel 1 • Fundamentos',
       title: 'Lecciones Shuar',
       description: 'Descubre vocabulario, frases y gramática esencial a través de lecciones interactivas.',
-      image: '/src/assets/persona_shuar.webp',
+      image: '/assets/persona_shuar.webp',
       color: 'primary',
       onClick: () => navigate('/estudiante/lecciones'),
       buttonText: 'Empezar'
@@ -41,7 +41,7 @@ const StudentHome = () => {
       subtitle: 'Cultura • Narrativa',
       title: 'Cuentos y Mitos',
       description: 'Sumérgete en la cosmovisión Shuar a través de historias tradicionales animadas.',
-      image: '/src/assets/comunidad_shuar_en_el_rio.webp',
+      image: '/assets/comunidad_shuar_en_el_rio.webp',
       color: 'secondary',
       onClick: () => navigate('/estudiante/cuentos'),
       buttonText: 'Leer ahora'
@@ -51,7 +51,7 @@ const StudentHome = () => {
       subtitle: 'Herramienta • Traducción',
       title: 'Traductor Shuar',
       description: 'Traduce frases y textos del español al Shuar con justificación lingüística.',
-      image: '/src/assets/persona_shuar_con_gorro.webp',
+      image: '/assets/persona_shuar_con_gorro.webp',
       color: 'primary',
       onClick: () => navigate('/estudiante/traductor'),
       buttonText: 'Traducir'
@@ -61,7 +61,7 @@ const StudentHome = () => {
       subtitle: 'Vocabulario • Consulta',
       title: 'Diccionario',
       description: 'Explora más de 5,000 términos con ejemplos de uso y pronunciación.',
-      image: '/src/assets/persona_shuar_con_loro.webp',
+      image: '/assets/persona_shuar_con_loro.webp',
       color: 'secondary',
       onClick: () => navigate('/estudiante/diccionario'),
       buttonText: 'Buscar'
@@ -71,7 +71,7 @@ const StudentHome = () => {
       subtitle: 'Comunidad • Colaboración',
       title: 'Contribuciones',
       description: 'Ayuda a expandir el conocimiento compartiendo nuevas palabras o historias.',
-      image: '/src/assets/comunidad_shuar_en_el_rio.webp',
+      image: '/assets/comunidad_shuar_en_el_rio.webp',
       color: 'primary',
       onClick: () => navigate('/estudiante/contribuciones'),
       buttonText: 'Colaborar'

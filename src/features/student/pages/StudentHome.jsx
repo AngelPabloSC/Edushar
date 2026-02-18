@@ -147,7 +147,6 @@ const StudentHome = () => {
                   {...item}
                   delay={index * 0.1}
                   progress={item.id === "lecciones" ? globalStats : null}
-                  onClick={() => navigate(item.path)}
                   priority={index === 0}
                 />
               ))}

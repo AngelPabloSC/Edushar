@@ -145,7 +145,10 @@ const StudentHome = () => {
                 <DashboardCard
                   key={item.id}
                   {...item}
-                  delay={index * 0.15}
+                  delay={index * 0.1}
+                  progress={item.id === "lecciones" ? globalStats : null}
+                  onClick={() => navigate(item.path)}
+                  priority={index === 0}
                 />
               ))}
             </Box>
@@ -156,8 +159,8 @@ const StudentHome = () => {
 
       {/* Background Ambient Blurs */}
       <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
-        <Box sx={{ position: 'absolute', top: '10%', left: '5%', width: 500, height: 500, bgcolor: 'primary.light', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.1 }} />
-        <Box sx={{ position: 'absolute', bottom: '10%', right: '5%', width: 600, height: 600, bgcolor: 'secondary.light', borderRadius: '50%', filter: 'blur(140px)', opacity: 0.1 }} />
+        <Box sx={{ position: 'absolute', top: '10%', left: '5%', width: 500, height: 500, bgcolor: 'primary.light', borderRadius: '50%', filter: 'blur(60px)', opacity: 0.1 }} />
+        <Box sx={{ position: 'absolute', bottom: '10%', right: '5%', width: 600, height: 600, bgcolor: 'secondary.light', borderRadius: '50%', filter: 'blur(80px)', opacity: 0.1 }} />
       </Box>
     </Box>
   );

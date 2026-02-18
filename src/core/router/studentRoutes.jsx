@@ -9,7 +9,7 @@ import StudentLayout from '@shared/layouts/StudentLayout';
 // Lazy load page components
 // Lazy load page components
 const LessonDetail = lazy(() => import('@features/student/pages/LessonDetail'));
-const StudentHome = lazy(() => import('@features/student/pages/StudentHome'));
+import StudentHome from '@features/student/pages/StudentHome';
 const StudentDashboard = lazy(() => import('@features/student/pages/StudentDashboard'));
 const StudentContributions = lazy(() => import('@features/student/pages/StudentContributions'));
 const StudentStories = lazy(() => import('@features/student/pages/StudentStories'));
@@ -32,9 +32,7 @@ const studentRoutes = [
       {
         path: 'inicio', // /estudiante/inicio
         element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <StudentHome />
-          </Suspense>
+          <StudentHome />
         ),
       },
       {

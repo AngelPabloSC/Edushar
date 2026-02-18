@@ -11,7 +11,8 @@ const DashboardCard = ({
   image, 
   color = "primary", // "primary" or "secondary"
   delay = 0,
-  progress = null // { completed, total, percentage }
+  progress = null, // { completed, total, percentage }
+  priority = false // If true, optimizes for LCP (high fetch priority, no fade-in delay)
 }) => {
   const theme = useTheme();
   
@@ -56,7 +57,7 @@ const DashboardCard = ({
             transform: 'translateX(4px)',
           }
         },
-        animation: `fadeInUp 0.6s ease-out ${delay}s backwards`
+        animation: priority ? 'none' : `fadeInUp 0.6s ease-out ${delay}s backwards`
       }}
       onClick={onClick}
     >
@@ -172,17 +173,20 @@ const DashboardCard = ({
             bgcolor: 'background.paper',
             opacity: 0.6,
             borderRadius: '50%', 
-            filter: 'blur(40px)', 
-            transition: 'transform 0.5s ease'
+            filter: priority ? 'blur(20px)' : 'blur(40px)', 
+            transition: 'transform 0.5s ease',
+            willChange: 'transform'
           }} 
         />
         
         {/* Image */}
         <Box 
           component="img"
-          className="7e"
+          className="card-image"
           alt={title} 
           src={image} 
+          loading={priority ? "eager" : "lazy"}
+          {...(priority ? { fetchpriority: "high" } : {})}
           sx={{
             width: '100%', 
             height: '100%', 

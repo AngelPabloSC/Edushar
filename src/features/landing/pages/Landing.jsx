@@ -9,25 +9,6 @@ const Landing = () => {
   const navigate = useNavigate();
   const { user, isLoggedIn, loading } = useLoginContext();
 
-  useEffect(() => {
-    if (!loading && isLoggedIn && user) {
-      const roleMapping = {
-        'admin': '/admin/dashboard',
-        'student': '/estudiante/inicio',
-        'ADMIN': '/admin/dashboard',
-        'ESTUDIANTE': '/estudiante/inicio'
-      };
-
-      const userRole = user?.role || user?.rol;
-      const dashboardPath = roleMapping[userRole];
-
-      console.log('🔒 Landing - User is authenticated, redirecting to:', dashboardPath);
-
-      if (dashboardPath) {
-        navigate(dashboardPath, { replace: true });
-      }
-    }
-  }, [loading, isLoggedIn, user, navigate]);
 
   // Don't render landing page content while checking auth or if user is authenticated
   if (loading || isLoggedIn) {
@@ -134,8 +115,8 @@ const Landing = () => {
               component="img"
               alt="3D high-gloss sticker of a tropical toucan"
               src="/assets/sticker1.webp"
-              fetchPriority="high"
-              loading="eager"
+              loading="lazy"
+              decoding="async"
               sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>
@@ -174,6 +155,7 @@ const Landing = () => {
               src="/assets/sticker3.webp"
               fetchPriority="high"
               loading="eager"
+              decoding="async"
               sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '9999px' }}
             />
           </Box>
@@ -246,8 +228,10 @@ const Landing = () => {
           >
             <Box
               component="img"
-              alt="3D high-gloss sticker of a small Chicha vessel"
+              alt="3D high-gloss sticker of a person with a parrot"
               src="/assets/persona_shuar_con_loro.webp"
+              loading="lazy"
+              decoding="async"
               sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>

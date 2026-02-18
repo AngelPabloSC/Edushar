@@ -133,7 +133,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a tropical toucan" 
-                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_12.46.42_yrdqnv.jpg"
+                src="src\assets\sticker1.webp"
                 fetchPriority="high"
                 loading="eager"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
@@ -171,7 +171,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a traditional Tawasa feather crown" 
-                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_11.58.24_ppkgxn.jpg"
+                src="src\assets\sticker3.webp"
                 fetchPriority="high"
                 loading="eager"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '9999px' }}
@@ -210,7 +210,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a woven Maki basket" 
-                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_11.55.19_eluclf.jpg"
+                src="src\assets\sticker2.webp"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '1.7rem' }}
             />
           </Box>
@@ -247,7 +247,7 @@ const Landing = () => {
             <Box 
                 component="img"
                 alt="3D high-gloss sticker of a small Chicha vessel" 
-                src="https://res.cloudinary.com/dbxjfufqv/image/upload/v1770508962/WhatsApp_Image_2026-02-04_at_12.17.27_jrxpr3.jpg"
+                src="src\assets\persona_shuar_con_loro.webp"
                 sx={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '2.2rem' }}
             />
           </Box>

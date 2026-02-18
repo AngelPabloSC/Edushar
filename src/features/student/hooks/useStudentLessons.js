@@ -48,9 +48,9 @@ export const useStudentLessons = () => {
                     const progressItems = progressResponse.code === 'COD_OK' ? (progressResponse.data?.items || []) : [];
 
                     // Map progress by lessonId for faster lookup
-                    const progressMap = {};
+                    const progressMap = new Map();
                     progressItems.forEach(item => {
-                        progressMap[item.lessonId] = item;
+                        progressMap.set(item.lessonId, item);
                     });
 
                     // Identify the first lesson of EACH level to unlock by default
@@ -66,7 +66,7 @@ export const useStudentLessons = () => {
 
                     // Merge Data
                     const mergedLessons = lessons.map((lesson, index) => {
-                        const userProgress = progressMap[lesson.id];
+                        const userProgress = progressMap.get(lesson.id);
                         const level = lesson.level || 'Otros';
 
                         let status = 'locked';
@@ -97,7 +97,7 @@ export const useStudentLessons = () => {
                             // 2. Unlock if PREVIOUS lesson is completed
                             else {
                                 const prevLesson = lessons[index - 1];
-                                const prevProgress = progressMap[prevLesson.id];
+                                const prevProgress = progressMap.get(prevLesson.id);
 
                                 if (prevProgress && prevProgress.status === 'completed') {
                                     status = 'available';
@@ -131,107 +131,91 @@ export const useStudentLessons = () => {
 
                     setRawLessons(mergedLessons);
 
-                    // valid stats
-                    const completed = mergedLessons.filter(l => l.completed).length;
-                    const total = mergedLessons.length;
-                    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+                    setRawLessons(mergedLessons);
 
-                    // Determine "Current Level" Text
-                    // Logic: Find the first lesson that is 'available' or 'in-progress'. The level of that lesson is the current user level.
-                    // If all are completed, show the highest level.
-                    // If none, default to 'Básico'.
-                    const activeLesson = mergedLessons.find(l => l.status === 'in-progress' || l.status === 'available');
-                    const lastCompleted = [...mergedLessons].reverse().find(l => l.status === 'completed');
+                    // Defer non-critical stats and activity calculation to free up the main thread for LCP
+                    setTimeout(() => {
+                        const completed = mergedLessons.filter(l => l.completed).length;
+                        const total = mergedLessons.length;
+                        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-                    let levelLabel = 'Nivel 1 • Fundamentos'; // default
+                        const activeLesson = mergedLessons.find(l => l.status === 'in-progress' || l.status === 'available');
+                        const lastCompleted = [...mergedLessons].reverse().find(l => l.status === 'completed');
 
-                    const targetLesson = activeLesson || lastCompleted;
+                        let levelLabel = 'Nivel 1 • Fundamentos';
+                        const targetLesson = activeLesson || lastCompleted;
 
-                    if (targetLesson) {
-                        const rawLevel = targetLesson.level || 'Básico';
-                        // Parse level to friendly string
-                        if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
-                        else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
-                        else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
-                        else levelLabel = `${rawLevel}`;
-                    } else if (mergedLessons.length > 0) {
-                        // Edge case: nothing started? Default to first lesson's level
-                        const first = mergedLessons[0];
-                        const rawLevel = first.level || 'Básico';
-                        if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
-                        else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
-                        else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
-                    }
+                        if (targetLesson) {
+                            const rawLevel = targetLesson.level || 'Básico';
+                            if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
+                            else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
+                            else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
+                            else levelLabel = `${rawLevel}`;
+                        } else if (mergedLessons.length > 0) {
+                            const first = mergedLessons[0];
+                            const rawLevel = first.level || 'Básico';
+                            if (rawLevel === 'Básico') levelLabel = 'Nivel 1 • Fundamentos';
+                            else if (rawLevel === 'Intermedio') levelLabel = 'Nivel 2 • Intermedio';
+                            else if (rawLevel === 'Avanzado') levelLabel = 'Nivel 3 • Avanzado';
+                        }
 
-                    // Calculate Streak
-                    // Logic: Count consecutive days where at least one lesson was updated/completed.
-                    // 1. Extract unique dates (YYYY-MM-DD) from progressItems
-                    const dates = [...new Set(progressItems
-                        .filter(p => p.updatedAt)
-                        .map(p => new Date(p.updatedAt).toISOString().split('T')[0])
-                    )].sort((a, b) => new Date(b) - new Date(a)); // Descending
+                        // Calculate Streak
+                        const dates = [...new Set(progressItems
+                            .filter(p => p.updatedAt)
+                            .map(p => p.updatedAt.substring(0, 10))
+                        )].sort((a, b) => b.localeCompare(a));
 
-                    let streak = 0;
-                    if (dates.length > 0) {
-                        const today = new Date().toISOString().split('T')[0];
-                        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                        let streak = 0;
+                        if (dates.length > 0) {
+                            const today = new Date().toISOString().split('T')[0];
+                            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+                            let currentDate = dates[0] === today ? today : (dates[0] === yesterday ? yesterday : null);
 
-                        // Check if streak is active (today or yesterday present)
-                        let currentDate = dates[0] === today ? today : (dates[0] === yesterday ? yesterday : null);
-
-                        if (currentDate) {
-                            streak = 1;
-                            let checkDate = new Date(currentDate);
-
-                            // Check previous days
-                            for (let i = 1; i < dates.length; i++) {
-                                checkDate.setDate(checkDate.getDate() - 1); // Go back 1 day
-                                const expectedDate = checkDate.toISOString().split('T')[0];
-
-                                if (dates[i] === expectedDate) {
-                                    streak++;
-                                } else {
-                                    break;
+                            if (currentDate) {
+                                streak = 1;
+                                let checkDate = new Date(currentDate);
+                                for (let i = 1; i < dates.length; i++) {
+                                    checkDate.setDate(checkDate.getDate() - 1);
+                                    const expectedDate = checkDate.toISOString().split('T')[0];
+                                    if (dates[i] === expectedDate) streak++;
+                                    else break;
                                 }
                             }
                         }
-                    }
 
-                    setGlobalStats({ completed, total, percentage, levelLabel, streak });
+                        setGlobalStats({ completed, total, percentage, levelLabel, streak });
 
-                    // Process Recent Activity (History)
-                    const activityList = progressItems
-                        .filter(p => p.updatedAt) // Ensure we have a date
-                        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-                        .slice(0, 5) // Last 5 items
-                        .map(item => {
-                            const lesson = lessons.find(l => l.id === item.lessonId);
-                            if (!lesson) return null;
+                        // Process Recent Activity (History)
+                        const activityList = progressItems
+                            .filter(p => p.updatedAt)
+                            .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)) // Use localeCompare for string dates
+                            .slice(0, 5)
+                            .map(item => {
+                                const lesson = lessons.find(l => l.id === item.lessonId);
+                                if (!lesson) return null;
+                                const date = new Date(item.updatedAt);
+                                const now = new Date();
+                                const diffInSeconds = Math.floor((now - date) / 1000);
+                                let timeLabel = '';
+                                if (diffInSeconds < 60) timeLabel = 'Hace unos segundos';
+                                else if (diffInSeconds < 3600) timeLabel = `Hace ${Math.floor(diffInSeconds / 60)} min`;
+                                else if (diffInSeconds < 86400) timeLabel = `Hace ${Math.floor(diffInSeconds / 3600)} h`;
+                                else timeLabel = `Hace ${Math.floor(diffInSeconds / 86400)} días`;
+                                return {
+                                    id: item.id || item._id || `${item.lessonId}-${Date.now()}`,
+                                    type: 'lesson',
+                                    title: `Lección: ${lesson.title}`,
+                                    time: timeLabel,
+                                    score: item.score,
+                                    exp: item.score,
+                                    percentage: item.percentage
+                                };
+                            })
+                            .filter(Boolean);
 
-                            // Format relative time (e.g., "Hace 2 horas")
-                            const date = new Date(item.updatedAt);
-                            const now = new Date();
-                            const diffInSeconds = Math.floor((now - date) / 1000);
-                            let timeLabel = '';
+                        setRecentActivity(activityList);
+                    }, 0);
 
-                            if (diffInSeconds < 60) timeLabel = 'Hace unos segundos';
-                            else if (diffInSeconds < 3600) timeLabel = `Hace ${Math.floor(diffInSeconds / 60)} min`;
-                            else if (diffInSeconds < 86400) timeLabel = `Hace ${Math.floor(diffInSeconds / 3600)} h`;
-                            else timeLabel = `Hace ${Math.floor(diffInSeconds / 86400)} días`;
-
-                            return {
-                                id: item.id || item._id || `${item.lessonId}-${Date.now()}`,
-                                type: 'lesson',
-                                title: `Lección: ${lesson.title}`,
-                                time: timeLabel,
-                                score: item.score,
-                                exp: item.score, // Assuming Score = XP for now
-                                percentage: item.percentage
-                            };
-                        })
-                        .filter(Boolean);
-
-                    setRecentActivity(activityList);
 
                 } else {
                     setError('Error al cargar las lecciones');

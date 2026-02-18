@@ -269,7 +269,7 @@ const StudentTranslator = () => {
                     }}
                   >
 
-                    <Box sx={{ position: 'absolute', top: -64, right: -64, width: 128, height: 128, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: '50%', filter: 'blur(40px)' }} />
+                    <Box sx={{ position: 'absolute', top: -64, right: -64, width: 128, height: 128, bgcolor: alpha(theme.palette.primary.main, 0.05), borderRadius: '50%', filter: 'blur(20px)', willChange: 'filter' }} />
 
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative', zIndex: 1 }}>
                       <Box>
@@ -282,7 +282,7 @@ const StudentTranslator = () => {
 
                         {/* Phonetics Display - Only show if provided by API */}
                         {translationResult.phonetic ? (
-                          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, bgcolor: alpha('#ffffff', 0.6), backdropFilter: 'blur(4px)', px: 1.5, py: 0.75, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.2) }}>
+                          <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, bgcolor: alpha('#ffffff', 0.6), backdropFilter: 'blur(4px)', px: 1.5, py: 0.75, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.2), willChange: 'backdrop-filter' }}>
                             <Campaign fontSize="small" color="primary" />
                             <Typography variant="body1" fontWeight={500} color="primary.dark" sx={{ fontFamily: 'monospace' }}>
                               [{translationResult.phonetic}]

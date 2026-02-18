@@ -10,13 +10,13 @@ import StudentLayout from '@shared/layouts/StudentLayout';
 // Lazy load page components
 const LessonDetail = lazy(() => import('@features/student/pages/LessonDetail'));
 import StudentHome from '@features/student/pages/StudentHome';
-const StudentDashboard = lazy(() => import('@features/student/pages/StudentDashboard'));
+import StudentDashboard from '@features/student/pages/StudentDashboard';
 const StudentContributions = lazy(() => import('@features/student/pages/StudentContributions'));
 const StudentStories = lazy(() => import('@features/student/pages/StudentStories'));
 const StoryReader = lazy(() => import('@features/student/pages/StoryReader'));
 const StudentDictionary = lazy(() => import('@features/student/pages/StudentDictionary'));
 const StudentProfile = lazy(() => import('@features/student/pages/StudentProfile'));
-const StudentTranslator = lazy(() => import('@features/student/pages/StudentTranslator'));
+import StudentTranslator from '@features/student/pages/StudentTranslator';
 
 // Rutas para estudiantes autenticados - Protegidas con ProtectRoute
 const studentRoutes = [
@@ -38,9 +38,7 @@ const studentRoutes = [
       {
         path: 'lecciones',
         element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <StudentDashboard />
-          </Suspense>
+          <StudentDashboard />
         ),
       },
       {
@@ -54,9 +52,7 @@ const studentRoutes = [
       {
         path: 'traductor',
         element: (
-          <Suspense fallback={<LoadingFallback />}>
-            <StudentTranslator />
-          </Suspense>
+          <StudentTranslator />
         ),
       },
       {

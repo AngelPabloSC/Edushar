@@ -150,17 +150,21 @@ const StudentDashboard = () => {
                     <Box sx={{
                         position: 'absolute', inset: 0,
                         bgcolor: alpha(theme.palette.primary.main, 0.2),
-                        filter: 'blur(40px)', borderRadius: '50%', transform: 'scale(1.2)'
+                        filter: 'blur(20px)', borderRadius: '50%', transform: 'scale(1.2)',
+                        willChange: 'filter'
                     }} />
                     <Box
                         component="img"
                         className="main-img"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAClquaYuHeJ2AgLFuWkxjioewQw0sDZlfNwKEuPCxsHoSgH_JpeIiQmiC63pncP9O4DBMjzuks41-HaGYXlfdmsXyKg5amlFFImvm5jRZfU805KYx3KmzJtmGR_rl7IPVXi0AYt0NABpARa2r6PU6CRrRyFII4aDNk052aM74Clet_eVGL9HRSY0cTFqNW9lbD0srj1VnXWcYftn8mwlIpJBX9vGD51mnfT0PBU3oA64-Y_TLzLloMYsrwja4OyPkPoFepfsRGTvn-"
+                        src="/assets/logo_lab.png"
                         alt="EduShuar Lab Icon"
                         sx={{
                             position: 'relative', zIndex: 1, width: '100%', height: '100%', objectFit: 'contain',
                             borderRadius: 8, transition: 'transform 0.5s ease', dropShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)'
                         }}
+                        loading="eager"
+                        fetchpriority="high"
+                        decoding="async"
                     />
                     <Box sx={{
                         position: 'absolute', top: -10, right: -10, zIndex: 2,

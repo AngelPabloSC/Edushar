@@ -262,6 +262,7 @@ const Landing = () => {
 
           <Typography
             variant="h5"
+            component="h2"
             sx={{
               fontFamily: 'Google Sans, sans-serif',
               color: 'primary.main',

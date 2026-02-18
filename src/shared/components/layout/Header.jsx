@@ -14,10 +14,10 @@ const Header = () => {
   const location = useLocation();
 
   return (
-    <AppBar 
-      position="sticky" 
+    <AppBar
+      position="sticky"
       elevation={0}
-      sx={{ 
+      sx={{
         bgcolor: 'rgba(255, 255, 255, 0.9)',
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid',
@@ -30,9 +30,9 @@ const Header = () => {
           <Button
             onClick={() => navigate('/')}
             aria-label="Ir a la página principal de EduShuar"
-            sx={{ 
-              display: 'flex', 
-              alignItems: 'center', 
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
               gap: 1.5,
               textTransform: 'none',
               color: 'inherit',
@@ -41,10 +41,10 @@ const Header = () => {
               },
             }}
           >
-            <Nature sx={{ fontSize: 32, color: 'secondary.main' }} />
-            <Typography 
-              variant="h6" 
-              component="span" 
+            <Nature sx={{ fontSize: 32, color: '#935106' }} />
+            <Typography
+              variant="h6"
+              component="span"
               fontWeight="bold"
               sx={{ color: 'text.primary' }}
             >
@@ -55,16 +55,16 @@ const Header = () => {
           {/* Navigation */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
             {navMenu.map((item) => (
-              <Button 
+              <Button
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 aria-label={`Ir a ${item.label}`}
                 sx={{
-                  color: location.pathname === item.path ? 'secondary.main' : 'text.primary',
+                  color: location.pathname === item.path ? '#935106' : 'text.primary',
                   fontWeight: location.pathname === item.path ? 600 : 500,
                   position: 'relative',
-                  '&:hover': { 
-                    color: 'secondary.main',
+                  '&:hover': {
+                    color: '#935106',
                     bgcolor: 'transparent',
                   },
                   '&::after': location.pathname === item.path ? {
@@ -75,7 +75,7 @@ const Header = () => {
                     transform: 'translateX(-50%)',
                     width: '60%',
                     height: 2,
-                    bgcolor: 'secondary.main',
+                    bgcolor: '#935106',
                     borderRadius: 1,
                   } : {},
                 }}
@@ -86,14 +86,18 @@ const Header = () => {
           </Box>
 
           {/* Login Button */}
-          <Button 
-            variant="contained" 
-            color="secondary"
+          <Button
+            variant="contained"
             onClick={() => navigate('/login')}
             aria-label="Iniciar sesión en EduShuar"
             sx={{
-              fontWeight: 600,
+              bgcolor: '#935106',
+              color: 'white',
+              fontWeight: 700,
               px: 3,
+              '&:hover': {
+                bgcolor: '#7a4205'
+              }
             }}
           >
             Iniciar Sesión

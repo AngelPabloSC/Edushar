@@ -29,51 +29,51 @@ const StudentHome = () => {
     {
       id: 'lecciones',
       subtitle: globalStats?.levelLabel || 'Nivel 1 • Fundamentos',
-      title: 'Lecciones Shuar',
-      description: 'Descubre vocabulario, frases y gramática esencial a través de lecciones interactivas.',
-      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_tb14eetb14eetb14_jeleah.png',
-      color: 'primary',
-      onClick: () => navigate('/estudiante/lecciones'),
+      title: "Lecciones Shuar",
+      description: "Aprende el idioma a través de lecciones interactivas.",
+      image: "https://res.cloudinary.com/dbxjfufqv/image/upload/f_auto,q_auto,w_600/v1770758465/Gemini_Generated_Image_tb14eetb14eetb14_jeleah.png",
+      path: "/estudiante/lecciones",
+      color: "primary",
       buttonText: 'Empezar'
     },
     {
       id: 'stories',
       subtitle: 'Cultura • Narrativa',
-      title: 'Cuentos y Mitos',
-      description: 'Sumérgete en la cosmovisión Shuar a través de historias tradicionales animadas.',
-      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758464/unnamed_mp5fkp.jpg',
-      color: 'secondary',
-      onClick: () => navigate('/estudiante/cuentos'),
+      title: "Cuentos y Mitos",
+      description: "Sumérgete en la rica cultura y tradiciones Shuar.",
+      image: "https://res.cloudinary.com/dbxjfufqv/image/upload/f_auto,q_auto,w_600/v1770758464/unnamed_mp5fkp.jpg",
+      path: "/estudiante/cuentos",
+      color: "secondary",
       buttonText: 'Leer ahora'
     },
     {
       id: 'translator',
       subtitle: 'Herramienta • Traducción',
-      title: 'Traductor Shuar',
-      description: 'Traduce frases y textos del español al Shuar con justificación lingüística.',
-      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_fr77f6fr77f6fr77_qhdusr.png',
-      color: 'primary',
-      onClick: () => navigate('/estudiante/traductor'),
+      title: "Traductor Shuar",
+      description: "Traducción instantánea de palabras y frases.",
+      image: "https://res.cloudinary.com/dbxjfufqv/image/upload/f_auto,q_auto,w_600/v1770758465/Gemini_Generated_Image_fr77f6fr77f6fr77_qhdusr.png",
+      path: "/estudiante/traductor",
+      color: "primary",
       buttonText: 'Traducir'
     },
     {
       id: 'dictionary',
       subtitle: 'Vocabulario • Consulta',
-      title: 'Diccionario',
-      description: 'Explora más de 5,000 términos con ejemplos de uso y pronunciación.',
-      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_o7ok5oo7ok5oo7ok_cugl1j.png',
-      color: 'secondary',
-      onClick: () => navigate('/estudiante/diccionario'),
+      title: "Diccionario",
+      description: "Explora el vocabulario completo con audios.",
+      image: "https://res.cloudinary.com/dbxjfufqv/image/upload/f_auto,q_auto,w_600/v1770758465/Gemini_Generated_Image_o7ok5oo7ok5oo7ok_cugl1j.png",
+      path: "/estudiante/diccionario",
+      color: "secondary",
       buttonText: 'Buscar'
     },
     {
       id: 'contributions',
       subtitle: 'Comunidad • Colaboración',
-      title: 'Contribuciones',
-      description: 'Ayuda a expandir el conocimiento compartiendo nuevas palabras o historias.',
-      image: 'https://res.cloudinary.com/dbxjfufqv/image/upload/v1770758465/Gemini_Generated_Image_2tb9xw2tb9xw2tb9_ozbsbl.png',
-      color: 'primary',
-      onClick: () => navigate('/estudiante/contribuciones'),
+      title: "Contribuciones",
+      description: "Mira y gestiona tus contribuciones a la comunidad.",
+      image: "https://res.cloudinary.com/dbxjfufqv/image/upload/f_auto,q_auto,w_600/v1770758465/Gemini_Generated_Image_2tb9xw2tb9xw2tb9_ozbsbl.png",
+      path: "/estudiante/aportes",
+      color: "primary",
       buttonText: 'Colaborar'
     }
   ];
@@ -145,7 +145,10 @@ const StudentHome = () => {
                 <DashboardCard
                   key={item.id}
                   {...item}
-                  delay={index * 0.15}
+                  delay={index * 0.1}
+                  progress={item.id === "lecciones" ? globalStats : null}
+                  onClick={() => navigate(item.path)}
+                  priority={index === 0}
                 />
               ))}
             </Box>
@@ -156,8 +159,8 @@ const StudentHome = () => {
 
       {/* Background Ambient Blurs */}
       <Box sx={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: -1, pointerEvents: 'none', overflow: 'hidden' }}>
-        <Box sx={{ position: 'absolute', top: '10%', left: '5%', width: 500, height: 500, bgcolor: 'primary.light', borderRadius: '50%', filter: 'blur(120px)', opacity: 0.1 }} />
-        <Box sx={{ position: 'absolute', bottom: '10%', right: '5%', width: 600, height: 600, bgcolor: 'secondary.light', borderRadius: '50%', filter: 'blur(140px)', opacity: 0.1 }} />
+        <Box sx={{ position: 'absolute', top: '10%', left: '5%', width: 500, height: 500, bgcolor: 'primary.light', borderRadius: '50%', filter: 'blur(60px)', opacity: 0.1 }} />
+        <Box sx={{ position: 'absolute', bottom: '10%', right: '5%', width: 600, height: 600, bgcolor: 'secondary.light', borderRadius: '50%', filter: 'blur(80px)', opacity: 0.1 }} />
       </Box>
     </Box>
   );

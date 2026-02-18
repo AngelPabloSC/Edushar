@@ -162,7 +162,7 @@ const Landing = () => {
                 height: '130%', 
                 bgcolor: 'white', 
                 p: 0.5, 
-                borderRadius: '9999px', // Full
+                borderRadius: '9999px', 
                 boxShadow: '0 25px 40px -10px rgba(26, 60, 52, 0.2), 0 10px 10px -5px rgba(26, 60, 52, 0.1)',
                 transition: 'transform 0.5s',
                 '&:hover': { transform: 'scale(1.1)' }
